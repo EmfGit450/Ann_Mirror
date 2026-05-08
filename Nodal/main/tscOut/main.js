@@ -1,10 +1,11 @@
 const guide = document.getElementById("guide");
-const svg = document.querySelector("#mainSvg");
+const svg = document.getElementById("mainSvg");
 const view = document.getElementById("view");
 const network = document.getElementById("network");
 const nodeNetwork = document.getElementById("nodes");
 const pathNetwork = document.getElementById("paths");
 const stylePopup = document.getElementById("stylePopup"); // used in style settings
+//Interfaces End
 //Sounds Start
 const ctx = new AudioContext();
 //Sounds are human-thought, but the embed code is AI generated
@@ -88,7 +89,7 @@ const colorPickerDiv = `<svg id="colorFeed" viewBox="0 0 60 40">
                               </svg>
                               <input id="hexColIn"/>
                               <button id="applyCusCol">Apply</button>
-                              <button id="backBtn">&#8592;</button>`;
+                              <button id="backBtn"><</button>`;
 const animFlowToggleDiv = `<button id="animToggle">
                                   <svg viewBox="-100 -100 200 200">
                                     <defs>
@@ -98,7 +99,7 @@ const animFlowToggleDiv = `<button id="animToggle">
                                     </defs>
                                     <g>
                                       <polyline id="animateToggleLogo" points="-8 -6, 0 0, -8 6" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="scale(4.8)"/>
-                                      <animateMotion dur="1s" repeatCount="indefinite" rotate="auto">
+                                      <animateMotion dur="0.9s" repeatCount="indefinite" rotate="auto">
                                         <mpath href="#animated"></mpath>
                                       </animateMotion>
                                     </g>
@@ -179,23 +180,25 @@ function drawPath(Start, End, isPathLoading = false, playSoundBool) {
     pHitbox.setAttribute("stroke-width", "10");
     pHitbox.setAttribute("fill", "none");
     const arrowDot = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    chevron.setAttribute("points", "-8 -6, 0 0, -8 6");
-    chevron.setAttribute("fill", "none");
-    chevron.setAttribute("stroke", "white");
-    chevron.setAttribute("stroke-width", "1.5");
-    chevron.setAttribute("stroke-linecap", "round");
-    chevron.setAttribute("stroke-linejoin", "round");
-    chevron.setAttribute("transform", "scale(2.2)");
-    const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
-    animMotion.setAttribute("dur", "1s");
-    animMotion.setAttribute("repeatCount", "indefinite");
-    animMotion.setAttribute("rotate", "auto");
-    const mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
-    mpath.setAttribute("href", `#pathV${pathCount}`);
-    animMotion.appendChild(mpath);
-    arrowDot.appendChild(chevron);
-    arrowDot.appendChild(animMotion);
+    if (animatedFlow) {
+        const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        chevron.setAttribute("points", "-8 -6, 0 0, -8 6");
+        chevron.setAttribute("fill", "none");
+        chevron.setAttribute("stroke", "white");
+        chevron.setAttribute("stroke-width", "1.5");
+        chevron.setAttribute("stroke-linecap", "round");
+        chevron.setAttribute("stroke-linejoin", "round");
+        chevron.setAttribute("transform", "scale(2.2)");
+        const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+        animMotion.setAttribute("dur", "1s");
+        animMotion.setAttribute("repeatCount", "indefinite");
+        animMotion.setAttribute("rotate", "auto");
+        const mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
+        mpath.setAttribute("href", `#pathV${pathCount}`);
+        animMotion.appendChild(mpath);
+        arrowDot.appendChild(chevron);
+        arrowDot.appendChild(animMotion);
+    }
     PG.setAttribute("id", "path" + pathCount);
     PG.classList.add("path");
     PG.setAttribute("data-on-layer", String(userOnLayer));
@@ -203,6 +206,8 @@ function drawPath(Start, End, isPathLoading = false, playSoundBool) {
     PG.appendChild(path);
     PG.appendChild(pHitbox);
     pathNetwork.appendChild(PG);
+    //const startNodePopup = infoPopupSection.querySelector(`#infopopup-${NodeStart.id}`)
+    //const endNodePopup = infoPopupSection.querySelector(`#infopopup-${NodeEnd.id}`)
     if (playSoundBool)
         playSound2(); //path sound
     //to not crash while loading
@@ -743,7 +748,6 @@ const StartHandler = (e) => {
         prevMidY = mouseE.clientY;
     }
 };
-//Telling tsc to shut up, since we already check if e.touches exists on line 821
 let rafPending = false;
 const DragPanHandler = (e) => {
     const touchE = e instanceof TouchEvent ? e : null;
@@ -751,8 +755,8 @@ const DragPanHandler = (e) => {
     const wheelE = e instanceof WheelEvent ? e : null;
     if (mouseE && !isPanning)
         return;
-    const MidX = touchE && touchE.touches.length > 1 ? (touchE.touches[0].clientX + touchE.touches[1].clientX) / 2 : (mouseE ?? wheelE).clientX;
-    const MidY = touchE && touchE.touches.length > 1 ? (touchE.touches[0].clientY + touchE.touches[1].clientY) / 2 : (mouseE ?? wheelE).clientY;
+    const MidX = touchE && touchE.touches.length > 1 ? (touchE.touches[0].clientX + touchE.touches[1].clientX) / 2 : (mouseE ?? wheelE)?.clientX;
+    const MidY = touchE && touchE.touches.length > 1 ? (touchE.touches[0].clientY + touchE.touches[1].clientY) / 2 : (mouseE ?? wheelE)?.clientY;
     if (!isFinite(MidX) || !isFinite(MidY))
         return;
     const ctm = svg.getScreenCTM();
@@ -861,6 +865,7 @@ for (const funcLoopA of optsArr1) {
 //Pathing Settings End
 //Style Settings Start
 let stylePopShow = false;
+let flowSettingsOpen = false;
 let ApplyStyleTo = undefined;
 const styleAppliers = {
     SP21: ".node",
@@ -875,55 +880,63 @@ function loadMainColorMenu() {
     const C5 = document.getElementById("colPick"); //color picker
     const colorOptions = [C1, C2, C3, C4, C5];
     function SettingStyle(option) {
-        if (!styleAppliers[option.id]) {
-            option.addEventListener("click", colPresEvents(option));
-            return;
-        }
-        const isSame = ApplyStyleTo === styleAppliers[option.id];
+        if (!styleAppliers[option.id])
+            return; // SP23 (Flow) handled separately
+        const targetSelector = styleAppliers[option.id]; // ".node" or ".path"
+        const isSame = ApplyStyleTo === targetSelector;
         if (isSame) {
             stylePopShow = false;
             ApplyStyleTo = undefined;
+            stylePopup.style.display = "none";
+            return;
         }
-        else {
-            ApplyStyleTo = styleAppliers[option.id];
-            if (ApplyStyleTo == ".path") {
-                C1.setAttribute("fill", "#FFFFFF");
-                C2.setAttribute("fill", "#FFDFEE");
-                C3.setAttribute("fill", "#4F4550");
-                C4.setAttribute("fill", "#323931");
-                colorOptions.forEach((ColP) => {
-                    ColP.classList.remove("colorSelected");
-                });
-            }
-            else {
-                C1.setAttribute("fill", "#73CFFF");
-                C2.setAttribute("fill", "#9163F2");
-                C3.setAttribute("fill", "#E30B45");
-                C4.setAttribute("fill", "#FFCB00");
-                colorOptions.forEach((ColN) => {
-                    ColN.classList.remove("colorSelected");
-                });
-            }
-            stylePopShow = true;
-        }
-        stylePopup.style.display = stylePopShow ? "block" : "none";
+        ApplyStyleTo = targetSelector;
+        stylePopShow = true;
+        stylePopup.style.display = "block";
+        const nodeColors = ["#73CFFF", "#9163F2", "#E30B45", "#FFCB00"];
+        const pathColors = ["#FFFFFF", "#FFDFEE", "#4F4550", "#323931"];
+        const colors = targetSelector === ".path" ? pathColors : nodeColors;
+        [C1, C2, C3, C4].forEach((circle, i) => {
+            circle.setAttribute("fill", colors[i]);
+            circle.classList.remove("colorSelected");
+        });
     }
     for (const funcLoopB of optsArr2) {
-        funcLoopB.onclick = () => {
-            funcLoopB.classList.toggle("selected");
-            if (funcLoopB != SP23) {
-                loadMainColorMenu();
+        if (funcLoopB == SP23) {
+            funcLoopB.onclick = () => {
+                flowSettingsOpen = !flowSettingsOpen;
+                funcLoopB.classList.toggle("selected");
+                optsArr2.forEach((opt) => {
+                    if (opt.id === funcLoopB.id)
+                        return;
+                    opt.classList.remove("selected");
+                });
+                if (flowSettingsOpen) {
+                    loadAnimFlowToggleDiv();
+                }
+                else {
+                    stylePopup.innerHTML = "";
+                    stylePopup.style.display = "none";
+                }
+            };
+        }
+        else {
+            funcLoopB.onclick = () => {
+                funcLoopB.classList.toggle("selected");
+                if (flowSettingsOpen) {
+                    flowSettingsOpen = false;
+                    stylePopup.innerHTML = "";
+                    stylePopup.style.display = "none";
+                    loadMainColorMenu();
+                }
                 SettingStyle(funcLoopB);
-            }
-            optsArr2.forEach((opt) => {
-                if (opt.id === funcLoopB.id)
-                    return;
-                opt.classList.remove("selected");
-            });
-            if (funcLoopB == SP23) {
-                loadAnimFlowToggleDiv();
-            }
-        };
+                optsArr2.forEach((opt) => {
+                    if (opt.id === funcLoopB.id)
+                        return;
+                    opt.classList.remove("selected");
+                });
+            };
+        }
     }
     const colPresEvents = (arg) => (e) => {
         e.stopPropagation();
@@ -942,19 +955,6 @@ function loadMainColorMenu() {
     };
     for (let col of colorOptions) {
         col.addEventListener("click", colPresEvents(col));
-    }
-    //BackBtn proof
-    if (ApplyStyleTo === ".path") {
-        C1.setAttribute("fill", "#FFFFFF");
-        C2.setAttribute("fill", "#FFDFEE");
-        C3.setAttribute("fill", "#4F4550");
-        C4.setAttribute("fill", "#323931");
-    }
-    else if (ApplyStyleTo === ".node") {
-        C1.setAttribute("fill", "#73CFFF");
-        C2.setAttribute("fill", "#9163F2");
-        C3.setAttribute("fill", "#E30B45");
-        C4.setAttribute("fill", "#FFCB00");
     }
 }
 loadMainColorMenu();
@@ -977,6 +977,7 @@ function loadColorPickerMenu() {
 }
 function ApplyCol(colorIn) {
     let Color;
+    const Index = animatedFlow ? 1 : 0;
     if (colorIn instanceof SVGCircleElement) {
         Color = colorIn.getAttribute("fill");
     }
@@ -993,7 +994,7 @@ function ApplyCol(colorIn) {
         return;
     network.querySelectorAll(ApplyStyleTo).forEach((el) => {
         if (ApplyStyleTo == ".path")
-            el.children[1]?.setAttribute("stroke", PathCol);
+            el.children[Index]?.setAttribute("stroke", PathCol);
         else if (ApplyStyleTo == ".node")
             el.setAttribute("fill", NodeCol);
     });
@@ -1009,10 +1010,9 @@ function loadAnimFlowToggleDiv() {
     const movingArrow = document.getElementById("animateToggleLogo");
     flowStyleToggle.style.background = "linear-gradient(90deg, #6293dca6, #a8c7f8a6)";
     flowStyleToggle.style.marginBottom = "30px";
-    let animated = true;
     flowStyleToggle.onclick = () => {
-        animated = !animated;
-        if (!animated) {
+        animatedFlow = !animatedFlow;
+        if (!animatedFlow) {
             flowStyleIndicLine.style.markerEnd = "url(#arrowhead)";
             movingArrow.setAttribute("stroke-width", "0");
         }
@@ -1020,6 +1020,36 @@ function loadAnimFlowToggleDiv() {
             flowStyleIndicLine.style.markerEnd = "";
             movingArrow.setAttribute("stroke-width", "1.5");
         }
+        pathNetwork.querySelectorAll(".path").forEach(p => {
+            const arrowGroup = p.children[0];
+            const pathEl = p.children[1];
+            const pathId = pathEl.getAttribute("id");
+            if (!animatedFlow) {
+                arrowGroup.innerHTML = "";
+                pathEl.setAttribute("marker-end", "url(#staticFlow)");
+            }
+            else {
+                arrowGroup.innerHTML = "";
+                const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+                chevron.setAttribute("points", "-8 -6, 0 0, -8 6");
+                chevron.setAttribute("fill", "none");
+                chevron.setAttribute("stroke", "white");
+                chevron.setAttribute("stroke-width", "1.5");
+                chevron.setAttribute("stroke-linecap", "round");
+                chevron.setAttribute("stroke-linejoin", "round");
+                chevron.setAttribute("transform", "scale(2.2)");
+                const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+                animMotion.setAttribute("dur", "1s");
+                animMotion.setAttribute("repeatCount", "indefinite");
+                animMotion.setAttribute("rotate", "auto");
+                const mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
+                mpath.setAttribute("href", `#${pathId}`);
+                animMotion.appendChild(mpath);
+                arrowGroup.appendChild(chevron);
+                arrowGroup.appendChild(animMotion);
+                pathEl.removeAttribute("marker-end");
+            }
+        });
     };
 }
 //Animated Or Static Flow Settings End

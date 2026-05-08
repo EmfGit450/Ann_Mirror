@@ -1,6 +1,6 @@
       const guide = document.getElementById("guide")!;
       
-      const svg = document.querySelector("#mainSvg") as SVGSVGElement;
+      const svg = document.getElementById("mainSvg") as unknown as SVGSVGElement;
       const view = document.getElementById("view") as unknown as SVGSVGElement;
       const network = document.getElementById("network") as unknown as SVGSVGElement;
       const nodeNetwork = document.getElementById("nodes") as unknown as SVGGElement;
@@ -23,6 +23,7 @@
         layer: string;
         draw: string;
       }
+      //Interfaces End
       //Sounds Start
       const ctx = new AudioContext();
       
@@ -118,7 +119,7 @@
                               </svg>
                               <input id="hexColIn"/>
                               <button id="applyCusCol">Apply</button>
-                              <button id="backBtn">&#8592;</button>`;
+                              <button id="backBtn"><</button>`;
                               
       const animFlowToggleDiv = `<button id="animToggle">
                                   <svg viewBox="-100 -100 200 200">
@@ -129,7 +130,7 @@
                                     </defs>
                                     <g>
                                       <polyline id="animateToggleLogo" points="-8 -6, 0 0, -8 6" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="scale(4.8)"/>
-                                      <animateMotion dur="1s" repeatCount="indefinite" rotate="auto">
+                                      <animateMotion dur="0.9s" repeatCount="indefinite" rotate="auto">
                                         <mpath href="#animated"></mpath>
                                       </animateMotion>
                                     </g>
@@ -221,27 +222,29 @@
         pHitbox.setAttribute("fill", "none");
         
         const arrowDot = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        
+        if (animatedFlow) {
+          const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+          chevron.setAttribute("points", "-8 -6, 0 0, -8 6");
+          chevron.setAttribute("fill", "none");
+          chevron.setAttribute("stroke", "white");
+          chevron.setAttribute("stroke-width", "1.5");
+          chevron.setAttribute("stroke-linecap", "round");
+          chevron.setAttribute("stroke-linejoin", "round");
+          chevron.setAttribute("transform", "scale(2.2)")
 
-        const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-        chevron.setAttribute("points", "-8 -6, 0 0, -8 6");
-        chevron.setAttribute("fill", "none");
-        chevron.setAttribute("stroke", "white");
-        chevron.setAttribute("stroke-width", "1.5");
-        chevron.setAttribute("stroke-linecap", "round");
-        chevron.setAttribute("stroke-linejoin", "round");
-        chevron.setAttribute("transform", "scale(2.2)")
+          const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+          animMotion.setAttribute("dur", "1s");
+          animMotion.setAttribute("repeatCount", "indefinite");
+          animMotion.setAttribute("rotate", "auto");
 
-        const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
-        animMotion.setAttribute("dur", "1s");
-        animMotion.setAttribute("repeatCount", "indefinite");
-        animMotion.setAttribute("rotate", "auto");
-
-        const mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
-        mpath.setAttribute("href", `#pathV${pathCount}`);
-
-        animMotion.appendChild(mpath);
-        arrowDot.appendChild(chevron);
-        arrowDot.appendChild(animMotion);
+          const mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
+          mpath.setAttribute("href", `#pathV${pathCount}`);
+          
+          animMotion.appendChild(mpath);
+          arrowDot.appendChild(chevron);
+          arrowDot.appendChild(animMotion);
+        }
         
         PG.setAttribute("id", "path" + pathCount);
         PG.classList.add("path");
@@ -250,6 +253,9 @@
         PG.appendChild(path);
         PG.appendChild(pHitbox);
         pathNetwork.appendChild(PG);
+        
+        //const startNodePopup = infoPopupSection.querySelector(`#infopopup-${NodeStart.id}`)
+        //const endNodePopup = infoPopupSection.querySelector(`#infopopup-${NodeEnd.id}`)
         
         if (playSoundBool) playSound2(); //path sound
         //to not crash while loading
@@ -264,6 +270,7 @@
             layer: userOnLayer,
             draw: ""
           }
+        
           state.paths.push(data)
         }
         pathCount++;
@@ -850,7 +857,6 @@
           prevMidY = mouseE.clientY;
         }
       };
-      //Telling tsc to shut up, since we already check if e.touches exists on line 821
 
       let rafPending = false;
 
@@ -861,8 +867,8 @@
         
         if (mouseE && !isPanning) return;
         
-        const MidX = touchE && touchE.touches.length > 1 ? (touchE.touches[0]!.clientX + touchE.touches[1]!.clientX) / 2 : (mouseE ?? wheelE)!.clientX;
-        const MidY = touchE && touchE.touches.length > 1 ? (touchE.touches[0]!.clientY + touchE.touches[1]!.clientY) / 2 : (mouseE ?? wheelE)!.clientY;
+        const MidX = touchE && touchE.touches.length > 1 ? (touchE.touches[0]!.clientX + touchE.touches[1]!.clientX) / 2 : (mouseE ?? wheelE)?.clientX;
+        const MidY = touchE && touchE.touches.length > 1 ? (touchE.touches[0]!.clientY + touchE.touches[1]!.clientY) / 2 : (mouseE ?? wheelE)?.clientY;
 
         if (!isFinite(MidX) || !isFinite(MidY)) return;
         
@@ -941,6 +947,7 @@
 
       const SP21 = document.getElementById("SP21")!; //Nodes Color
       const SP22 = document.getElementById("SP22")!; //Paths Color
+      
       const SP23 = document.getElementById("SP23")!; //Animated or Static Flow
       
       const optsArr1 = [SP11, SP12, SP13];
@@ -990,6 +997,7 @@
       //Pathing Settings End
       //Style Settings Start
       let stylePopShow = false;
+      let flowSettingsOpen = false;
       let ApplyStyleTo: string | undefined = undefined;
 
       const styleAppliers: {[key: string]: string} = { // global scope for proper color menu switching
@@ -1009,55 +1017,67 @@
         const colorOptions = [C1, C2, C3, C4, C5];
 
         function SettingStyle(option: HTMLElement) {
-          if (!styleAppliers[option.id]) {
-            option.addEventListener("click", colPresEvents(option as unknown as SVGCircleElement));
-            return;
-          }
+          if (!styleAppliers[option.id]) return; // SP23 (Flow) handled separately
 
-          const isSame = ApplyStyleTo === styleAppliers[option.id];
+          const targetSelector = styleAppliers[option.id]; // ".node" or ".path"
+          const isSame = ApplyStyleTo === targetSelector;
 
           if (isSame) {
             stylePopShow = false;
             ApplyStyleTo = undefined;
-          } else {
-            ApplyStyleTo = styleAppliers[option.id];
-            if (ApplyStyleTo == ".path") {
-              C1.setAttribute("fill", "#FFFFFF");
-              C2.setAttribute("fill", "#FFDFEE");
-              C3.setAttribute("fill", "#4F4550");
-              C4.setAttribute("fill", "#323931");
-              colorOptions.forEach((ColP) => {
-                ColP.classList.remove("colorSelected");
-              });
-            } else {
-              C1.setAttribute("fill", "#73CFFF");
-              C2.setAttribute("fill", "#9163F2");
-              C3.setAttribute("fill", "#E30B45");
-              C4.setAttribute("fill", "#FFCB00");
-              colorOptions.forEach((ColN) => {
-                ColN.classList.remove("colorSelected");
-              });
-            }
-            stylePopShow = true;
+            stylePopup.style.display = "none";
+            return;
           }
-          stylePopup.style.display = stylePopShow ? "block" : "none";
+
+          ApplyStyleTo = targetSelector;
+          stylePopShow = true;
+          stylePopup.style.display = "block";
+
+          const nodeColors = ["#73CFFF", "#9163F2", "#E30B45", "#FFCB00"];
+          const pathColors = ["#FFFFFF", "#FFDFEE", "#4F4550", "#323931"];
+          const colors = targetSelector === ".path" ? pathColors : nodeColors;
+
+          [C1, C2, C3, C4].forEach((circle, i) => {
+            circle.setAttribute("fill", colors[i]);
+            circle.classList.remove("colorSelected");
+          });
         }
 
         for (const funcLoopB of optsArr2) {
-          funcLoopB!.onclick = () => {
-            funcLoopB!.classList.toggle("selected");
-            if (funcLoopB != SP23) {
-              loadMainColorMenu();
+          if (funcLoopB == SP23) {
+            funcLoopB.onclick = () => {
+              flowSettingsOpen = !flowSettingsOpen
+              
+              funcLoopB!.classList.toggle("selected");
+              optsArr2.forEach((opt) => {
+                if (opt.id === funcLoopB!.id) return;
+                opt.classList.remove("selected");
+              });
+              if (flowSettingsOpen) {
+                loadAnimFlowToggleDiv()
+              }
+              else {
+                stylePopup.innerHTML = ""
+                stylePopup.style.display = "none";
+              }
+            }
+          }
+          else {
+            funcLoopB!.onclick = () => {
+              funcLoopB!.classList.toggle("selected");
+              if (flowSettingsOpen) {
+                flowSettingsOpen = false;
+                stylePopup.innerHTML = "";
+                stylePopup.style.display = "none";
+                loadMainColorMenu();
+              }
               SettingStyle(funcLoopB);
-            }
-            optsArr2.forEach((opt) => {
-              if (opt.id === funcLoopB!.id) return;
-              opt.classList.remove("selected");
-            });
-            if (funcLoopB == SP23) {
-              loadAnimFlowToggleDiv()
-            }
-          };
+              optsArr2.forEach((opt) => {
+                if (opt.id === funcLoopB!.id) return;
+                opt.classList.remove("selected");
+              });
+            };
+          }
         }
 
         const colPresEvents = (arg: SVGCircleElement) => (e: TouchEvent | MouseEvent) => {
@@ -1077,18 +1097,6 @@
 
         for (let col of colorOptions) {
           col.addEventListener("click", colPresEvents(col));
-        }
-        //BackBtn proof
-        if (ApplyStyleTo === ".path") {
-          C1.setAttribute("fill", "#FFFFFF");
-          C2.setAttribute("fill", "#FFDFEE");
-          C3.setAttribute("fill", "#4F4550");
-          C4.setAttribute("fill", "#323931");
-        } else if (ApplyStyleTo === ".node") {
-          C1.setAttribute("fill", "#73CFFF");
-          C2.setAttribute("fill", "#9163F2");
-          C3.setAttribute("fill", "#E30B45");
-          C4.setAttribute("fill", "#FFCB00");
         }
       }
       loadMainColorMenu();
@@ -1116,6 +1124,7 @@
 
       function ApplyCol(colorIn: SVGCircleElement | string) {
         let Color: string | null;
+        const Index = animatedFlow ? 1 : 0
         if (colorIn instanceof SVGCircleElement) {
           Color = colorIn.getAttribute("fill");
         } else {
@@ -1128,7 +1137,7 @@
         if (!ApplyStyleTo) return;
         network.querySelectorAll(ApplyStyleTo).forEach((el) => {
           if (ApplyStyleTo == ".path")
-            el.children[1]?.setAttribute("stroke", PathCol);
+            el.children[Index]?.setAttribute("stroke", PathCol);
           else if (ApplyStyleTo == ".node") el.setAttribute("fill", NodeCol);
         });
         JSONSave();
@@ -1140,23 +1149,59 @@
         stylePopup.innerHTML = animFlowToggleDiv;
         stylePopup.style.display = "block";
         
-        const flowStyleToggle = document.getElementById("animToggle");
-        const flowStyleIndicLine = flowStyleToggle.querySelector(".animated");
-        const movingArrow = document.getElementById("animateToggleLogo");
+        const flowStyleToggle = document.getElementById("animToggle")!;
+        const flowStyleIndicLine = flowStyleToggle.querySelector(".animated")!;
+        const movingArrow = document.getElementById("animateToggleLogo")!;
         flowStyleToggle.style.background = "linear-gradient(90deg, #6293dca6, #a8c7f8a6)";
         flowStyleToggle.style.marginBottom = "30px"
         
-        let animated = true;
         flowStyleToggle.onclick = () => {
-          animated = !animated;
-          if (!animated) {
+          animatedFlow = !animatedFlow;
+  
+          if (!animatedFlow) {
             flowStyleIndicLine.style.markerEnd = "url(#arrowhead)";
             movingArrow.setAttribute("stroke-width", "0")
-          }
-          else {
+          } else {
             flowStyleIndicLine.style.markerEnd = "";
             movingArrow.setAttribute("stroke-width", "1.5")
           }
+  
+          pathNetwork.querySelectorAll(".path").forEach(p => {
+            const arrowGroup = p.children[0] as SVGGElement;
+            const pathEl = p.children[1] as SVGPathElement;
+            const pathId = pathEl.getAttribute("id");
+    
+            if (!animatedFlow) {
+              arrowGroup.innerHTML = "";
+      
+              pathEl.setAttribute("marker-end", "url(#staticFlow)");
+            } else {
+              arrowGroup.innerHTML = "";
+      
+              const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+              chevron.setAttribute("points", "-8 -6, 0 0, -8 6");
+              chevron.setAttribute("fill", "none");
+              chevron.setAttribute("stroke", "white");
+              chevron.setAttribute("stroke-width", "1.5");
+              chevron.setAttribute("stroke-linecap", "round");
+              chevron.setAttribute("stroke-linejoin", "round");
+              chevron.setAttribute("transform", "scale(2.2)");
+      
+              const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+              animMotion.setAttribute("dur", "1s");
+              animMotion.setAttribute("repeatCount", "indefinite");
+              animMotion.setAttribute("rotate", "auto");
+      
+              const mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
+              mpath.setAttribute("href", `#${pathId}`);
+      
+              animMotion.appendChild(mpath);
+              arrowGroup.appendChild(chevron);
+              arrowGroup.appendChild(animMotion);
+        
+              pathEl.removeAttribute("marker-end");
+            }
+          });
         }
       }
       //Animated Or Static Flow Settings End

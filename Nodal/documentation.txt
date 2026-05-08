@@ -302,3 +302,18 @@ NodalV6 -
   - path creation sound
   - node and path deletion sound
 Will add more later
+
+May 7th 18:00 - 18:01 {
+    i have been unable to document and update nodal because i couldnt access the tab
+}
+May 8th 19:18 - 19:18:47 {
+    i believe i procrastinated a lot today, should waste less time tomorrow
+}
+May 8th 19:28 - 19:29 {
+   i am finished for today, i cannot make architectural chnages with 30 minutes
+   im not a chad programmer, but i do i know what to do next
+}
+
+TASKS(for 9th May)
+- Add live updates to node popups(New path, deletion, etc) []
+- Make transitions between Flow -> Paths and Nodes better []
