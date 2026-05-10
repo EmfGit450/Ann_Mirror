@@ -108,18 +108,21 @@
                                   </linearGradient>
                               </defs>
 
-                              <circle id="col1" r="30" cx="80" cy="70" fill="#73CFFF" />
-                              <circle id="col2" r="30" cx="160" cy="70" fill="#9163F2" />
-                              <circle id="col3" r="30" cx="240" cy="70" fill="#E30B45" />
-                              <circle id="col4" r="30" cx="320" cy="70" fill="#FFCB00" />
+                              <circle id="col1" r="30" cx="80" cy="70" fill="#6692C1" />
+                              <circle id="col2" r="30" cx="160" cy="70" fill="#A33855" />
+                              <circle id="col3" r="30" cx="240" cy="70" fill="#7B6EAB" />
+                              <circle id="col4" r="30" cx="320" cy="70" fill="#6EAB94" />
                               <circle id="colPick" r="30" cx="400" cy="70" fill="url(#rainbow)" />
                             </svg>`;
-      const colorPickerDiv = `<svg id="colorFeed" viewBox="0 0 60 40">
-                                <rect id="colorShow" x="0" y="0" width="60" height="40" rx="15" ry="15"/>
-                              </svg>
-                              <input id="hexColIn"/>
-                              <button id="applyCusCol">Apply</button>
-                              <button id="backBtn"><</button>`;
+      const colorPickerDiv = `<div id="pickr-container"></div>
+                              <button id="backBtn">
+                                <svg viewBox="-10 -10 20 20">
+                                  <g>
+                                    <path d="M -5 -2 L 5 -2" fill="none" stroke="black" stroke-width="1"/>
+                                    <polyline points="-2 -5 -5 -2 -2 1" fill="none" stroke="black" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                                  </g>
+                                </svg>
+                              </button>`;
                               
       const animFlowToggleDiv = `<button id="animToggle">
                                   <svg viewBox="-100 -100 200 200">
@@ -222,17 +225,20 @@
         pHitbox.setAttribute("fill", "none");
         
         const arrowDot = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        arrowDot.classList.add("animation");
+        
+        const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        chevron.setAttribute("points", "-8 -6, 0 0, -8 6");
+        chevron.setAttribute("fill", "none");
+        chevron.setAttribute("stroke", "white");
+        chevron.setAttribute("stroke-width", "1.5");
+        chevron.setAttribute("stroke-linecap", "round");
+        chevron.setAttribute("stroke-linejoin", "round");
+        chevron.setAttribute("transform", "scale(2.2)")
+        
+        arrowDot.appendChild(chevron);
         
         if (animatedFlow) {
-          const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-          chevron.setAttribute("points", "-8 -6, 0 0, -8 6");
-          chevron.setAttribute("fill", "none");
-          chevron.setAttribute("stroke", "white");
-          chevron.setAttribute("stroke-width", "1.5");
-          chevron.setAttribute("stroke-linecap", "round");
-          chevron.setAttribute("stroke-linejoin", "round");
-          chevron.setAttribute("transform", "scale(2.2)")
-
           const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
           animMotion.setAttribute("dur", "1s");
           animMotion.setAttribute("repeatCount", "indefinite");
@@ -242,7 +248,6 @@
           mpath.setAttribute("href", `#pathV${pathCount}`);
           
           animMotion.appendChild(mpath);
-          arrowDot.appendChild(chevron);
           arrowDot.appendChild(animMotion);
         }
         
@@ -282,24 +287,18 @@
         const end = document.getElementById(p.getAttribute("data-end") || "");
         if (!start || !end) return;
 
-        const X1 =
-          parseFloat(start.querySelector("circle")!.getAttribute("cx") || "0");
-        const Y1 =
-          parseFloat(start.querySelector("circle")!.getAttribute("cy") || "0");
-        const X2 =
-          parseFloat(end.querySelector("circle")!.getAttribute("cx") || "0");
-        const Y2 =
-          parseFloat(end.querySelector("circle")!.getAttribute("cy") || "0");
+        const X1 = parseFloat(start.querySelector("circle")!.getAttribute("cx") || "0");
+        const Y1 = parseFloat(start.querySelector("circle")!.getAttribute("cy") || "0");
+        const X2 = parseFloat(end.querySelector("circle")!.getAttribute("cx") || "0");
+        const Y2 = parseFloat(end.querySelector("circle")!.getAttribute("cy") || "0");
         
-        // prettier-ignore
-        const startNpoints = [ //Dont Judge The Dictionaries Pls
+        const startNpoints = [
           {x: X1, y: Y1 + RADIUS},
           {x: X1, y: Y1 - RADIUS},
           {x: X1 - RADIUS, y: Y1},
           {x: X1 + RADIUS, y: Y1}
         ];
         
-        // prettier-ignore
         const EndNpoints = [
           {x: X2, y: Y2 + RADIUS},
           {x: X2, y: Y2 - RADIUS},
@@ -344,6 +343,10 @@
             "d",
             `M ${bestSx} ${bestSy} L ${bestEx} ${bestEy}`,
           );
+          p.setAttribute("data-x1", `${bestSx}`);
+          p.setAttribute("data-y1", `${bestSy}`);
+          p.setAttribute("data-x2", `${bestEx}`);
+          p.setAttribute("data-y2", `${bestEy}`);
         } else {
           const angle = Math.atan2(Y2 - Y1, X2 - X1); //The angle at which 2 lies from 1 in rad
           const sx = X1 + RADIUS * Math.cos(angle);
@@ -981,6 +984,7 @@
             const HitPath = pat.children[2] as SVGPathElement;
             updatePath(VPath!, HitPath!);
           });
+          JSONSave();
         }
       }
 
@@ -999,6 +1003,56 @@
       let stylePopShow = false;
       let flowSettingsOpen = false;
       let ApplyStyleTo: string | undefined = undefined;
+      
+      let C1, C2, C3, C4;
+      
+      function SettingStyle(option: HTMLElement) {
+        if (!styleAppliers[option.id]) return; // SP23 (Flow) handled separately
+
+        const targetSelector = styleAppliers[option.id]; // ".node" or ".path"
+        const isSame = ApplyStyleTo === targetSelector;
+
+        if (isSame) {
+          stylePopShow = false;
+          ApplyStyleTo = undefined;
+          stylePopup.style.display = "none";
+          return;
+        }
+
+        ApplyStyleTo = targetSelector;
+        stylePopShow = true;
+        stylePopup.style.display = "block";
+
+        const nodeColors = ["#6692C1", "#A33855", "#7B6EAB", "#6EAB94"];
+        const pathColors = ["#FFFFFF", "#FFDFEE", "#afc4ee", "#cbfdea"];
+        const colors = targetSelector === ".path" ? pathColors : nodeColors;
+
+        [C1, C2, C3, C4].forEach((circle, i) => {
+          circle.setAttribute("fill", colors[i]);
+          circle.classList.remove("colorSelected");
+        });
+      }
+      
+      function ApplyCol(colorIn: SVGCircleElement | string) {
+        let Color: string | null;
+        
+        if (colorIn instanceof SVGCircleElement) {
+          Color = colorIn.getAttribute("fill");
+        } else {
+          Color = colorIn;
+        }
+        if (Color != "url(#rainbow)") {
+          if (ApplyStyleTo == ".path") PathCol = Color as string;
+          else if (ApplyStyleTo == ".node") NodeCol = Color as string;
+        }
+        if (!ApplyStyleTo) return;
+        network.querySelectorAll(ApplyStyleTo).forEach((el) => {
+          if (ApplyStyleTo == ".path")
+            el.children[1]?.setAttribute("stroke", PathCol);
+          else if (ApplyStyleTo == ".node") el.setAttribute("fill", NodeCol);
+        });
+        JSONSave();
+      }
 
       const styleAppliers: {[key: string]: string} = { // global scope for proper color menu switching
         SP21: ".node",
@@ -1008,40 +1062,13 @@
       function loadMainColorMenu() {
         stylePopup.innerHTML = colorPresetDiv;
 
-        const C1 = document.getElementById("col1") as unknown as SVGCircleElement;
-        const C2 = document.getElementById("col2") as unknown as SVGCircleElement;
-        const C3 = document.getElementById("col3") as unknown as SVGCircleElement;
-        const C4 = document.getElementById("col4")  as unknown as SVGCircleElement;
+        C1 = document.getElementById("col1") as unknown as SVGCircleElement;
+        C2 = document.getElementById("col2") as unknown as SVGCircleElement;
+        C3 = document.getElementById("col3") as unknown as SVGCircleElement;
+        C4 = document.getElementById("col4")  as unknown as SVGCircleElement;
         const C5 = document.getElementById("colPick") as unknown as SVGCircleElement; //color picker
 
         const colorOptions = [C1, C2, C3, C4, C5];
-
-        function SettingStyle(option: HTMLElement) {
-          if (!styleAppliers[option.id]) return; // SP23 (Flow) handled separately
-
-          const targetSelector = styleAppliers[option.id]; // ".node" or ".path"
-          const isSame = ApplyStyleTo === targetSelector;
-
-          if (isSame) {
-            stylePopShow = false;
-            ApplyStyleTo = undefined;
-            stylePopup.style.display = "none";
-            return;
-          }
-
-          ApplyStyleTo = targetSelector;
-          stylePopShow = true;
-          stylePopup.style.display = "block";
-
-          const nodeColors = ["#73CFFF", "#9163F2", "#E30B45", "#FFCB00"];
-          const pathColors = ["#FFFFFF", "#FFDFEE", "#4F4550", "#323931"];
-          const colors = targetSelector === ".path" ? pathColors : nodeColors;
-
-          [C1, C2, C3, C4].forEach((circle, i) => {
-            circle.setAttribute("fill", colors[i]);
-            circle.classList.remove("colorSelected");
-          });
-        }
 
         for (const funcLoopB of optsArr2) {
           if (funcLoopB == SP23) {
@@ -1057,7 +1084,7 @@
                 loadAnimFlowToggleDiv()
               }
               else {
-                stylePopup.innerHTML = ""
+                loadMainColorMenu();
                 stylePopup.style.display = "none";
               }
             }
@@ -1067,8 +1094,8 @@
               funcLoopB!.classList.toggle("selected");
               if (flowSettingsOpen) {
                 flowSettingsOpen = false;
+                ApplyStyleTo = undefined;
                 stylePopup.innerHTML = "";
-                stylePopup.style.display = "none";
                 loadMainColorMenu();
               }
               SettingStyle(funcLoopB);
@@ -1084,7 +1111,7 @@
           e.stopPropagation();
           if (arg == C5) {
             loadColorPickerMenu();
-          } //no error catching since arg will always be the desired input
+          }
           else {
             arg.classList.add("colorSelected");
             ApplyCol(arg); 
@@ -1103,47 +1130,59 @@
 
       function loadColorPickerMenu() {
         stylePopup.innerHTML = colorPickerDiv;
-        const colFeedback = document.getElementById("colorShow")!;
-        const HexColIn = document.getElementById("hexColIn") as HTMLInputElement;
-        const applyColBtn = document.getElementById("applyCusCol")!;
+        
         const backBtn = document.getElementById("backBtn")!;
         
-        applyColBtn.onclick = () => {
-          const HexColor = HexColIn.value;
-          ApplyCol(HexColor);
-        };
-        
-        HexColIn.oninput = () => {
-          colFeedback.setAttribute("fill", HexColIn.value);
-        };
+        let PickerColor = ApplyStyleTo === ".node" ? NodeCol : PathCol;
+        if (typeof PickerColor !== "string" || !PickerColor.startsWith("#")) PickerColor = "#FFFFFF";
+  
+        const pickr = Pickr.create({
+          el: '#pickr-container',
+          theme: 'nano',
+          default: PickerColor,
+          components: {
+            preview: true,
+            opacity: false,
+            hue: true,
+            interaction: {
+              hex: true,
+              rgba: true,
+              input: true,
+              clear: false,
+              save: true
+            }
+          }
+        });
+
+        pickr.on('save', (color: any, instance: any) => {  //using any since these are foreign items
+          ApplyCol(color.toHEXA().toString());
+        });
         
         backBtn.onclick = () => {
           loadMainColorMenu();
-        };
-      }
-
-      function ApplyCol(colorIn: SVGCircleElement | string) {
-        let Color: string | null;
-        const Index = animatedFlow ? 1 : 0
-        if (colorIn instanceof SVGCircleElement) {
-          Color = colorIn.getAttribute("fill");
-        } else {
-          Color = colorIn;
         }
-        if (Color != "url(#rainbow)") {
-          if (ApplyStyleTo == ".path") PathCol = Color as string;
-          else if (ApplyStyleTo == ".node") NodeCol = Color as string;
-        }
-        if (!ApplyStyleTo) return;
-        network.querySelectorAll(ApplyStyleTo).forEach((el) => {
-          if (ApplyStyleTo == ".path")
-            el.children[Index]?.setAttribute("stroke", PathCol);
-          else if (ApplyStyleTo == ".node") el.setAttribute("fill", NodeCol);
-        });
-        JSONSave();
       }
       //Animated Or Static Flow Settings Start
       let animatedFlow = true;
+      
+      function drawArrowAt() {
+        pathNetwork.querySelectorAll(".path").forEach(path => {
+          const x1 = parseFloat(path.getAttribute("data-x1"));
+          const y1 = parseFloat(path.getAttribute("data-y1"));
+          const x2 = parseFloat(path.getAttribute("data-x2"));
+          const y2 = parseFloat(path.getAttribute("data-y2"));
+        
+          const at50X = (x1 + x2) / 2;
+          const at50Y = (y1 + y2) / 2;
+        
+          const at75X = (at50X + x2) / 2;
+          const at75Y = (at50Y + y2) / 2;
+        
+          const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI
+          
+          path.children[0].setAttribute("transform", `translate(${at75X}, ${at75Y}) rotate(${angle}) scale(2.2)`);
+        });
+      }
       
       function loadAnimFlowToggleDiv() {
         stylePopup.innerHTML = animFlowToggleDiv;
@@ -1172,7 +1211,8 @@
             const pathId = pathEl.getAttribute("id");
     
             if (!animatedFlow) {
-              arrowGroup.innerHTML = "";
+              arrowGroup.children[1].innerHTML = "";
+              drawArrowAt();
       
               pathEl.setAttribute("marker-end", "url(#staticFlow)");
             } else {
