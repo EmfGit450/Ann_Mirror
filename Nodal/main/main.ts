@@ -324,15 +324,15 @@
         ];
 
         if (pathOption == "8") {
-          startNpoints.push({x: X1 + RADIUS * 0.7071, y: Y1 + RADIUS * 0.7071});
-          startNpoints.push({x: X1 - RADIUS * 0.7071, y: Y1 + RADIUS * 0.7071});
-          startNpoints.push({x: X1 + RADIUS * 0.7071, y: Y1 - RADIUS * 0.7071});
-          startNpoints.push({x: X1 - RADIUS * 0.7071, y: Y1 - RADIUS * 0.7071});
+          startNpoints.push({x: X1 + 28.284, y: Y1 + 28.284});
+          startNpoints.push({x: X1 - 28.284, y: Y1 + 28.284});
+          startNpoints.push({x: X1 + 28.284, y: Y1 - 28.284});
+          startNpoints.push({x: X1 - 28.284, y: Y1 - 28.284});
 
-          EndNpoints.push({x: X2 + RADIUS * 0.7071, y: Y2 + RADIUS * 0.7071});
-          EndNpoints.push({x: X2 - RADIUS * 0.7071, y: Y2 + RADIUS * 0.7071});
-          EndNpoints.push({x: X2 + RADIUS * 0.7071, y: Y2 - RADIUS * 0.7071});
-          EndNpoints.push({x: X2 - RADIUS * 0.7071, y: Y2 - RADIUS * 0.7071});
+          EndNpoints.push({x: X2 + 28.284, y: Y2 + 28.284});
+          EndNpoints.push({x: X2 - 28.284, y: Y2 + 28.284});
+          EndNpoints.push({x: X2 + 28.284, y: Y2 - 28.284});
+          EndNpoints.push({x: X2 - 28.284, y: Y2 - 28.284});
         }
 
         let minDistance = Infinity;
