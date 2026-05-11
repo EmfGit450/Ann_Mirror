@@ -7,7 +7,13 @@ const pathNetwork = document.getElementById("paths");
 const stylePopup = document.getElementById("stylePopup"); // used in style settings
 //Interfaces End
 //Sounds Start
-const ctx = new AudioContext();
+let ctx = null;
+function getCtx() {
+    if (!ctx)
+        ctx = new AudioContext();
+    return ctx;
+}
+ctx = getCtx();
 //Sounds are human-thought, but the embed code is AI generated
 function playLoadSound() {
     const osc = ctx.createOscillator();
@@ -168,14 +174,14 @@ const clickTwo = (e) => {
     if (target.tagName == "circle") {
         const endNode = target.parentElement;
         NodeEnd = endNode;
-        drawPath(NodeStart, NodeEnd, false, true);
+        drawPath(NodeStart, NodeEnd, false);
         guide.style.display = "none";
         document.removeEventListener("click", clickTwo);
         document.removeEventListener("touchend", clickTwo);
         pathMode = false;
     }
 };
-function drawPath(Start, End, isPathLoading = false, playSoundBool) {
+function drawPath(Start, End, isPathLoading = false) {
     if (Start == End)
         return;
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -224,9 +230,6 @@ function drawPath(Start, End, isPathLoading = false, playSoundBool) {
     pathNetwork.appendChild(PG);
     //const startNodePopup = infoPopupSection.querySelector(`#infopopup-${NodeStart.id}`)
     //const endNodePopup = infoPopupSection.querySelector(`#infopopup-${NodeEnd.id}`)
-    if (playSoundBool)
-        playSound2(); //path sound
-    //to not crash while loading
     updatePath(path, pHitbox);
     if (!animatedFlow)
         StaticiseFlow();
@@ -265,14 +268,14 @@ function updatePath(p, hitbox) {
         { x: X2 + RADIUS, y: Y2 }
     ];
     if (pathOption == "8") {
-        startNpoints.push({ x: X1 + RADIUS * 0.7071, y: Y1 + RADIUS * 0.7071 });
-        startNpoints.push({ x: X1 - RADIUS * 0.7071, y: Y1 + RADIUS * 0.7071 });
-        startNpoints.push({ x: X1 + RADIUS * 0.7071, y: Y1 - RADIUS * 0.7071 });
-        startNpoints.push({ x: X1 - RADIUS * 0.7071, y: Y1 - RADIUS * 0.7071 });
-        EndNpoints.push({ x: X2 + RADIUS * 0.7071, y: Y2 + RADIUS * 0.7071 });
-        EndNpoints.push({ x: X2 - RADIUS * 0.7071, y: Y2 + RADIUS * 0.7071 });
-        EndNpoints.push({ x: X2 + RADIUS * 0.7071, y: Y2 - RADIUS * 0.7071 });
-        EndNpoints.push({ x: X2 - RADIUS * 0.7071, y: Y2 - RADIUS * 0.7071 });
+        startNpoints.push({ x: X1 + 28.284, y: Y1 + 28.284 });
+        startNpoints.push({ x: X1 - 28.284, y: Y1 + 28.284 });
+        startNpoints.push({ x: X1 + 28.284, y: Y1 - 28.284 });
+        startNpoints.push({ x: X1 - 28.284, y: Y1 - 28.284 });
+        EndNpoints.push({ x: X2 + 28.284, y: Y2 + 28.284 });
+        EndNpoints.push({ x: X2 - 28.284, y: Y2 + 28.284 });
+        EndNpoints.push({ x: X2 + 28.284, y: Y2 - 28.284 });
+        EndNpoints.push({ x: X2 - 28.284, y: Y2 - 28.284 });
     }
     let minDistance = Infinity;
     let distance = null;
@@ -454,8 +457,7 @@ function resolveCollisions(movedNode) {
                 otherD.y = Y;
             }
             pathNetwork.querySelectorAll(".pathV").forEach((p) => {
-                if (p.getAttribute("data-start") === otherGroup.id ||
-                    p.getAttribute("data-end") === otherGroup.id) {
+                if (p.getAttribute("data-start") === otherGroup.id || p.getAttribute("data-end") === otherGroup.id) {
                     const hitboxPath = p.parentElement?.querySelector(".pathHB") || "";
                     updatePath(p, hitboxPath);
                 }
@@ -490,7 +492,7 @@ Add.addEventListener("click", () => {
     };
     state.nodes.push(data);
     nodeCount++;
-    playSound1();
+    playSound1(440, 0.3, "sine", 1);
     JSONSave();
 });
 //Add End
@@ -527,7 +529,7 @@ const DeleteClick = (e) => {
         }, 300);
     }
     if ((target?.matches(".pathV") || target?.matches(".pathHB")) && deleteMode) {
-        playSound1(180, 0.2, 'sawtooth', 0.2);
+        playSound1(1000, 0.2, 'sine', 1);
         const pg = target.parentElement;
         if (!pg)
             return;
@@ -662,7 +664,7 @@ function Deletion(layerNum) {
     setTimeout(() => {
         LayerToDie?.remove();
     }, 300);
-    const currentBtns = [...layerMenu.querySelectorAll("button")].filter(btn => !btn.classList.contains("deletingelement"));
+    const currentBtns = [...newLayerMenu.querySelectorAll("button")].filter(btn => !btn.classList.contains("deletingelement"));
     currentBtns.forEach(btn => {
         const layerProperty = btn.dataset.layerProp;
         if (parseInt(layerProperty) > layerNum) {
@@ -1143,7 +1145,7 @@ function JSONLoad(type) {
         if (startN && endN) {
             NodeStart = startN;
             NodeEnd = endN;
-            drawPath(startN, endN, true, false);
+            drawPath(startN, endN, true);
         }
         // grouping and other SVG stuff is handled by drawPath
     });

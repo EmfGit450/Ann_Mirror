@@ -310,10 +310,69 @@ May 8th 19:18 - 19:18:47 {
     i believe i procrastinated a lot today, should waste less time tomorrow
 }
 May 8th 19:28 - 19:29 {
-   i am finished for today, i cannot make architectural chnages with 30 minutes
-   im not a chad programmer, but i do i know what to do next
+    i am finished for today, i cannot make architectural chnages with 30 minutes
+    im not a chad programmer, but i do i know what to do next
 }
 
 TASKS(for 9th May)
 - Add live updates to node popups(New path, deletion, etc) []
 - Make transitions between Flow -> Paths and Nodes better []
+
+May 9th 17:31 - 17:31 {
+    ive been trying to find a color picker that works for 1-2 hours now
+}
+May 10th 17:18 - 17:19 {
+    changed node color and path color presets
+    const nodeColors = ["#6692C1", "#A33855", "#7B6EAB", "#6EAB94"];
+    const pathColors = ["#FFFFFF", "#FFDFEE", "#afc4ee", "#cbfdea"];
+    
+    Edited from 17:19 to 17:20
+    I used the color picker i started with, the 2 hours were a waste. Pickr
+}
+May 11th 11:47 - 11:48 {
+    Finally implemented static or animated arrow setting, using this fucntion.
+    
+    function StaticiseFlow() {
+        pathNetwork.querySelectorAll(".path").forEach(p => {
+          const pathV = p.children[1];
+          
+          const x1 = parseFloat(pathV.getAttribute("data-x1"));
+          const y1 = parseFloat(pathV.getAttribute("data-y1"));
+          const x2 = parseFloat(pathV.getAttribute("data-x2"));
+          const y2 = parseFloat(pathV.getAttribute("data-y2"));
+        
+          const at50X = (x1 + x2) / 2;
+          const at50Y = (y1 + y2) / 2;
+        
+          const at75X = (at50X + x2) / 2;
+          const at75Y = (at50Y + y2) / 2;
+        
+          const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI
+          
+          p.children[0].setAttribute("transform", `translate(${at75X}, ${at75Y}) rotate(${angle}) scale(1)`);
+        });
+      }
+      
+  }
+May 11th 13:09 - 13:11 {
+    implemented random loading sound
+    
+    const frequencies = [300, 433, 505, 670, 850, 1000]
+    const randomFreq = frequencies[Math.floor(Math.random() * frequencies.length)]
+
+    osc.frequency.value = randomFreq;
+    
+    //from line 1272
+    function JSONLoad(type: string) { //loadfile or loadlayer
+		  isLoading = true;
+      state = getState();
+      if (type == "loadfile") {
+        console.log("Loading localStorage global-state");
+        playLoadSound();
+      }
+      //Edited from 13:52 to 13:53
+    //......
+    }
+    
+    nice
+}

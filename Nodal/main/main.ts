@@ -25,7 +25,13 @@
       }
       //Interfaces End
       //Sounds Start
-      const ctx = new AudioContext();
+      let ctx: AudioContext | null = null;
+
+      function getCtx() {
+        if (!ctx) ctx = new AudioContext();
+        return ctx;
+      }
+      ctx = getCtx();
       
       //Sounds are human-thought, but the embed code is AI generated
       function playLoadSound() {
@@ -205,7 +211,7 @@
         if (target.tagName == "circle") {
           const endNode = target.parentElement as SVGGElement | null; 
           NodeEnd = endNode as any;
-          drawPath(NodeStart!, NodeEnd!, false, true);
+          drawPath(NodeStart!, NodeEnd!, false);
           guide.style.display = "none";
           document.removeEventListener("click", clickTwo);
           document.removeEventListener("touchend", clickTwo);
@@ -213,7 +219,7 @@
         }
       };
 
-      function drawPath(Start: SVGCircleElement, End: SVGCircleElement, isPathLoading: boolean = false, playSoundBool: boolean) {
+      function drawPath(Start: SVGCircleElement, End: SVGCircleElement, isPathLoading: boolean = false) {
         if (Start == End) return;
         const path = document.createElementNS(
           "http://www.w3.org/2000/svg",
@@ -277,9 +283,6 @@
         
         //const startNodePopup = infoPopupSection.querySelector(`#infopopup-${NodeStart.id}`)
         //const endNodePopup = infoPopupSection.querySelector(`#infopopup-${NodeEnd.id}`)
-        
-        if (playSoundBool) playSound2(); //path sound
-        //to not crash while loading
         
         updatePath(path, pHitbox);
         if (!animatedFlow) StaticiseFlow();
@@ -534,10 +537,7 @@
             }
             
             pathNetwork.querySelectorAll(".pathV").forEach((p) => {
-              if (
-                p.getAttribute("data-start") === otherGroup.id ||
-                p.getAttribute("data-end") === otherGroup.id
-              ) {
+              if (p.getAttribute("data-start") === otherGroup.id || p.getAttribute("data-end") === otherGroup.id) {
                 const hitboxPath = p.parentElement?.querySelector(".pathHB") || "";
                 updatePath(p as SVGPathElement, hitboxPath as SVGPathElement);
               }
@@ -578,7 +578,7 @@
         state.nodes.push(data);
         nodeCount++;
         
-        playSound1();
+        playSound1(440, 0.3, "sine", 1);
         
         JSONSave();
       });
@@ -619,7 +619,7 @@
           }, 300);
         }
         if ((target?.matches(".pathV") || target?.matches(".pathHB")) && deleteMode) {
-          playSound1(180, 0.2, 'sawtooth', 0.2);
+          playSound1(1000, 0.2, 'sine', 1);
           
           const pg = (target as Element).parentElement;
           if (!pg) return;
@@ -762,7 +762,7 @@
         setTimeout( () => {
           LayerToDie?.remove();
         }, 300);
-        const currentBtns = [...layerMenu.querySelectorAll("button")].filter(btn => !btn.classList.contains("deletingelement"));
+        const currentBtns = [...newLayerMenu.querySelectorAll("button")].filter(btn => !btn.classList.contains("deletingelement"));
           currentBtns.forEach(btn => {
             const layerProperty: string = btn.dataset.layerProp as string;
             if (parseInt(layerProperty) > layerNum) {
@@ -1307,7 +1307,7 @@
           if (startN && endN) {
 				    NodeStart = startN;
 				    NodeEnd = endN;
-				    drawPath(startN, endN, true, false);
+				    drawPath(startN, endN, true);
 			     }
           // grouping and other SVG stuff is handled by drawPath
         });
