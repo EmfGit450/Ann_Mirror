@@ -9,6 +9,19 @@ const stylePopup = document.getElementById("stylePopup"); // used in style setti
 //Sounds Start
 const ctx = new AudioContext();
 //Sounds are human-thought, but the embed code is AI generated
+function playLoadSound() {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const frequencies = [300, 433, 505, 670, 850, 1000];
+    const randomFreq = frequencies[Math.floor(Math.random() * frequencies.length)];
+    osc.frequency.value = randomFreq;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+}
 function playSound1(freq = 440, duration = 0.3, type = 'sine', volume = 0.3) {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -61,7 +74,7 @@ let transX = 0;
 let transY = 0;
 let nodeCount = 1;
 let pathCount = 1;
-let NodeCol = "#73CFFF"; //Default Node color
+let NodeCol = "#6692C1"; //Default Node color
 let PathCol = "#FFFFFF"; //Default Path color
 const RADIUS = 40;
 //HTML Lines Start
@@ -96,7 +109,7 @@ const colorPickerDiv = `<div id="pickr-container"></div>
 const animFlowToggleDiv = `<button id="animToggle">
                                   <svg viewBox="-100 -100 200 200">
                                     <defs>
-                                    <marker viewBox="-15 -15 30 30" id="arrowhead" markerWidth="15" markerHeight="15" refX="0" refY="0" orient="auto">
+                                    <marker viewBox="-15 -15 30 30" id="arrow" markerWidth="15" markerHeight="15" refX="0" refY="0" orient="auto">
                                       <polyline points="-8 -6, 0 0, -8 6" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="scale(1.4)"/>
                                     </marker>
                                     </defs>
@@ -175,7 +188,6 @@ function drawPath(Start, End, isPathLoading = false, playSoundBool) {
     path.setAttribute("stroke", PathCol);
     path.setAttribute("stroke-width", "3.6");
     path.setAttribute("stroke-linecap", "round");
-    //path.setAttribute("marker-end", "url(#arrowhead)") for future update FUP
     path.setAttribute("data-start", NodeStart.id);
     path.setAttribute("data-end", NodeEnd.id);
     pHitbox.classList.add("pathHB");
@@ -216,6 +228,8 @@ function drawPath(Start, End, isPathLoading = false, playSoundBool) {
         playSound2(); //path sound
     //to not crash while loading
     updatePath(path, pHitbox);
+    if (!animatedFlow)
+        StaticiseFlow();
     if (!isPathLoading) {
         const data = {
             id: "path" + pathCount,
@@ -280,20 +294,22 @@ function updatePath(p, hitbox) {
         }
         p.setAttribute("d", `M ${bestSx} ${bestSy} L ${bestEx} ${bestEy}`);
         hitbox.setAttribute("d", `M ${bestSx} ${bestSy} L ${bestEx} ${bestEy}`);
-        p.setAttribute("data-x1", `${bestSx}`);
-        p.setAttribute("data-y1", `${bestSy}`);
-        p.setAttribute("data-x2", `${bestEx}`);
-        p.setAttribute("data-y2", `${bestEy}`);
     }
     else {
         const angle = Math.atan2(Y2 - Y1, X2 - X1); //The angle at which 2 lies from 1 in rad
-        const sx = X1 + RADIUS * Math.cos(angle);
-        const sy = Y1 + RADIUS * Math.sin(angle); //Calculating the positions
-        const ex = X2 - RADIUS * Math.cos(angle); //of points
-        const ey = Y2 - RADIUS * Math.sin(angle);
-        p.setAttribute("d", `M ${sx} ${sy} L ${ex} ${ey}`);
-        hitbox.setAttribute("d", `M ${sx} ${sy} L ${ex} ${ey}`);
+        bestSx = X1 + RADIUS * Math.cos(angle);
+        bestSy = Y1 + RADIUS * Math.sin(angle); //Calculating the positions
+        bestEx = X2 - RADIUS * Math.cos(angle); //of points
+        bestEy = Y2 - RADIUS * Math.sin(angle);
+        p.setAttribute("d", `M ${bestSx} ${bestSy} L ${bestEx} ${bestEy}`);
+        hitbox.setAttribute("d", `M ${bestSx} ${bestSy} L ${bestEx} ${bestEy}`);
     }
+    p.setAttribute("data-x1", `${bestSx}`);
+    p.setAttribute("data-y1", `${bestSy}`);
+    p.setAttribute("data-x2", `${bestEx}`);
+    p.setAttribute("data-y2", `${bestEy}`);
+    if (!animatedFlow)
+        StaticiseFlow();
 }
 //Path End
 //Drag Start
@@ -332,8 +348,7 @@ function makeDraggable(node) {
         const finger = pt.matrixTransform(network.getScreenCTM().inverse());
         Sdrag(circle, finger.x, finger.y);
         pathNetwork.querySelectorAll(".pathV").forEach((p) => {
-            if (p.getAttribute("data-start") === node.id ||
-                p.getAttribute("data-end") === node.id) {
+            if (p.getAttribute("data-start") === node.id || p.getAttribute("data-end") === node.id) {
                 const hitboxPath = p.parentElement?.querySelector(".pathHB");
                 updatePath(p, hitboxPath);
             }
@@ -485,7 +500,7 @@ let deleteMode = false;
 const DeleteClick = (e) => {
     const target = e.target;
     if (target?.matches(".node") && deleteMode) {
-        playSound1(180, 0.2, 'sawtooth', 0.2);
+        playSound1(1000, 0.2, 'sine', 1);
         const nodeGroup = target.parentElement;
         if (!nodeGroup)
             return;
@@ -565,7 +580,7 @@ function showPopup(node) {
     const displayOutputs = [...pathNetwork.querySelectorAll(".pathV")].filter(path => path.getAttribute("data-start") === node.id).length;
     const SVGstructure = `<g class="infoPopup" id="popup-${node.id}" transform="translate(${nodeData.x - 95}, ${nodeData.y + 60})">
                 <rect width="175" height="210" x="10" y="10" rx="8" ry="8" fill="white" stroke="#000000d5" stroke-width="1"/>
-                <text x="78" y="60" font-size="30" text-anchor="middle" fill="black">${(node.id).replace("node", "Node")}</text>
+                <text x="34" y="60" font-size="30" text-anchor="start" fill="black">${(node.id).replace("n", "N")}</text>
                 <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" transform="translate(129.6, 40) scale(1.13)"/>
                 <text x="40" y="90" font-size="14" text-anchor="start" fill="black">ID: ${node.id}</text>
                 <text x="40" y="120" font-size="14" text-anchor="start" fill="black">Inputs: ${displayInputs}</text>
@@ -1022,18 +1037,19 @@ function loadColorPickerMenu() {
 }
 //Animated Or Static Flow Settings Start
 let animatedFlow = true;
-function drawArrowAt() {
-    pathNetwork.querySelectorAll(".path").forEach(path => {
-        const x1 = parseFloat(path.getAttribute("data-x1"));
-        const y1 = parseFloat(path.getAttribute("data-y1"));
-        const x2 = parseFloat(path.getAttribute("data-x2"));
-        const y2 = parseFloat(path.getAttribute("data-y2"));
+function StaticiseFlow() {
+    pathNetwork.querySelectorAll(".path").forEach(p => {
+        const pathV = p.children[1];
+        const x1 = parseFloat(pathV.getAttribute("data-x1"));
+        const y1 = parseFloat(pathV.getAttribute("data-y1"));
+        const x2 = parseFloat(pathV.getAttribute("data-x2"));
+        const y2 = parseFloat(pathV.getAttribute("data-y2"));
         const at50X = (x1 + x2) / 2;
         const at50Y = (y1 + y2) / 2;
         const at75X = (at50X + x2) / 2;
         const at75Y = (at50Y + y2) / 2;
         const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-        path.children[0].setAttribute("transform", `translate(${at75X}, ${at75Y}) rotate(${angle}) scale(2.2)`);
+        p.children[0].setAttribute("transform", `translate(${at75X}, ${at75Y}) rotate(${angle}) scale(1)`);
     });
 }
 function loadAnimFlowToggleDiv() {
@@ -1044,35 +1060,31 @@ function loadAnimFlowToggleDiv() {
     const movingArrow = document.getElementById("animateToggleLogo");
     flowStyleToggle.style.background = "linear-gradient(90deg, #6293dca6, #a8c7f8a6)";
     flowStyleToggle.style.marginBottom = "30px";
-    flowStyleToggle.onclick = () => {
-        animatedFlow = !animatedFlow;
+    function syncUIwithAnim() {
         if (!animatedFlow) {
-            flowStyleIndicLine.style.markerEnd = "url(#arrowhead)";
+            flowStyleIndicLine.setAttribute("marker-end", "url(#arrow)");
             movingArrow.setAttribute("stroke-width", "0");
         }
         else {
-            flowStyleIndicLine.style.markerEnd = "";
+            flowStyleIndicLine.setAttribute("marker-end", "");
             movingArrow.setAttribute("stroke-width", "1.5");
         }
+    }
+    syncUIwithAnim();
+    flowStyleToggle.onclick = () => {
+        animatedFlow = !animatedFlow;
+        syncUIwithAnim();
+        JSONSave();
         pathNetwork.querySelectorAll(".path").forEach(p => {
             const arrowGroup = p.children[0];
             const pathEl = p.children[1];
             const pathId = pathEl.getAttribute("id");
             if (!animatedFlow) {
-                arrowGroup.children[1].innerHTML = "";
-                drawArrowAt();
-                pathEl.setAttribute("marker-end", "url(#staticFlow)");
+                arrowGroup.children[1].remove();
+                StaticiseFlow();
             }
             else {
-                arrowGroup.innerHTML = "";
-                const chevron = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-                chevron.setAttribute("points", "-8 -6, 0 0, -8 6");
-                chevron.setAttribute("fill", "none");
-                chevron.setAttribute("stroke", "white");
-                chevron.setAttribute("stroke-width", "1.5");
-                chevron.setAttribute("stroke-linecap", "round");
-                chevron.setAttribute("stroke-linejoin", "round");
-                chevron.setAttribute("transform", "scale(2.2)");
+                p.children[0].setAttribute("transform", "");
                 const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
                 animMotion.setAttribute("dur", "1s");
                 animMotion.setAttribute("repeatCount", "indefinite");
@@ -1080,9 +1092,7 @@ function loadAnimFlowToggleDiv() {
                 const mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
                 mpath.setAttribute("href", `#${pathId}`);
                 animMotion.appendChild(mpath);
-                arrowGroup.appendChild(chevron);
                 arrowGroup.appendChild(animMotion);
-                pathEl.removeAttribute("marker-end");
             }
         });
     };
@@ -1097,7 +1107,7 @@ function JSONSave() {
     if (isLoading)
         return;
     let localState = state;
-    localState.settings = [{ nodecolor: NodeCol, pathcolor: PathCol, nodecount: nodeCount, pathcount: pathCount, pathopt: pathOption }];
+    localState.settings = { nodecolor: NodeCol, pathcolor: PathCol, nodecount: nodeCount, pathcount: pathCount, pathopt: pathOption, animated: animatedFlow };
     localStorage.setItem("global-state", JSON.stringify(localState));
 }
 function JSONLoad(type) {
@@ -1105,6 +1115,7 @@ function JSONLoad(type) {
     state = getState();
     if (type == "loadfile") {
         console.log("Loading localStorage global-state");
+        playLoadSound();
     }
     infoPopupSection.innerHTML = "";
     nodeNetwork.innerHTML = "";
@@ -1142,13 +1153,14 @@ function boot() {
     const loadState = JSON.parse(localStorage.getItem("global-state") || "null");
     //Initializiation
     state = loadState ? loadState : {
-        settings: [{
-                nodecolor: "#73CFFF",
-                pathcolor: "#FFFFFF",
-                nodecount: 0,
-                pathcount: 0,
-                pathopt: "Smooth"
-            }],
+        settings: {
+            nodecolor: "#6692C1",
+            pathcolor: "#FFFFFF",
+            nodecount: 0,
+            pathcount: 0,
+            pathopt: "Smooth",
+            animated: true
+        },
         nodes: [],
         paths: []
     };
@@ -1157,9 +1169,10 @@ function boot() {
     nodeCount = nodeNums.length ? Math.max(...nodeNums) + 1 : 1;
     const pathNums = state.paths.map((p) => parseInt(p.id.replace("path", "")));
     pathCount = pathNums.length ? Math.max(...pathNums) + 1 : 1;
-    NodeCol = (state.settings && state.settings[0].nodecolor) ? state.settings[0].nodecolor : "#73CFFF";
-    PathCol = (state.settings && state.settings[0].pathcolor) ? state.settings[0].pathcolor : "#FFFFFF";
-    pathOption = (state.settings && state.settings[0].pathopt) ? state.settings[0].pathopt : "8";
+    NodeCol = (state.settings && state.settings.nodecolor) ? state.settings.nodecolor : "#6692C1";
+    PathCol = (state.settings && state.settings.pathcolor) ? state.settings.pathcolor : "#FFFFFF";
+    pathOption = (state.settings && state.settings.pathopt) ? state.settings.pathopt : "8";
+    animatedFlow = state.settings.animated;
     //Visual Setup of Path Setting
     const activePO = Object.keys(pathSettings).find(k => pathSettings[k] === pathOption); //activePO is activePathOption
     Object.keys(pathSettings).forEach(k => {
