@@ -33,7 +33,7 @@
       }
       ctx = getCtx();
       
-      //Sounds are human-thought, but the embed code is AI generated
+      //Sound embed code is AI generated
       function playLoadSound() {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
