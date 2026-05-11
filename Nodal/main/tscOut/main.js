@@ -14,7 +14,7 @@ function getCtx() {
     return ctx;
 }
 ctx = getCtx();
-//Sounds are human-thought, but the embed code is AI generated
+//Sound embed code is AI generated
 function playLoadSound() {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -129,6 +129,13 @@ const animFlowToggleDiv = `<button id="animToggle">
                                   </svg>
                                 </button>`;
 //HTML Lines End
+function getCount(type) {
+    const usedIds = type == "node" ? state.nodes.map((n) => parseInt(n.id.replace("node", ""))) : state.paths.map((n) => parseInt(n.id.replace("path", "")));
+    let i = 1;
+    while (usedIds.includes(i))
+        i++;
+    return i;
+}
 //Path Start
 const Path = document.getElementById("pathBtn");
 let NodeStart = null;
@@ -184,11 +191,14 @@ const clickTwo = (e) => {
 function drawPath(Start, End, isPathLoading = false) {
     if (Start == End)
         return;
+    if (!isPathLoading)
+        pathCount = getCount("path");
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     const pHitbox = document.createElementNS("http://www.w3.org/2000/svg", "path");
     //PG = Path Group
     const PG = document.createElementNS("http://www.w3.org/2000/svg", "g");
     path.classList.add("pathV");
+    console.log("drawing path with id:", pathCount);
     path.setAttribute("id", `pathV${pathCount}`);
     path.setAttribute("fill", "none");
     path.setAttribute("stroke", PathCol);
@@ -242,8 +252,8 @@ function drawPath(Start, End, isPathLoading = false) {
             draw: ""
         };
         state.paths.push(data);
+        pathCount = getCount("path");
     }
-    pathCount++;
     JSONSave();
 }
 function updatePath(p, hitbox) {
@@ -311,8 +321,15 @@ function updatePath(p, hitbox) {
     p.setAttribute("data-y1", `${bestSy}`);
     p.setAttribute("data-x2", `${bestEx}`);
     p.setAttribute("data-y2", `${bestEy}`);
-    if (!animatedFlow)
-        StaticiseFlow();
+    if (!animatedFlow) {
+        const arrowGroup = p.parentElement.children[0];
+        const at50X = (bestSx + bestEx) / 2;
+        const at50Y = (bestSy + bestEy) / 2;
+        const at75X = (at50X + bestEx) / 2;
+        const at75Y = (at50Y + bestEy) / 2;
+        const angle = Math.atan2(bestEy - bestSy, bestEx - bestSx) * 180 / Math.PI;
+        arrowGroup?.setAttribute("transform", `translate(${at75X}, ${at75Y}) rotate(${angle}) scale(1)`);
+    }
 }
 //Path End
 //Drag Start
@@ -470,6 +487,7 @@ function resolveCollisions(movedNode) {
 //Add Start
 const Add = document.getElementById("addBtn");
 Add.addEventListener("click", () => {
+    nodeCount = getCount("node");
     const NewNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     //NNG = New Node Group
     const NNG = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -491,7 +509,7 @@ Add.addEventListener("click", () => {
         layer: userOnLayer,
     };
     state.nodes.push(data);
-    nodeCount++;
+    nodeCount = getCount("node");
     playSound1(440, 0.3, "sine", 1);
     JSONSave();
 });
@@ -527,6 +545,7 @@ const DeleteClick = (e) => {
             deleteMode = !deleteMode;
             JSONSave();
         }, 300);
+        nodeCount;
     }
     if ((target?.matches(".pathV") || target?.matches(".pathHB")) && deleteMode) {
         playSound1(1000, 0.2, 'sine', 1);
@@ -1081,6 +1100,7 @@ function loadAnimFlowToggleDiv() {
             const arrowGroup = p.children[0];
             const pathEl = p.children[1];
             const pathId = pathEl.getAttribute("id");
+            console.log(pathId);
             if (!animatedFlow) {
                 arrowGroup.children[1].remove();
                 StaticiseFlow();
@@ -1117,6 +1137,7 @@ function JSONLoad(type) {
     state = getState();
     if (type == "loadfile") {
         console.log("Loading localStorage global-state");
+        console.log(`Paths:- ${pathCount}`, `Nodes:- ${nodeCount}`);
         playLoadSound();
     }
     infoPopupSection.innerHTML = "";
@@ -1145,9 +1166,9 @@ function JSONLoad(type) {
         if (startN && endN) {
             NodeStart = startN;
             NodeEnd = endN;
+            pathCount = parseInt(p.id.replace("path", ""));
             drawPath(startN, endN, true);
         }
-        // grouping and other SVG stuff is handled by drawPath
     });
     isLoading = false;
 }

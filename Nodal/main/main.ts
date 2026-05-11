@@ -164,6 +164,13 @@
                                   </svg>
                                 </button>`;
       //HTML Lines End
+      
+      function getCount(type): number {
+        const usedIds = type == "node" ? state.nodes.map((n: NodalNode) => parseInt(n.id.replace("node", ""))) : state.paths.map((n: NodalPath) => parseInt(n.id.replace("path", "")));
+        let i = 1;
+        while (usedIds.includes(i)) i++;
+        return i;
+      }
 
       //Path Start
       const Path = document.getElementById("pathBtn")!;
@@ -221,6 +228,9 @@
 
       function drawPath(Start: SVGCircleElement, End: SVGCircleElement, isPathLoading: boolean = false) {
         if (Start == End) return;
+        
+        if (!isPathLoading) pathCount = getCount("path");
+        
         const path = document.createElementNS(
           "http://www.w3.org/2000/svg",
           "path",
@@ -233,6 +243,9 @@
         const PG = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
         path.classList.add("pathV");
+        
+        console.log("drawing path with id:", pathCount);
+        
         path.setAttribute("id", `pathV${pathCount}`);
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", PathCol);
@@ -297,8 +310,8 @@
           }
         
           state.paths.push(data)
+          pathCount = getCount("path")
         }
-        pathCount++;
         JSONSave();
       }
 
@@ -376,7 +389,15 @@
         p.setAttribute("data-x2", `${bestEx}`);
         p.setAttribute("data-y2", `${bestEy}`);
         
-        if (!animatedFlow) StaticiseFlow();
+        if (!animatedFlow) {
+          const arrowGroup = p.parentElement.children[0] as SVGGElement;
+          const at50X = (bestSx + bestEx) / 2;
+          const at50Y = (bestSy + bestEy) / 2;
+          const at75X = (at50X + bestEx) / 2;
+          const at75Y = (at50Y + bestEy) / 2;
+          const angle = Math.atan2(bestEy - bestSy, bestEx - bestSx) * 180 / Math.PI;
+          arrowGroup?.setAttribute("transform", `translate(${at75X}, ${at75Y}) rotate(${angle}) scale(1)`);
+        }
       }
       //Path End
       //Drag Start
@@ -551,6 +572,8 @@
       const Add = document.getElementById("addBtn")!;
       
       Add.addEventListener("click", () => {
+        nodeCount = getCount("node");
+        
         const NewNode = document.createElementNS(
           "http://www.w3.org/2000/svg",
           "circle",
@@ -576,7 +599,7 @@
           layer: userOnLayer,
         }
         state.nodes.push(data);
-        nodeCount++;
+        nodeCount = getCount("node");
         
         playSound1(440, 0.3, "sine", 1);
         
@@ -617,6 +640,7 @@
             deleteMode = !deleteMode;
             JSONSave()
           }, 300);
+          nodeCount
         }
         if ((target?.matches(".pathV") || target?.matches(".pathHB")) && deleteMode) {
           playSound1(1000, 0.2, 'sine', 1);
@@ -1235,6 +1259,7 @@
             const arrowGroup = p.children[0] as SVGGElement;
             const pathEl = p.children[1] as SVGPathElement;
             const pathId = pathEl.getAttribute("id");
+            console.log(pathId);
     
             if (!animatedFlow) {
               arrowGroup.children[1].remove();
@@ -1278,6 +1303,7 @@
         state = getState();
         if (type == "loadfile") {
           console.log("Loading localStorage global-state");
+          console.log(`Paths:- ${pathCount}`, `Nodes:- ${nodeCount}`)
           playLoadSound();
         }
         infoPopupSection.innerHTML = "";
@@ -1307,9 +1333,9 @@
           if (startN && endN) {
 				    NodeStart = startN;
 				    NodeEnd = endN;
+				    pathCount = parseInt(p.id.replace("path", ""));
 				    drawPath(startN, endN, true);
-			     }
-          // grouping and other SVG stuff is handled by drawPath
+          }
         });
         isLoading = false;
       }
