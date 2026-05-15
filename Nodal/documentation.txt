@@ -376,3 +376,37 @@ May 11th 13:09 - 13:11 {
     
     nice
 }
+
+May 14th 17:49 - 17:56 {
+    Nodal is moving from scalable vector graphic, which is cpu-powered, to webgpu
+    which is gpu-powered. i am not going use a library that adds overhead, but am going
+    to make my own, starting from getContext("webgpu"). 
+    I want nodal to be fast, and i want it to be capable - tens of thousands of parameters
+    which is more than enough for hands-on learning purposes.
+    
+    this will take, maybe a significant amount of time, which is not good since im approaching m0the end of my holidays
+    school will start on 29th May, im willing(does free will exist?) to tolerate it for learning
+    It takes a lot to define a line.
+    
+    function datLine(x1, y1, x2, y2, width) {
+    const [dx, dy] = [x2 - x1, y2 - y1];
+    const length = Math.sqrt(dx ** 2 + dy ** 2);
+    const [px, py] = [-dy / length, dx / length];
+    
+    const [offX, offY] = [px * (width / 2), py * (width / 2)];
+    
+    const [cx1, cy1] = pixelToClip(x1 - offX, y1 - offY);
+    const [cx2, cy2] = pixelToClip(x2 - offX, y2 - offY);
+    const [cx3, cy3] = pixelToClip(x2 + offX, y2 + offY);
+    
+    const [cx4, cy4] = pixelToClip(x1 + offX, y1 + offY);
+    const [cx5, cy5] = pixelToClip(x2 + offX, y2 + offY);
+    const [cx6, cy6] = pixelToClip(x1 - offX, y1 - offY);
+    
+    return [cx1, cy1, cx2, cy2, cx3, cy3, cx4, cy4, cx5, cy5, cx6, cy6];
+    }
+    
+    paired with multi-sample anti-aliasing(instead of sharp differnces between pixels, we make some pixels more faint, the ones nearing/lining the edges, to make it look smooth)
+    
+    currently am trying to set up color buffer to draw with multiple colors.
+}
