@@ -4,7 +4,7 @@ pages:
   - mkdir -p public
   - cp -r Nodal/. public/
   - cp index.html public/
-  - cp logo.svg public/
+  - cp logo.jpg public/
   artifacts:
     paths:
       - public
