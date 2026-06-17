@@ -410,3 +410,10 @@ May 14th 17:49 - 17:56 {
     
     currently am trying to set up color buffer to draw with multiple colors.
 }
+June 10th 2026 17:49 - 17:50 {
+  Will start porting nodal to pixi.js tomorrow or today, ambiguous since i am working
+  on math++, my c++ math library, which i may use for nodal.
+}
+June 17th 2026 19:55 - 19:56 {
+  Wind down in 5 minutes. built a better index.html.
+}
