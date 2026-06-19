@@ -1,92 +1,58 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Nodal</title>
-    <style>
-	    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');	   
-		  
-		  :root {
-		    --color-primary: linear-gradient(-51deg, #DFDFDF, #EFEFEF);
-		    --color-accent: #5dddd5f9;
-		  }
-		  
-		  * {
-		    -webkit-tap-highlight-color: transparent;
-		    outline: none;
-		    box-sizing: border-box;
-		  }
-	    body {
-		    background: black;
-		    padding: 24px;
-	    }
-	    
-	    .main-c {
-	      padding: 2.4rem;
-	      height: 79vh;
-	      background: linear-gradient(-51deg, #030303, #090909);
-	      border-radius: 1.5rem;
-	      box-shadow: 0.1rem 0.1rem 1rem #121212;
-	      
-	      font-family: "Jetbrains Mono", Monospace;
-		    color: white;
-		    
-		    display: flex;
-		    flex-direction: column;
-	    }
-	    
-	    button {
-	      border: none;
-	      border-radius: 1.4rem;
-	      background: linear-gradient(102deg, #EEE, #959a9af9);
-	      font-size: 2rem;
-	      width: 4rem;
-	      height: 3rem;
-	    }
-	    
-	    .pixi-canvas {
-	      height: 50vh;
-	      width: 50vw;
-	    }
-	    
-	    .bottom-editor-btns {
-	      display: flex;
-	      gap: 0.9rem
-	    }
-	    
-	    @media (max-width: 1320px), (max-height: 1000px) {
-	      .main-c {
-	        height: 92vh;
-	      }
-	    }
-    </style>
+    <link rel="stylesheet" href="editor.css"/>
   </head>
-  <!-- resolution below 1320 x 1000 requires adjustment -->
+  <!-- resolution below 445 x 730 requires adjustment -->
   <body>
-	  <div class="main-c"> 
-      <div class="top-left-editor-btns">
-        <button>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-terminal">
-            <polyline points="4 18 10 12 4 6" />
-            <line x1="12" y1="20" x2="20" y2="20" />
+	 <div class="main-c">
+		 <div class="top-editor-btns">
+		     <button id="code-editor">
+		        <svg viewBox="0 0 24 24">
+		           <path d="M 2 6 L 9 13 M 9 13 L 2 20" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+		           <path class="blink-cursor" d="M 12 21 L 21 21" stroke="black" stroke-width="3" stroke-linecap="round"/>
+		        </svg>
+		     </button>
+		     <button id="editor-settings"> <!-- path from feathericons.com -->
+		        <svg class="settings-icon-svg" viewBox="0 0 24 24">
+		           <circle r="4" cx="12" cy="12" fill="none" stroke="black" stroke-width="2"/>
+		           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" fill="none" stroke-width="2" stroke="black" />
+		        </svg>
+		     </button>
+		 </div>
+		 
+		 <div class="pixi-canvas">
+		 
+		 </div>
+		 
+		 <div class="bottom-editor-btns">
+		    <button id="add-node">
+		      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 12 3 L 12 21 M 3 12 L 21 12"/>
           </svg>
-        </button>
-      </div>
-      
-      <div class="pixi-canvas">
-        
-      </div>
-      
-      <div class="right-editor-btns">
-        
-      </div>
-      <div class="bottom-editor-btns">
-        <button>+</button>
-        <button>-</button>
-        <button>~</button>
-        <button>X</button>
-      </div>
-	  </div>
+		    </button>
+		    <button id="delete">
+		      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 4 12 L 20 12"/>
+          </svg>
+		    </button>
+		    <button id="path">
+		      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle r="4.6" cx="5.8" cy="7"/>
+            <path d="M 9.08 10.22 L 13.72 14.78"/>
+            <circle r="4.6" cx="17" cy="18"/>
+          </svg>
+		    </button>
+		    <button id="clear"> <!-- from feathericons.com -->
+		      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+		    </button>
+		 </div>
+	 </div>
   </body>
 </html>

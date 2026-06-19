@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');	   
+		  
+@keyframes blink {
+	0% { opacity: 0; }
+	50% { opacity: 1; }
+	100% { opacity: 0; }
+}
+		  
+* {
+  webkit-tap-highlight-color: transparent;
+	box-sizing: border-box;
+	outline: none;
+}
+		  
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+	background: black;
+	padding: 32px;
+	display: flex;
+	flex-direction: column;
+}
+
+/*Main Container*/
+.main-c {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100dvh - 64px);
+	padding: 1.8rem;
+	background: #030303;
+	border-radius: 1.5rem;
+	box-shadow: 0.2rem 0.2rem 1rem #1F1F1F;
+	      
+	font-family: "Jetbrains Mono", Monospace;
+	color: white;
+}
+/*End*/
+	    
+/* Primary Button Styling*/
+button {
+  display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 0;
+	border-radius: 1.5rem;
+		    
+	transition: 0.3s ease;
+	width: 4.3rem;
+	height: 3.3rem;
+	background: linear-gradient(51deg, #F7F7F7, #A3A3A3);
+	box-shadow: 0.1rem 0.1rem 1rem #DCDCDC69;
+}
+button svg {
+	width: 1.8rem;
+	height: 1.8rem;
+}
+button svg * {
+  transition: stroke 0.3s ease;
+}
+		  
+button:focus {
+  background: #070707;
+	box-shadow: 0.05rem 0.05rem 1rem #DCDCDCAA;
+	transform: scale(1.1);
+}
+button:focus svg * {
+  stroke: #FFF;
+}
+/*End*/
+		  
+/*Top Editor Buttons*/
+.top-editor-btns {
+	display: flex;
+  justify-content: space-between;
+}
+		 
+.blink-cursor {
+	animation: blink 0.7s infinite none;
+}
+/*End*/
+		  
+/*Pixi Canvas*/
+.pixi-canvas {
+	display: flex;
+	flex-grow: 1;
+	min-height: 0;
+}
+/*End*/
+		 
+/*Bottom Editor Buttons*/
+.bottom-editor-btns {
+  display: flex;
+  align-items: flex-end;
+	gap: 0.7rem;
+}
+/*End*/
+		 
+@media (max-width: 700px), (max-height: 1000px) {
+	button {
+		width: 3.8rem;
+		height: 2.8rem;
+	}
+}

@@ -23,15 +23,18 @@
 		    100% { opacity: 1; transform: translateY(0); }
 		  }
 		  
-		  :root {
-		    --color-primary: linear-gradient(-51deg, #DFDFDF, #EFEFEF);
-		    --color-accent: #5dddd5f9;
-		  }
-		  
 		  * {
 		    -webkit-tap-highlight-color: transparent;
 		    outline: none;
 		    box-sizing: border-box;
+		  }
+		  
+		  html, body {
+		    margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
 		  }
 	    body {
 		    background: black;
@@ -40,8 +43,8 @@
 	    
 	    .main-c {
 	      padding: 4rem;
-	      height: 79vh;
-	      background: linear-gradient(-51deg, #030303, #090909);
+	      height: calc(100dvh - 64px);
+	      background: #030303;
 	      border-radius: 1.5rem;
 	      box-shadow: 0.1rem 0.1rem 1rem #121212;
 	      
@@ -105,10 +108,6 @@
 		  }
 	    
 	    @media (max-width: 1320px), (max-height: 1000px) {
-	      .main-c {
-	        height: 90vh;
-	      }
-	      
 	      header {
 	        margin-bottom: 3rem;
 	        margin-left: 1rem;
@@ -135,7 +134,7 @@
            <span>Nodal</span>
          </header>
          <nav>
-             <a target="_blank" href="Nodal/main.html">Editor</a>
+             <a target="_blank" href="Nodal/pixi/editor.html">Editor</a>
              <a target="_blank" href="https://gitlab.com/EmfGit450/nodal">Code</a>
          </nav>
 	 </div>
