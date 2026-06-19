@@ -32,6 +32,8 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  gap: 0.4rem;
+  
   height: calc(100dvh - 64px);
 	padding: 1.8rem;
 	background: #030303;
@@ -91,6 +93,18 @@ button:focus svg * {
 	display: flex;
 	flex-grow: 1;
 	min-height: 0;
+	position: relative;
+	overflow: hidden;
+}
+
+.pixi-canvas canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
 }
 /*End*/
 		 
