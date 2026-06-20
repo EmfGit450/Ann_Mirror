@@ -5,6 +5,16 @@
 	50% { opacity: 1; }
 	100% { opacity: 0; }
 }
+
+@keyframes drawLine {
+  from { stroke-dasharray: 100; stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes pulse {
+  0% { r: 7; }
+  50% { r: 8.2; }
+  100% { r: 7; }
+}
 		  
 * {
   webkit-tap-highlight-color: transparent;
@@ -26,6 +36,41 @@ body {
 	display: flex;
 	flex-direction: column;
 }
+
+/*Loading Screen*/
+.loading-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100dvw;
+  height: 100dvh;
+  z-index: 1000;
+  background: linear-gradient(90deg, #11111188, #EEEEEE22);
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: all;
+}
+
+.faded-out-loading-screen {
+  transition: 1s ease;
+  opacity: 0;
+}
+
+.loading-screen svg {
+  width: 25vmin;
+  height: 25vmin;
+}
+
+.loadline {
+  animation: drawLine 3s ease infinite;
+}
+
+.loadcirc {
+  animation: pulse 2s ease infinite;
+}
+/*End*/
 
 /*Main Container*/
 .main-c {

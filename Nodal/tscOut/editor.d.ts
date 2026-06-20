@@ -1,4 +1,5 @@
 declare const PIXI: typeof import("pixi.js");
+declare const loadingScreen: HTMLElement;
 declare const codeEditorBtn: HTMLElement;
 declare const settingsBtn: HTMLElement;
 declare const addNodeBtn: HTMLElement;

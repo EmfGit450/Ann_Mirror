@@ -1,4 +1,5 @@
 "use strict";
+const loadingScreen = document.querySelector(".loading-screen");
 const codeEditorBtn = document.getElementById("code-editor");
 const settingsBtn = document.getElementById("editor-settings");
 const addNodeBtn = document.getElementById("add-node");
@@ -8,14 +9,9 @@ const clearBtn = document.getElementById("clear");
 const hintBox = document.getElementById("hintbox");
 const togglableBtns = [codeEditorBtn, addNodeBtn, deleteBtn, pathBtn];
 const CRUDBtnHints = ["Coding", "Add", "Delete", "Path"];
-/*const togglableBtns = {
-  "Add": addNodeBtn,
-  "Remove": deleteBtn,
-  "Path": pathBtn
-}*/
 const canvasContainer = document.querySelector(".pixi-canvas");
 let NodeCol = "#5F81A8", PathCol = "#FFFFFF";
-let NodeCount = 0, PathCount = 0;
+let NodeCount = 1, PathCount = 1;
 let Nodes = [];
 let Paths = [];
 (async () => {
@@ -32,7 +28,11 @@ let Paths = [];
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
     app.stage.sortableChildren = true;
-    //Loading Screen Removal
+    Load();
+    setTimeout(() => {
+        loadingScreen.classList.add("faded-out-loading-screen");
+        loadingScreen.style.pointerEvents = "none";
+    }, 500);
     //Pixi.js Setup End
     //Button Toggling Start
     for (let i = 0; i < 4; i++) {
@@ -50,32 +50,60 @@ let Paths = [];
     }
     //Button Toggling End
     //Node Start
+    function drawNode(x, y, idn) {
+        const node = new PIXI.Graphics()
+            .circle(x, y, 20)
+            .fill(NodeCol);
+        node.zIndex = 1;
+        node.eventMode = "static";
+        node.cursor = "pointer";
+        const data = {
+            idn: idn, //id number
+            x: x,
+            y: y
+        };
+        node.on("pointerdown", (e) => {
+            e.stopPropagation();
+            if (deleteBtn.classList.contains("active")) {
+                node.destroy();
+                Nodes = Nodes.filter((node) => node.idn !== data.idn);
+                if (Nodes.length > 0)
+                    NodeCount = Math.max(...Nodes.map((node) => node.idn)) + 1;
+                else
+                    NodeCount = 1;
+                Save();
+            }
+        });
+        app.stage.addChild(node);
+        return data;
+    }
     app.stage.on("pointerdown", (e) => {
         if (addNodeBtn.classList.contains("active")) {
             const [ex, ey] = [e.global.x, e.global.y];
             NodeCount++;
-            const node = new PIXI.Graphics()
-                .circle(ex, ey, 20)
-                .fill(NodeCol);
-            node.zIndex = 1;
-            node.eventMode = "static";
-            node.cursor = "pointer";
-            const data = {
-                idn: NodeCount, //id number
-                x: ex,
-                y: ey
-            };
-            node.on("pointerdown", (e) => {
-                e.stopPropagation();
-                if (deleteBtn.classList.contains("active")) {
-                    node.destroy();
-                    Nodes = Nodes.filter(node => node.idn !== data.idn);
-                }
-            });
-            Nodes.push(data);
-            app.stage.addChild(node);
+            const ndata = drawNode(ex, ey, NodeCount);
+            Nodes.push(ndata);
+            Save();
         }
     });
     //Node End
+    //State Start
+    function Save() {
+        localStorage.setItem("state", JSON.stringify({ nodes: Nodes }));
+    }
+    function Load() {
+        const state = JSON.parse(localStorage.getItem("state")) ?? { nodes: [] };
+        if (state) {
+            if (state.nodes.length > 0)
+                NodeCount = Math.max(...state.nodes.map((node) => node.idn)) + 1;
+            else
+                NodeCount = 1;
+            state.nodes.forEach((node) => {
+                drawNode(node.x, node.y, node.idn);
+                Nodes.push(node);
+            });
+        }
+    }
+    //State End
 })();
 //# sourceMappingURL=editor.js.map
