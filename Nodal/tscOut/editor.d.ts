@@ -8,7 +8,7 @@ declare const pathBtn: HTMLElement;
 declare const clearBtn: HTMLElement;
 declare const hintBox: HTMLElement;
 declare const togglableBtns: HTMLElement[];
-declare const CRUDBtnHints: string[];
+declare const btnHints: string[];
 declare const canvasContainer: HTMLElement;
 interface NodeData {
     idn: number;
@@ -16,11 +16,14 @@ interface NodeData {
     y: number;
 }
 interface PathData {
+    idn: number;
     startNode: NodeData;
     endNode: NodeData;
 }
-declare let NodeCol: string, PathCol: string;
+declare let NodeCol: number, PathCol: number;
 declare let NodeCount: number, PathCount: number;
 declare let Nodes: NodeData[];
 declare let Paths: PathData[];
+declare let pathCreateState: boolean;
+declare let startNodeForPath: NodeData;
 //# sourceMappingURL=editor.d.ts.map
