@@ -204,6 +204,7 @@ let startNodeForPath: NodeData;
     localStorage.clear();
     Nodes = [], Paths = [];
     NodeCount = 1, PathCount = 1;
+    pathCreateState = false;
   }
   //Clear End
   
