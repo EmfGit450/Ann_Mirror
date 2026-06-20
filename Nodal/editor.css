@@ -56,7 +56,7 @@ button {
 	transition: 0.3s ease;
 	width: 4.3rem;
 	height: 3.3rem;
-	background: linear-gradient(51deg, #F7F7F7, #A3A3A3);
+	background: radial-gradient(ellipse, #F7F7F7, #AAA);
 	box-shadow: 0.1rem 0.1rem 1rem #DCDCDC69;
 }
 button svg {
@@ -66,13 +66,14 @@ button svg {
 button svg * {
   transition: stroke 0.3s ease;
 }
-		  
-button:focus {
-  background: #070707;
+
+button.active {
+  background: radial-gradient(ellipse, #222, #070707);
 	box-shadow: 0.05rem 0.05rem 1rem #DCDCDCAA;
-	transform: scale(1.1);
+	transform: scale(1.05);
 }
-button:focus svg * {
+
+button.active svg * {
   stroke: #FFF;
 }
 /*End*/
@@ -109,10 +110,24 @@ button:focus svg * {
 /*End*/
 		 
 /*Bottom Editor Buttons*/
-.bottom-editor-btns {
+.bottom-editor {
   display: flex;
-  align-items: flex-end;
-	gap: 0.7rem;
+  justify-content: space-between;
+}
+
+.bottom-left-editor-btns {
+  display: flex;
+  gap: 0.6rem
+}
+
+.hintbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 8rem;
+  border: 2px solid white;
+  border-radius: 1.3rem;
+  color: #FFF;
 }
 /*End*/
 		 
