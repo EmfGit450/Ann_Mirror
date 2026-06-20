@@ -5,7 +5,9 @@ const addNodeBtn = document.getElementById("add-node");
 const deleteBtn = document.getElementById("delete");
 const pathBtn = document.getElementById("path");
 const clearBtn = document.getElementById("clear");
+const hintBox = document.getElementById("hintbox");
 const togglableBtns = [codeEditorBtn, addNodeBtn, deleteBtn, pathBtn];
+const CRUDBtnHints = ["Coding", "Add", "Delete", "Path"];
 /*const togglableBtns = {
   "Add": addNodeBtn,
   "Remove": deleteBtn,
@@ -33,14 +35,21 @@ let Paths = [];
     //Loading Screen Removal
     //Pixi.js Setup End
     //Button Toggling Start
-    togglableBtns.forEach(btn => {
+    for (let i = 0; i < 4; i++) {
+        const btn = togglableBtns[i];
         btn.addEventListener("click", () => {
             btn.classList.toggle("active");
             togglableBtns.forEach(b => b !== btn && b.classList.remove("active"));
+            if (btn.classList.contains("active")) {
+                hintBox.innerHTML = CRUDBtnHints[i];
+            }
+            else {
+                hintBox.innerHTML = "";
+            }
         });
-    });
+    }
     //Button Toggling End
-    //Add Start
+    //Node Start
     app.stage.on("pointerdown", (e) => {
         if (addNodeBtn.classList.contains("active")) {
             const [ex, ey] = [e.global.x, e.global.y];
@@ -49,15 +58,24 @@ let Paths = [];
                 .circle(ex, ey, 20)
                 .fill(NodeCol);
             node.zIndex = 1;
+            node.eventMode = "static";
+            node.cursor = "pointer";
             const data = {
                 idn: NodeCount, //id number
                 x: ex,
                 y: ey
             };
+            node.on("pointerdown", (e) => {
+                e.stopPropagation();
+                if (deleteBtn.classList.contains("active")) {
+                    node.destroy();
+                    Nodes = Nodes.filter(node => node.idn !== data.idn);
+                }
+            });
             Nodes.push(data);
             app.stage.addChild(node);
         }
     });
-    //Add End
+    //Node End
 })();
 //# sourceMappingURL=editor.js.map

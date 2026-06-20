@@ -120,7 +120,7 @@ button.active svg * {
   gap: 0.6rem
 }
 
-.hintbox {
+#hintbox {
   display: flex;
   justify-content: center;
   align-items: center;

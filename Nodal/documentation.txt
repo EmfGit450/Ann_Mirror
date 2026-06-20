@@ -417,3 +417,8 @@ June 10th 2026 17:49 - 17:50 {
 June 17th 2026 19:55 - 19:56 {
   Wind down in 5 minutes. built a better index.html.
 }
+June 20th 2026 13:35 - 19:38 {
+  forgot to write here. things are going smooth so far, and if pretext is fast, then its definetely the DOMs problem
+  not Javascripts'. Add node ability is here, with Pixi.js.
+  heard i can access the render pass inside pixi, so it might be easy for compute as well.
+}

@@ -5,7 +5,9 @@ declare const addNodeBtn: HTMLElement;
 declare const deleteBtn: HTMLElement;
 declare const pathBtn: HTMLElement;
 declare const clearBtn: HTMLElement;
+declare const hintBox: HTMLElement;
 declare const togglableBtns: HTMLElement[];
+declare const CRUDBtnHints: string[];
 declare const canvasContainer: HTMLElement;
 interface NodeData {
     idn: number;
