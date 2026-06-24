@@ -76,6 +76,12 @@ let startNodeForPath;
             x: x,
             y: y
         };
+        gsap.from(node.scale, {
+            x: 0,
+            y: 0,
+            duration: 0.5,
+            ease: "power4.inOut"
+        });
         app.stage.addChild(node);
         let dragging = false;
         let thisPtrId = null;
@@ -83,18 +89,33 @@ let startNodeForPath;
         node.on("pointerdown", (e) => {
             e.stopPropagation();
             if (deleteBtn.classList.contains("active")) {
-                node.destroy();
-                Nodes = Nodes.filter((node) => node.idn !== data.idn);
-                Paths.forEach(path => {
-                    if (path.startNode === data || path.endNode === data) {
-                        path.pgo?.destroy();
+                gsap.to(node.scale, {
+                    x: 0,
+                    y: 0,
+                    duration: 0.5,
+                    ease: "power4.inOut",
+                    onComplete: () => {
+                        node.destroy();
                     }
                 });
-                Paths = Paths.filter(path => path.startNode !== data && path.endNode !== data);
+                Nodes = Nodes.filter((node) => node.idn !== data.idn);
                 if (Nodes.length > 0)
                     NodeCount = Math.max(...Nodes.map((node) => node.idn)) + 1;
                 else
                     NodeCount = 1;
+                Paths.forEach(path => {
+                    if (path.startNode === data || path.endNode === data) {
+                        gsap.to(path.pgo, {
+                            alpha: 0,
+                            duration: 0.5,
+                            ease: "power4.inOut",
+                            onComplete: () => {
+                                path.pgo?.destroy();
+                            }
+                        });
+                    }
+                });
+                Paths = Paths.filter(path => path.startNode !== data && path.endNode !== data);
                 Save();
             }
             else if (pathBtn.classList.contains("active")) {
@@ -168,7 +189,14 @@ let startNodeForPath;
             path.eventMode = "static";
             path.on("pointerdown", () => {
                 if (deleteBtn.classList.contains("active")) {
-                    path?.destroy();
+                    gsap.to(path, {
+                        alpha: 0,
+                        duration: 0.5,
+                        ease: "power4.inOut",
+                        onComplete: () => {
+                            path?.destroy();
+                        }
+                    });
                     Paths = Paths.filter((p) => p.idn !== pdata.idn);
                     if (Paths.length > 0)
                         PathCount = Math.max(...Paths.map((p) => p.idn)) + 1;
@@ -177,6 +205,11 @@ let startNodeForPath;
                 }
             });
             app.stage.addChild(path);
+            gsap.from(path, {
+                alpha: 0,
+                duration: 0.5,
+                ease: "power4.inOut"
+            });
         }
         path.moveTo(ipdat.startNode.x, ipdat.startNode.y)
             .lineTo(ipdat.endNode.x, ipdat.endNode.y)

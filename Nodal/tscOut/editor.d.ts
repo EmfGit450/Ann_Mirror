@@ -1,4 +1,5 @@
 declare const PIXI: typeof import("pixi.js");
+declare const gsap: any;
 type PIXIGraphics = import("pixi.js").Graphics;
 declare const loadingScreen: HTMLElement;
 declare const codeEditorBtn: HTMLElement;

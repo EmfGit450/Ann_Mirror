@@ -1,4 +1,5 @@
 declare const PIXI: typeof import("pixi.js");
+declare const gsap: any;
 type PIXIGraphics = import("pixi.js").Graphics;
 
 const loadingScreen = document.querySelector(".loading-screen")! as HTMLElement;
@@ -113,6 +114,13 @@ let startNodeForPath: NodeData;
       y: y
     }
     
+    gsap.from(node.scale, {
+      x: 0,
+      y: 0,
+      duration: 0.5,
+      ease: "power4.inOut"
+    });
+    
     app.stage.addChild(node); 
     
     let dragging = false;
@@ -122,18 +130,35 @@ let startNodeForPath: NodeData;
     node.on("pointerdown", (e) => {
       e.stopPropagation();
       if (deleteBtn.classList.contains("active")) {
-        node.destroy();
+        gsap.to(node.scale, {
+          x: 0,
+          y: 0,
+          duration: 0.5,
+          ease: "power4.inOut",
+          onComplete: () => {
+            node.destroy();
+          }
+        });
+        
         Nodes = Nodes.filter((node: NodeData) => node.idn !== data.idn);
+            
+        if (Nodes.length > 0) NodeCount = Math.max(...Nodes.map((node: NodeData) => node.idn)) + 1;
+        else NodeCount = 1;
         
         Paths.forEach(path => {
           if (path.startNode === data || path.endNode === data) {
-            path.pgo?.destroy();
+            gsap.to(path.pgo, {
+              alpha: 0,
+              duration: 0.5,
+              ease: "power4.inOut",
+              onComplete: () => {
+                path.pgo?.destroy();
+              }
+            });
           }
-        })
+        });
         Paths = Paths.filter(path => path.startNode !== data && path.endNode !== data);
-       
-        if (Nodes.length > 0) NodeCount = Math.max(...Nodes.map((node: NodeData) => node.idn)) + 1;
-        else NodeCount = 1;
+        
         
         Save();
       }
@@ -231,7 +256,14 @@ let startNodeForPath: NodeData;
       
       path.on("pointerdown", () => {
         if (deleteBtn.classList.contains("active")) {
-          path?.destroy();
+          gsap.to(path, {
+            alpha: 0,
+            duration: 0.5,
+            ease: "power4.inOut",
+            onComplete: () => {
+              path?.destroy();
+            }
+          });
           Paths = Paths.filter((p: PathData) => p.idn !== pdata.idn);
           
           if (Paths.length > 0) PathCount = Math.max(...Paths.map((p: PathData) => p.idn)) + 1;
@@ -240,6 +272,11 @@ let startNodeForPath: NodeData;
       });
       
       app.stage.addChild(path);
+      gsap.from(path, {
+        alpha: 0,
+        duration: 0.5,
+        ease: "power4.inOut"
+      });
     }
     
     path.moveTo(ipdat.startNode.x, ipdat.startNode.y)
