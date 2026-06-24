@@ -9,15 +9,23 @@
 	50% { opacity: 1; }
 	100% { opacity: 0; }
 }
+@keyframes open {
+  from { width: 0; }
+  to { width: 50dvw; }
+}
+@keyframes close {
+  from { width: 50dvw; }
+  to { width: 0; }
+}
 
 @keyframes drawLine {
   from { stroke-dasharray: 100; stroke-dashoffset: 100; }
   to { stroke-dashoffset: 0; }
 }
 @keyframes pulse {
-  0% { r: 7; }
-  50% { r: 8.2; }
-  100% { r: 7; }
+  0% { r: 8; }
+  50% { r: 9.5; }
+  100% { r: 8; }
 }
 		  
 * {
@@ -36,9 +44,9 @@ html, body {
 
 body {
 	background: black;
-	padding: 32px;
 	display: flex;
 	flex-direction: column;
+	padding: 2rem;
 }
 
 /*Loading Screen*/
@@ -81,16 +89,30 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.4rem;
+  gap: 0.5rem;
   
-  height: calc(100dvh - 64px);
-	padding: 1.8rem;
+  height: calc(100dvh - 3.8rem);
+  padding: 1.8rem;
 	background: #030303;
 	border-radius: 1.5rem;
 	box-shadow: 0.2rem 0.2rem 1rem #1F1F1F;
 	      
 	font-family: "Jetbrains Mono", Monospace;
 	color: white;
+}
+/*End*/
+
+/*Coding Panel*/
+.coding-panel {
+  display: flex;
+  background: #6669;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 0;
+  height: 80dvh;
+  padding: 0;
 }
 /*End*/
 	    
@@ -176,6 +198,7 @@ button.active svg * {
   width: 8rem;
   border: 2px solid white;
   border-radius: 1.3rem;
+  font-size: 0.9rem;
   color: #FFF;
 }
 /*End*/

@@ -1,7 +1,7 @@
 declare const PIXI: typeof import("pixi.js");
+type PIXIGraphics = import("pixi.js").Graphics;
 declare const loadingScreen: HTMLElement;
 declare const codeEditorBtn: HTMLElement;
-declare const settingsBtn: HTMLElement;
 declare const addNodeBtn: HTMLElement;
 declare const deleteBtn: HTMLElement;
 declare const pathBtn: HTMLElement;
@@ -19,6 +19,7 @@ interface PathData {
     idn: number;
     startNode: NodeData;
     endNode: NodeData;
+    pgo?: PIXIGraphics | undefined;
 }
 declare let NodeCol: number, PathCol: number;
 declare let NodeCount: number, PathCount: number;
