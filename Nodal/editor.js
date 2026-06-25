@@ -1,4 +1,5 @@
 const loadingScreen = document.querySelector(".loading-screen");
+
 const codeEditorBtn = document.getElementById("code-editor");
 
 //const settingsBtn = document.getElementById("editor-settings");
@@ -17,7 +18,7 @@ const btnHints = [ "Add", "Delete", "Path" ];
 const canvasContainer = document.querySelector(".pixi-canvas");
 
 let NodeCol = 0x5F81A8, PathCol = 0xFFFFFF;
-let NodeCount = 1, PathCount = 1;
+let NodeCount = 0, PathCount = 0;
 
 let Nodes = [];
 let Paths = [];
@@ -29,17 +30,74 @@ let startNodeForPath;
 //Later
 
 class Node {
-  constructor(props) {
+  constructor(props, viewport) {
     this.x = props.x;
     this.y = props.y;
+    this.idn = props.idn;
+    
+    this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(NodeCol);
+    this.pig.position.set(this.x, this.y);
+    this.pig.zIndex = 1;
+    this.pig.eventMode = "static";
+    this.pig.cursor = "pointer";
+    
+    this.selected = false;
+    
+    gsap.from(this.pig.scale, {
+      x: 0,
+      y: 0,
+      duration: 0.3,
+      ease: "power4.inOut"
+    });
+    
+    viewport.addChild(this.pig);
   };
   
+  delete() {
+    gsap.to(this.pig.scale, {
+      x: 0,
+      y: 0,
+      duration: 0.2,
+      ease: "power4.inOut",
+      onComplete: () => {
+        this.pig.destroy();
+      }
+    });
+  }
+  
+  update(props) {
+    if (props.x) {
+      this.pig.position.x = props.x;
+      this.x = props.x;
+    }
+    if (props.y) {
+      this.pig.position.y = props.y;
+      this.y = props.y;
+    }
+    this.idn = props.idn ? props.idn : this.idn;
+  }
+  
+  selectToggle(state) {
+    if (state === undefined) this.selected = !this.selected;
+    else this.selected = state;
+    
+    if (this.selected) {
+      this.pig.clear().circle(0, 0, 20).fill(NodeCol).stroke({width: 2, color: 0xFFFFFF});
+      this.pig.position.set(this.x, this.y);
+    }
+    else {
+      this.pig.clear().circle(0, 0, 20).fill(NodeCol);
+      this.pig.position.set(this.x, this.y);
+    }
+  }
   
 }
 
 (async () => {
   //Pixi.js Setup Start
   const app = new PIXI.Application();
+  
+  const view = new PIXI.Container();
   
   await app.init({
     resizeTo: canvasContainer,
@@ -52,9 +110,9 @@ class Node {
   canvasContainer.appendChild(app.canvas);
   app.stage.eventMode = "static";
   app.stage.hitArea = app.screen;
-  app.stage.sortableChildren = true;
+  view.sortableChildren = true;
   
-  Load();
+  app.stage.addChild(view);
   
   setTimeout( () => {
     loadingScreen.classList.add("faded-out-loading-screen");
@@ -64,7 +122,7 @@ class Node {
   
   //Button Toggling Start
   for (let i = 0; i < 3; i++) {
-    const btn = togglableBtns[i]!;
+    const btn = togglableBtns[i];
     btn.addEventListener("click", () => {
       btn.classList.toggle("active");
       togglableBtns.forEach(b => b !== btn && b.classList.remove("active"));
@@ -79,6 +137,67 @@ class Node {
   }
   //Button Toggling End
   
+  //Visual Start
+  app.stage.on("pointerdown", (e) => {
+    //Add Node Start
+    if (addNodeBtn.classList.contains("active")) {
+      const worldPos = view.toLocal(e.global);
+      const [ex, ey] = [worldPos.x, worldPos.y]
+      
+      NodeCount++;
+      const newNode = new Node({x: ex, y: ey, idn: NodeCount}, view);
+      Nodes.push(newNode);
+    }
+    //Add Node End
+    
+    //Delete Start
+    else if (deleteBtn.classList.contains("active")) {
+      if (e.target instanceof PIXI.Graphics) {
+        const schedno = Nodes.find(node => node.pig === e.target) //scheduled death of node node
+        schedno.selectToggle(false);
+        schedno.delete();
+      }
+    }
+    //Delete End
+  });
+  //Visual End
+  
+  //Camera Start
+  let scale = 1;
+  let prevDist = 0;
+  
+  canvasContainer.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    if (!(addNodeBtn.classList.contains("active")) &&
+        !(deleteBtn.classList.contains("active")) && 
+        !(pathBtn.classList.contains("active")) ) {
+      if (e.touches[0] && e.touches[1]) {
+        const lf1 = new PIXI.Point(e.touches[0].clientX, e.touches[0].clientY);
+        const lf2 = new PIXI.Point(e.touches[1].clientX, e.touches[1].clientY);
+        const wf1 = view.toLocal(lf1);
+        const wf2 = view.toLocal(lf2);
+        
+        const [dx, dy] = [wf2.x - wf1.x, wf2.y - wf2.y];
+      
+        const distance = Math.hypot(dx, dy);
+        
+        if (distance > prevDist) {
+          scale -= 0.005
+        }
+        else if (distance < prevDist) {
+          scale += 0.005;
+        }
+        console.log(scale, distance);
+        
+        scale = Math.max(0.075, Math.min(3, scale));
+        view.scale.set(scale);
+        prevDist = distance;
+      }
+    }
+    
+  });
+  //Camera End
+  
   //HintBox Start
   function ShowHint(text) {
     hintBox.style.animation = "none";
@@ -87,276 +206,8 @@ class Node {
     hintBox.style.animation = "appear 0.6s";
   }
   //HintBox End
-  
-  //Node & Path Start
-  function drawNode(x, y, idn) {
-    const node = new PIXI.Graphics()
-          .circle(0, 0, 20)
-          .fill(NodeCol);
-          
-    node.position.set(x, y);
-    node.zIndex = 1;
-    node.eventMode = "static";
-    node.cursor = "pointer";
-      
-    const data: NodeData = {
-      idn: idn, //id number
-      x: x,
-      y: y
-    }
-    
-    gsap.from(node.scale, {
-      x: 0,
-      y: 0,
-      duration: 0.3,
-      ease: "power4.inOut"
-    });
-    
-    app.stage.addChild(node); 
-    
-    let dragging = false;
-    let thisPtrId = null;
-    const offset = new PIXI.Point();
-      
-    node.on("pointerdown", (e) => {
-      e.stopPropagation();
-      if (deleteBtn.classList.contains("active")) {
-        gsap.to(node.scale, {
-          x: 0,
-          y: 0,
-          duration: 0.3,
-          ease: "power4.inOut",
-          onComplete: () => {
-            node.destroy();
-            pathCreateState = false;
-          }
-        });
-        
-        Nodes = Nodes.filter(node=> node.idn !== data.idn);
-            
-        if (Nodes.length > 0) NodeCount = Math.max(...Nodes.map(node => node.idn)) + 1;
-        else NodeCount = 1;
-        
-        Paths.forEach(path => {
-          if (path.startNode === data || path.endNode === data) {
-            gsap.to(path.pgo as PIXI.Graphics, {
-              alpha: 0,
-              duration: 0.3,
-              ease: "power4.inOut",
-              onComplete: () => {
-                path.pgo?.destroy();
-              }
-            });
-          }
-        });
-        Paths = Paths.filter(path => path.startNode !== data && path.endNode !== data);
-        
-        
-        Save();
-      }
-      
-      else if (pathBtn.classList.contains("active")) {
-        if (!pathCreateState) {
-          ShowHint("Start Node")
-          
-          startNodeForPath = data;
-          
-          pathCreateState = true;
-        }
-        else {
-          ShowHint("End Node")
-          
-          if (startNodeForPath.idn === data.idn) {
-            setTimeout( () => {
-              ShowHint("Path");
-            }, 700);
-            return;
-          }
-          
-          PathCount++;
-    
-          const pdata = drawPath({startNode: startNodeForPath, endNode: data});
-          
-          Paths.push(pdata);
-          Save();
-          
-          pathCreateState = false;
-          
-          setTimeout( () => {
-            ShowHint("Path");
-          }, 700);
-        }
-        
-      }
-      
-      else {
-        dragging = true;
-        thisPtrId = e.pointerId;
-      
-        const localMouse = e.getLocalPosition(node);
-        offset.x = localMouse.x;
-        offset.y = localMouse.y;
-      }
-    });
-    
-    node.on("globalpointermove", (e) => {
-      if (!dragging || e.pointerId !== thisPtrId) return;
-      
-      const stagePos = e.getLocalPosition(app.stage);
-      
-      const pathsToUpdate = Paths.filter(path => path.startNode === data || path.endNode === data);
-      
-      node.position.x = stagePos.x - offset.x;
-      node.position.y = stagePos.y - offset.y;
-      
-      
-      const tuda = Nodes.find(node => node.idn === idn); //to-update data
-      if (tuda) {
-        tuda.x = node.position.x;
-        tuda.y = node.position.y;
-      }
-      
-      pathsToUpdate.forEach(path => {
-        drawPath({startNode: path.startNode, endNode: path.endNode, pgo: path.pgo});
-      })
-    });
-    
-    node.on("pointerup", () => {
-      dragging = false;
-      thisPtrId = null;
-      Save();
-    });
-    node.on("pointerupoutside", () => {
-      dragging = false;
-      thisPtrId = null;
-      Save();
-    });
-    
-    return data;
-  }
-  
-  function drawPath(ipdat) {
-    let path = ipdat.pgo;
-    if (path) {
-      ipdat.pgo?.clear();
-    }
-    else {
-      path = new PIXI.Graphics()
-      
-      path.zIndex = 0;
-      path.eventMode = "static";
-      
-      path.on("pointerdown", () => {
-        if (deleteBtn.classList.contains("active")) {
-          gsap.to(path as PIXI.Graphics, {
-            alpha: 0,
-            duration: 0.3,
-            ease: "power4.inOut",
-            onComplete: () => {
-              path?.destroy();
-            }
-          });
-          Paths = Paths.filter((p: PathData) => p.idn !== pdata.idn);
-          
-          if (Paths.length > 0) PathCount = Math.max(...Paths.map((p: PathData) => p.idn)) + 1;
-          else PathCount = 1;
-        }
-      });
-      
-      app.stage.addChild(path);
-      gsap.from(path, {
-        alpha: 0,
-        duration: 0.3,
-        ease: "power4.inOut"
-      });
-    }
-    
-    path.moveTo(ipdat.startNode.x, ipdat.startNode.y)
-        .lineTo(ipdat.endNode.x, ipdat.endNode.y)
-        .stroke({ width: 2, color: PathCol });
-    
-    const pdata: PathData = {
-      idn: ipdat.idn ? ipdat.idn : PathCount,
-      startNode: ipdat.startNode,
-      endNode: ipdat.endNode,
-      pgo: path ? path : ipdat.pgo
-    }
-    
-    return pdata;
-  }
-  
-  
-  app.stage.on("pointerdown", (e) => {
-    if (addNodeBtn.classList.contains("active")) {
-      const [ ex, ey ] = [ e.global.x, e.global.y ];
-      
-      NodeCount++;
-      const ndata = drawNode(ex, ey, NodeCount);
-      
-      Nodes.push(ndata);
-      Save();
-    }
-  });
-  //Node & Path End
-  
-  //Clear Start
-  clearBtn.onclick = () => {
-    [...app.stage.children].forEach(obj => {
-      obj?.destroy();
-    });
-
-    app.stage.removeChildren();
-    
-    localStorage.clear();
-    Nodes = [], Paths = [];
-    NodeCount = 1, PathCount = 1;
-    pathCreateState = false;
-  }
-  //Clear End
    
-  //State Start
-  function Save() {
-    const syncPaths = Paths.map(({pgo, ...other}) => other);
-    
-    localStorage.setItem("state", JSON.stringify({ nodes: Nodes, paths: syncPaths }));
-  }
+  window.app = app
+  window.state = () => [NodeCount, Nodes, PathCount, Paths];
   
-  function Load() {
-    const state = JSON.parse(localStorage.getItem("state") as string) ?? { nodes: [], paths: [] };
-    
-    if (state) {
-      if (state.nodes.length > 0) NodeCount = Math.max(...state.nodes.map((node: NodeData) => node.idn)) + 1;
-      if (state.paths.length > 0) PathCount = Math.max(...state.paths.map((path: PathData) => path.idn)) + 1;
-      
-      state.nodes.forEach((node: NodeData) => {
-        const hotnd = drawNode(node.x, node.y, node.idn);
-        Nodes.push(hotnd);
-      });
-      state.paths.forEach((path: PathData) => {
-        const StartNode = Nodes.find(n => n.idn === path.startNode.idn);
-        const EndNode = Nodes.find(n => n.idn === path.endNode.idn);
-
-        if (StartNode && EndNode) {
-          path.startNode = StartNode;
-          path.endNode = EndNode;
-        }
-        
-        const pdata = drawPath(path);
-        Paths.push(pdata);
-      });
-    }
-  }
-  //State End
-   
-  (window as any).app = app;
-  (window as any).getNodes = () => Nodes;
-  (window as any).getNodeCount = () => NodeCount;
-  (window as any).getPaths = () => Paths;
-  (window as any).getPathCount = () => PathCount;
-  
-  
-  
-  //Code Editor Start
-  
-  //Code Editor End
 })();
