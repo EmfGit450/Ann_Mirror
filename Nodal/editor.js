@@ -165,7 +165,26 @@ class Node {
   //Camera Start
   let scale = 1;
   let prevDist = 0;
+  let offsetX = 0, offsetY = 0;
   
+  //Zoom Start
+  canvasContainer.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    if (!(addNodeBtn.classList.contains("active")) &&
+        !(deleteBtn.classList.contains("active")) && 
+        !(pathBtn.classList.contains("active")) ) {
+      if (e.touches[0] && e.touches[1]) {
+        const lf1 = new PIXI.Point(e.touches[0].clientX, e.touches[0].clientY);
+        const lf2 = new PIXI.Point(e.touches[1].clientX, e.touches[1].clientY);
+        
+        const [dx, dy] = [lf2.x - lf1.x, lf1.y - lf2.y];
+      
+        const distance = Math.hypot(dx, dy);
+        
+        prevDist = distance;
+      }
+    }
+  });
   canvasContainer.addEventListener("touchmove", (e) => {
     e.preventDefault();
     if (!(addNodeBtn.classList.contains("active")) &&
@@ -174,28 +193,33 @@ class Node {
       if (e.touches[0] && e.touches[1]) {
         const lf1 = new PIXI.Point(e.touches[0].clientX, e.touches[0].clientY);
         const lf2 = new PIXI.Point(e.touches[1].clientX, e.touches[1].clientY);
-        const wf1 = view.toLocal(lf1);
-        const wf2 = view.toLocal(lf2);
         
-        const [dx, dy] = [wf2.x - wf1.x, wf2.y - wf2.y];
+        const midpoint = new PIXI.Point((lf1.x + lf2.x) / 2, (lf1.y + lf2.y) / 2);
+        const worldPoint = view.toLocal(midpoint);
+        
+        const [dx, dy] = [lf2.x - lf1.x, lf1.y - lf2.y];
       
         const distance = Math.hypot(dx, dy);
         
-        if (distance > prevDist) {
-          scale -= 0.005
-        }
-        else if (distance < prevDist) {
-          scale += 0.005;
-        }
-        console.log(scale, distance);
+        const zoom = distance / prevDist;
         
-        scale = Math.max(0.075, Math.min(3, scale));
+        scale *= 1 + (zoom - 1) * 0.9;
+        scale = Math.max(0.075, Math.min(6, scale) );
+        
         view.scale.set(scale);
+        
+        const changed = view.toGlobal(worldPoint);
+        
+        view.position.x += midpoint.x - changed.x;
+        view.position.y += midpoint.y - changed.y;
+        
         prevDist = distance;
+        
       }
     }
-    
   });
+  //Zoom End
+  
   //Camera End
   
   //HintBox Start
