@@ -165,61 +165,55 @@ class Node {
   //Camera Start
   let scale = 1;
   let prevDist = 0;
-  let offsetX = 0, offsetY = 0;
+  let prevMidp;
   
-  //Zoom Start
-  canvasContainer.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    if (!(addNodeBtn.classList.contains("active")) &&
-        !(deleteBtn.classList.contains("active")) && 
-        !(pathBtn.classList.contains("active")) ) {
-      if (e.touches[0] && e.touches[1]) {
-        const lf1 = new PIXI.Point(e.touches[0].clientX, e.touches[0].clientY);
-        const lf2 = new PIXI.Point(e.touches[1].clientX, e.touches[1].clientY);
+  let targetX = view.x, targetY = view.y;
+  let targetScale = view.scale.x;
+  
+  const allCRUDInactive = () => !togglableBtns.some(btn => btn.classList.contains("active"));
+  
+  const TouchCamera = (e) => {
+    if (e.touches.length === 2 && allCRUDInactive()) {
+      const lf1 = new PIXI.Point(e.touches[0].clientX, e.touches[0].clientY);
+      const lf2 = new PIXI.Point(e.touches[1].clientX, e.touches[1].clientY);
         
-        const [dx, dy] = [lf2.x - lf1.x, lf1.y - lf2.y];
+      const [dx, dy] = [lf2.x - lf1.x, lf1.y - lf2.y];
       
-        const distance = Math.hypot(dx, dy);
+      const distance = Math.hypot(dx, dy);
+      
+      const midpoint = new PIXI.Point((lf1.x + lf2.x) / 2, (lf1.y + lf2.y) / 2);
         
+      if (e.type === "touchstart") {
         prevDist = distance;
+        prevMidp = midpoint;
       }
-    }
-  });
-  canvasContainer.addEventListener("touchmove", (e) => {
-    e.preventDefault();
-    if (!(addNodeBtn.classList.contains("active")) &&
-        !(deleteBtn.classList.contains("active")) && 
-        !(pathBtn.classList.contains("active")) ) {
-      if (e.touches[0] && e.touches[1]) {
-        const lf1 = new PIXI.Point(e.touches[0].clientX, e.touches[0].clientY);
-        const lf2 = new PIXI.Point(e.touches[1].clientX, e.touches[1].clientY);
-        
-        const midpoint = new PIXI.Point((lf1.x + lf2.x) / 2, (lf1.y + lf2.y) / 2);
+      else if (e.type == "touchmove") {
         const worldPoint = view.toLocal(midpoint);
-        
-        const [dx, dy] = [lf2.x - lf1.x, lf1.y - lf2.y];
-      
-        const distance = Math.hypot(dx, dy);
         
         const zoom = distance / prevDist;
         
-        scale *= 1 + (zoom - 1) * 0.9;
+        targetScale = scale *= zoom;
         scale = Math.max(0.075, Math.min(6, scale) );
         
         view.scale.set(scale);
         
         const changed = view.toGlobal(worldPoint);
         
-        view.position.x += midpoint.x - changed.x;
-        view.position.y += midpoint.y - changed.y;
+        view.x += (midpoint.x - prevMidp.x) + (midpoint.x - changed.x);
+        view.y += (midpoint.y - prevMidp.y) + (midpoint.y - changed.y);
         
         prevDist = distance;
-        
+        prevMidp = midpoint;
+      }
+      else {
+        prevDist = 0;
+        prevMidp = null;
       }
     }
-  });
-  //Zoom End
-  
+  }
+  canvasContainer.addEventListener("touchstart", TouchCamera);
+  canvasContainer.addEventListener("touchmove", TouchCamera);
+  canvasContainer.addEventListener("touchend", TouchCamera);
   //Camera End
   
   //HintBox Start
