@@ -18,10 +18,9 @@ const btnHints = [ "Add", "Delete", "Path" ];
 const canvasContainer = document.querySelector(".pixi-canvas");
 
 let NodeCol = 0x5F81A8, PathCol = 0xFFFFFF;
-let NodeCount = 0, PathCount = 0;
 
-let Nodes = [];
-let Paths = [];
+let Nodes = new Map();
+let Paths = new Map();
 
 let pathCreateState = false;
 let startNodeForPath;
@@ -33,7 +32,8 @@ class Node {
   constructor(props, viewport) {
     this.x = props.x;
     this.y = props.y;
-    this.idn = props.idn;
+    this.id = crypto.randomUUID();
+    this.label = props.label ? props.label : this.id;
     
     this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(NodeCol);
     this.pig.position.set(this.x, this.y);
@@ -41,23 +41,27 @@ class Node {
     this.pig.eventMode = "static";
     this.pig.cursor = "pointer";
     
+    this.pig.nodeId = this.id;
+    
     this.selected = false;
     
     gsap.from(this.pig.scale, {
       x: 0,
       y: 0,
-      duration: 0.3,
+      duration: 0.2,
       ease: "power4.inOut"
     });
     
     viewport.addChild(this.pig);
+    
+    console.log(this.id, this.label, this.pig.nodeId);
   };
   
   delete() {
     gsap.to(this.pig.scale, {
       x: 0,
       y: 0,
-      duration: 0.2,
+      duration: 0.15,
       ease: "power4.inOut",
       onComplete: () => {
         this.pig.destroy();
@@ -66,15 +70,17 @@ class Node {
   }
   
   update(props) {
-    if (props.x) {
+    if (props.x !== undefined) {
       this.pig.position.x = props.x;
       this.x = props.x;
     }
-    if (props.y) {
+    if (props.y !== undefined) {
       this.pig.position.y = props.y;
       this.y = props.y;
     }
-    this.idn = props.idn ? props.idn : this.idn;
+    if (props.label !== undefined) {
+      this.label = props.label;
+    }
   }
   
   selectToggle(state) {
@@ -117,23 +123,43 @@ class Node {
   setTimeout( () => {
     loadingScreen.classList.add("faded-out-loading-screen");
     loadingScreen.style.pointerEvents = "none";
-  }, 500)
+  }, 450)
   //Pixi.js Setup End
   
   //Button Toggling Start
-  for (let i = 0; i < 3; i++) {
-    const btn = togglableBtns[i];
-    btn.addEventListener("click", () => {
-      btn.classList.toggle("active");
-      togglableBtns.forEach(b => b !== btn && b.classList.remove("active"));
+   const toggleBtn = (btn, hint) => {
+    btn.classList.toggle("active");
+    togglableBtns.forEach(b => b !== btn && b.classList.remove("active"));
       
-      if (btn.classList.contains("active")) {
-        ShowHint(btnHints[i]);
-      }
-      else {
-        hintBox.innerHTML = "";
+    if (btn.classList.contains("active")) {
+      ShowHint(hint);
+    }
+    else {
+      hintBox.innerHTML = "";
+    }
+  }
+  
+  addNodeBtn.onclick = () => {
+    toggleBtn(addNodeBtn, "Add");
+  }
+  deleteBtn.onclick = () => {
+    toggleBtn(deleteBtn, "Delete");
+    
+    let noSelections = true;
+    Nodes.forEach((node, id) => {
+      if (node.selected) {
+        noSelections = false;
+        node.delete();
+        Nodes.delete(id);
       }
     });
+    if (!noSelections) {
+      setTimeout( () => toggleBtn(deleteBtn, ""), 300);
+    }
+  }
+  
+  pathBtn.onclick = () => {
+    toggleBtn(pathBtn, "Path")
   }
   //Button Toggling End
   
@@ -144,21 +170,28 @@ class Node {
       const worldPos = view.toLocal(e.global);
       const [ex, ey] = [worldPos.x, worldPos.y]
       
-      NodeCount++;
-      const newNode = new Node({x: ex, y: ey, idn: NodeCount}, view);
-      Nodes.push(newNode);
+      const newNode = new Node({x: ex, y: ey}, view);
+      Nodes.set(newNode.id, newNode);
     }
     //Add Node End
     
     //Delete Start
     else if (deleteBtn.classList.contains("active")) {
       if (e.target instanceof PIXI.Graphics) {
-        const schedno = Nodes.find(node => node.pig === e.target) //scheduled death of node node
-        schedno.selectToggle(false);
+        const schedno = Nodes.get(e.target.nodeId) //scheduled-death-of node
         schedno.delete();
+        
+        Nodes.delete(schedno.id);
       }
     }
     //Delete End
+    
+    else {
+      if (e.target instanceof PIXI.Graphics) {
+        const selno = Nodes.get(e.target.nodeId);
+        selno.selectToggle();
+      }
+    }
   });
   //Visual End
   
@@ -166,9 +199,6 @@ class Node {
   let scale = 1;
   let prevDist = 0;
   let prevMidp;
-  
-  let targetX = view.x, targetY = view.y;
-  let targetScale = view.scale.x;
   
   const allCRUDInactive = () => !togglableBtns.some(btn => btn.classList.contains("active"));
   
@@ -224,8 +254,4 @@ class Node {
     hintBox.style.animation = "appear 0.6s";
   }
   //HintBox End
-   
-  window.app = app
-  window.state = () => [NodeCount, Nodes, PathCount, Paths];
-  
 })();
