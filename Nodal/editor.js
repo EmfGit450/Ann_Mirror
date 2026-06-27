@@ -53,8 +53,6 @@ class Node {
     });
     
     viewport.addChild(this.pig);
-    
-    console.log(this.id, this.label, this.pig.nodeId);
   };
   
   delete() {
@@ -172,6 +170,8 @@ class Node {
       
       const newNode = new Node({x: ex, y: ey}, view);
       Nodes.set(newNode.id, newNode);
+      
+      console.log(Array.from(Nodes.values()));
     }
     //Add Node End
     
