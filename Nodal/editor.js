@@ -44,6 +44,9 @@ class Node {
     this.pig.nodeId = this.id;
     
     this.selected = false;
+    this.isDragging = false;
+    this.dragOffset = {};
+    this.pointerId = null;
     
     gsap.from(this.pig.scale, {
       x: 0,
@@ -162,6 +165,10 @@ class Node {
   //Button Toggling End
   
   //Visual Start
+  let lastTapTime = 0;
+  let lastTapNodeId = null;
+  
+  //CreateDeleteSelect Nodes Start
   app.stage.on("pointerdown", (e) => {
     //Add Node Start
     if (addNodeBtn.classList.contains("active")) {
@@ -186,13 +193,77 @@ class Node {
     }
     //Delete End
     
-    else {
-      if (e.target instanceof PIXI.Graphics) {
-        const selno = Nodes.get(e.target.nodeId);
-        selno.selectToggle();
+    //Select Nodes Start
+    else if (e.target instanceof PIXI.Graphics) {
+      const node = Nodes.get(e.target.nodeId);
+    
+      const now = performance.now();
+      const isDoubleTap = (now - lastTapTime < 300) && (lastTapNodeId === node.id);
+    
+      if (isDoubleTap) {
+        node.selectToggle();
+        if (node.selected) e.target.zIndex = 2;
+        else e.target.zIndex = 1;
+        
+        lastTapTime = 0;
+        lastTapNodeId = null;
+      } 
+      else {
+        lastTapTime = now;
+        lastTapNodeId = node.id;
+      
+        setTimeout(() => {
+          if (lastTapTime === now && !node.isDragging) {
+            node.isDragging = true;
+            node.pointerId = e.pointerId;
+            const pointerLocal = node.pig.toLocal(e.global);
+            node.dragOffset = { offx: -pointerLocal.x, offy: -pointerLocal.y };
+          }
+        }, 300);
+      }
+    }
+    //Select Nodes End
+  });
+  //CreateDeleteSelect Nodes Emd
+  
+  //Drag Node Start
+  app.stage.on("pointerdown", (e) => {
+    if (e.target instanceof PIXI.Graphics && allCRUDInactive()) {
+      const dragno = Nodes.get(e.target.nodeId);
+      if (dragno.selected) {
+        dragno.isDragging = true;
+        dragno.pointerId = e.pointerId;
+        const pointerLocal = dragno.pig.toLocal(e.global);
+        dragno.dragOffset = { offx: -pointerLocal.x, offy: -pointerLocal.y };
       }
     }
   });
+
+  app.stage.on("globalpointermove", (e) => {
+    Nodes.forEach((node) => {
+      if (node.pointerId === e.pointerId && node.isDragging) {
+        const worldPos = view.toLocal(e.global);
+        
+        node.pig.position.x = worldPos.x + node.dragOffset.offx;
+        node.pig.position.y = worldPos.y + node.dragOffset.offy;
+        
+        node.x = node.pig.position.x;
+        node.y = node.pig.position.y;
+      }
+    });
+  });
+
+  app.stage.on("globalpointerterminate", (e) => {
+    Nodes.forEach((node) => {
+      if (node.pointerId === e.pointerId) {
+        node.isDragging = false;
+        node.pointerId = null;
+        node.dragOffset = {};
+      }
+    });
+  });
+  //Drag Nodes End
+  
   //Visual End
   
   //Camera Start
@@ -201,9 +272,17 @@ class Node {
   let prevMidp;
   
   const allCRUDInactive = () => !togglableBtns.some(btn => btn.classList.contains("active"));
+  const anyNodeDragging = () => {
+    Nodes.forEach((node) => {
+      if (node.isDragging && node.selected) return true
+    });
+    return false
+  }
+  
+  //BUG: CANNOT ZOOM & PINCH
   
   const TouchCamera = (e) => {
-    if (e.touches.length === 2 && allCRUDInactive()) {
+    if (e.touches.length === 2 && allCRUDInactive() && !anyNodeDragging) {
       const lf1 = new PIXI.Point(e.touches[0].clientX, e.touches[0].clientY);
       const lf2 = new PIXI.Point(e.touches[1].clientX, e.touches[1].clientY);
         
@@ -238,6 +317,7 @@ class Node {
       else {
         prevDist = 0;
         prevMidp = null;
+        isAnyNodeDragging = false;
       }
     }
   }
