@@ -56,6 +56,8 @@ class Node {
     });
     
     viewport.addChild(this.pig);
+    
+    console.log(this.id, this.label, this.pig.nodeId);
   };
   
   delete() {
@@ -177,8 +179,6 @@ class Node {
       
       const newNode = new Node({x: ex, y: ey}, view);
       Nodes.set(newNode.id, newNode);
-      
-      console.log(Array.from(Nodes.values()));
     }
     //Add Node End
     
@@ -267,6 +267,31 @@ class Node {
   //Visual End
   
   //Camera Start
+  class Camera {
+    constructor() {
+      this.view = {
+        scale: 1,
+        offsetX: 0,
+        offsetY: 0
+      }
+      this.touchState = {
+        prevDist: 0,
+        prevMidp: null
+      }
+      
+      this.touchOrbit();
+      this.keymiceOrbit();
+    }
+    
+    touchOrbit = () => {
+      app.stage.on("pointerdown", (e) => {
+        console.log(e);
+      });
+    }
+    
+  }
+  
+  
   let scale = 1;
   let prevDist = 0;
   let prevMidp;
