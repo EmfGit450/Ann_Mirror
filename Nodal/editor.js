@@ -46,6 +46,7 @@ class Node {
     this.selected = false;
     this.isDragging = false;
     this.dragOffset = {};
+    this.dragTimeout = 0;
     this.pointerId = null;
     
     gsap.from(this.pig.scale, {
@@ -209,14 +210,15 @@ class Node {
         lastTapNodeId = null;
       } 
       else {
-        lastTapTime = now;
-        lastTapNodeId = node.id;
-      
-        setTimeout(() => {
+        const startGlobal = new PIXI.Point(e.global.x, e.global.y);
+        const startPointerId = e.pointerId;
+        
+        node.dragTimeout = setTimeout(() => {
           if (lastTapTime === now && !node.isDragging) {
             node.isDragging = true;
-            node.pointerId = e.pointerId;
-            const pointerLocal = node.pig.toLocal(e.global);
+            node.pointerId = startPointerId
+            
+            const pointerLocal = node.pig.toLocal(startGlobal); 
             node.dragOffset = { offx: -pointerLocal.x, offy: -pointerLocal.y };
           }
         }, 300);
@@ -253,102 +255,122 @@ class Node {
     });
   });
 
-  app.stage.on("globalpointerterminate", (e) => {
+  const clearNodeDragState = (e) => {
     Nodes.forEach((node) => {
+      if (node.dragTimeout) {
+        clearTimeout(node.dragTimeout);
+        node.dragTimeout = null;
+      }
+    
       if (node.pointerId === e.pointerId) {
         node.isDragging = false;
         node.pointerId = null;
         node.dragOffset = {};
       }
     });
-  });
+  };
+  
+  app.stage.on("pointerup", clearNodeDragState);
+  app.stage.on("pointerupoutside", clearNodeDragState);
   //Drag Nodes End
   
   //Visual End
   
   //Camera Start
   class Camera {
-    constructor() {
+    constructor(app, viewport) {
+      this.app = app;
+      this.viewport = viewport;
+      
       this.view = {
         scale: 1,
+        zoom: 1,
         offsetX: 0,
         offsetY: 0
       }
       this.touchState = {
-        prevDist: 0,
+        prevDist: 0, 
         prevMidp: null
       }
+      this.activePointers = new Map();
       
       this.touchOrbit();
-      this.keymiceOrbit();
+      //this.keymiceOrbit();
     }
     
     touchOrbit = () => {
-      app.stage.on("pointerdown", (e) => {
-        console.log(e);
+      this.app.stage.on("pointerdown", (e) => {
+        this.activePointers.set(e.pointerId, {x: e.global.x, y: e.global.y});
+        
+        if (this.activePointers.size === 2) {
+          const fArr = [...this.activePointers.values()];
+          const f1 = fArr[0];
+          const f2 = fArr[1];
+          
+          this.touchState.prevMidp = new PIXI.Point((f1.x + f2.x) / 2, (f1.y + f2.y) / 2);
+          
+          this.touchState.prevDist = Math.hypot(f1.x - f2.x, f1.y - f2.y);
+        }
+      });
+      
+      this.app.stage.on("pointermove", (e) => {
+        if (!anyNodeDragging() && this.activePointers.size === 2 && this.activePointers.has(e.pointerId)) {
+          console.log(anyNodeDragging())
+          
+          this.activePointers.set(e.pointerId, {x: e.global.x, y: e.global.y});
+          
+          const fArr = [...this.activePointers.values()];
+          const f1 = fArr[0];
+          const f2 = fArr[1];
+          
+          const currDist = Math.hypot(f1.x - f2.x, f1.y - f2.y);
+          const midpoint = new PIXI.Point((f1.x + f2.x) / 2, (f1.y + f2.y) / 2);
+          
+          if (!this.touchState.prevDist || !this.touchState.prevMidp) {
+            this.touchState.prevDist = currDist;
+            this.touchState.prevMidp = midpoint;
+            return; 
+          }
+          
+          const worldPoint = this.viewport.toLocal(midpoint);
+          
+          this.view.zoom = currDist / this.touchState.prevDist;
+          this.view.scale *= this.view.zoom;
+          
+          this.viewport.scale.set(this.view.scale);
+          
+          const worldPointAfter = this.viewport.toLocal(midpoint);
+          
+          this.viewport.x += (worldPointAfter.x - worldPoint.x) * this.view.scale + (midpoint.x - this.touchState.prevMidp.x);
+          this.viewport.y += (worldPointAfter.y - worldPoint.y) * this.view.scale + (midpoint.y - this.touchState.prevMidp.y);
+          
+          this.touchState.prevDist = currDist;
+          this.touchState.prevMidp = midpoint;
+        }
+      });
+      
+      this.app.stage.on("pointerup", (e) => {
+        console.log("pointerup:", e.pointerId);
+        this.activePointers.delete(e.pointerId);
+        
+        if (this.activePointers.size <= 1) {
+          this.touchState.prevDist = 0;
+          this.touchState.prevMidp = null;
+        }
       });
     }
     
   }
   
-  
-  let scale = 1;
-  let prevDist = 0;
-  let prevMidp;
+  const viewCamera = new Camera(app, view);
   
   const allCRUDInactive = () => !togglableBtns.some(btn => btn.classList.contains("active"));
   const anyNodeDragging = () => {
-    Nodes.forEach((node) => {
-      if (node.isDragging && node.selected) return true
-    });
-    return false
-  }
-  
-  //BUG: CANNOT ZOOM & PINCH
-  
-  const TouchCamera = (e) => {
-    if (e.touches.length === 2 && allCRUDInactive() && !anyNodeDragging) {
-      const lf1 = new PIXI.Point(e.touches[0].clientX, e.touches[0].clientY);
-      const lf2 = new PIXI.Point(e.touches[1].clientX, e.touches[1].clientY);
-        
-      const [dx, dy] = [lf2.x - lf1.x, lf1.y - lf2.y];
-      
-      const distance = Math.hypot(dx, dy);
-      
-      const midpoint = new PIXI.Point((lf1.x + lf2.x) / 2, (lf1.y + lf2.y) / 2);
-        
-      if (e.type === "touchstart") {
-        prevDist = distance;
-        prevMidp = midpoint;
-      }
-      else if (e.type == "touchmove") {
-        const worldPoint = view.toLocal(midpoint);
-        
-        const zoom = distance / prevDist;
-        
-        targetScale = scale *= zoom;
-        scale = Math.max(0.075, Math.min(6, scale) );
-        
-        view.scale.set(scale);
-        
-        const changed = view.toGlobal(worldPoint);
-        
-        view.x += (midpoint.x - prevMidp.x) + (midpoint.x - changed.x);
-        view.y += (midpoint.y - prevMidp.y) + (midpoint.y - changed.y);
-        
-        prevDist = distance;
-        prevMidp = midpoint;
-      }
-      else {
-        prevDist = 0;
-        prevMidp = null;
-        isAnyNodeDragging = false;
-      }
+    for (const node of Nodes.values()) {
+      if (node.isDragging) return true;
     }
+    return false;
   }
-  canvasContainer.addEventListener("touchstart", TouchCamera);
-  canvasContainer.addEventListener("touchmove", TouchCamera);
-  canvasContainer.addEventListener("touchend", TouchCamera);
   //Camera End
   
   //HintBox Start
