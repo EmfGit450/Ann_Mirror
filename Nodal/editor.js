@@ -203,25 +203,23 @@ class Node {
     
       if (isDoubleTap) {
         node.selectToggle();
-        if (node.selected) e.target.zIndex = 2;
-        else e.target.zIndex = 1;
-        
+        e.target.zIndex = node.selected ? 2 : 1;
+  
         lastTapTime = 0;
         lastTapNodeId = null;
-      } 
-      else {
-        const startGlobal = new PIXI.Point(e.global.x, e.global.y);
-        const startPointerId = e.pointerId;
         
-        node.dragTimeout = setTimeout(() => {
-          if (lastTapTime === now && !node.isDragging) {
-            node.isDragging = true;
-            node.pointerId = startPointerId
-            
-            const pointerLocal = node.pig.toLocal(startGlobal); 
-            node.dragOffset = { offx: -pointerLocal.x, offy: -pointerLocal.y };
-          }
-        }, 300);
+        node.isDragging = false;
+        node.pointerId = null;
+      }
+      else {
+        lastTapTime = now;
+        lastTapNodeId = node.id;
+  
+        node.isDragging = true;
+        node.pointerId = e.pointerId;
+  
+        const pointerLocal = node.pig.toLocal(e.global);
+        node.dragOffset = { offx: -pointerLocal.x, offy: -pointerLocal.y };
       }
     }
     //Select Nodes End
@@ -335,7 +333,10 @@ class Node {
           const worldPoint = this.viewport.toLocal(midpoint);
           
           this.view.zoom = currDist / this.touchState.prevDist;
-          this.view.scale *= this.view.zoom;
+          const rawScale = this.view.scale * this.view.zoom;
+          this.view.scale = Math.max(0.1, Math.min(10, rawScale));
+          
+          console.log(`scale: ${this.view.scale}\nzoom: ${this.view.zoom}`)
           
           this.viewport.scale.set(this.view.scale);
           
