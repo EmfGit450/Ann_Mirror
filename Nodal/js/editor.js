@@ -57,8 +57,6 @@ class Node {
     });
     
     viewport.addChild(this.pig);
-    
-    console.log(this.id, this.label, this.pig.nodeId);
   };
   
   delete() {
@@ -282,9 +280,7 @@ class Node {
       
       this.view = {
         scale: 1,
-        zoom: 1,
-        offsetX: 0,
-        offsetY: 0
+        zoom: 1
       }
       this.touchState = {
         prevDist: 0, 
@@ -313,8 +309,6 @@ class Node {
       
       this.app.stage.on("pointermove", (e) => {
         if (!anyNodeDragging() && this.activePointers.size === 2 && this.activePointers.has(e.pointerId)) {
-          console.log(anyNodeDragging())
-          
           this.activePointers.set(e.pointerId, {x: e.global.x, y: e.global.y});
           
           const fArr = [...this.activePointers.values()];
@@ -336,14 +330,15 @@ class Node {
           const rawScale = this.view.scale * this.view.zoom;
           this.view.scale = Math.max(0.1, Math.min(10, rawScale));
           
-          console.log(`scale: ${this.view.scale}\nzoom: ${this.view.zoom}`)
-          
           this.viewport.scale.set(this.view.scale);
           
           const worldPointAfter = this.viewport.toLocal(midpoint);
           
-          this.viewport.x += (worldPointAfter.x - worldPoint.x) * this.view.scale + (midpoint.x - this.touchState.prevMidp.x);
-          this.viewport.y += (worldPointAfter.y - worldPoint.y) * this.view.scale + (midpoint.y - this.touchState.prevMidp.y);
+          const panX = midpoint.x - this.touchState.prevMidp.x;
+          const panY = midpoint.y - this.touchState.prevMidp.y;
+          
+          this.viewport.x += (worldPointAfter.x - worldPoint.x) * this.view.scale + panX;
+          this.viewport.y += (worldPointAfter.y - worldPoint.y) * this.view.scale + panY;
           
           this.touchState.prevDist = currDist;
           this.touchState.prevMidp = midpoint;
@@ -351,7 +346,6 @@ class Node {
       });
       
       this.app.stage.on("pointerup", (e) => {
-        console.log("pointerup:", e.pointerId);
         this.activePointers.delete(e.pointerId);
         
         if (this.activePointers.size <= 1) {
