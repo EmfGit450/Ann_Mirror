@@ -46,7 +46,7 @@ body {
 	background: black;
 	display: flex;
 	flex-direction: column;
-	padding: 2rem;
+	padding: 1.7rem;
 }
 
 /*Loading Screen*/
@@ -91,8 +91,8 @@ body {
   justify-content: space-between;
   gap: 0.5rem;
   
-  height: calc(100dvh - 3.8rem);
-  padding: 1.8rem;
+  height: calc(100dvh - 2.4rem);
+  padding: 1rem;
 	background: #030303;
 	border-radius: 1.5rem;
 	box-shadow: 0.2rem 0.2rem 1rem #1F1F1F;
