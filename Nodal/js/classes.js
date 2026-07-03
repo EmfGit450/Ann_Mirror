@@ -78,18 +78,17 @@ class Layer {
     this.x = props.x;
     this.y = props.y;
     
-    this.pig = new PIXI.Graphics().drawRoundedRect(0,0,60,60,10).fill({color: 0xFFFFFF, alpha: 0.2});
+    this.pig = new PIXI.Graphics().drawRect(0,0,60,60).fill({color: 0xFFFFFF, alpha: 0.2});
     this.pig.position.set(this.x, this.y);
     
     viewport.addChild(this.pig);
-    console.log(this.pig)
   }
   
-  setHeight(val) {
+  setDim(valh, valw) {
     gsap.to(this.pig, {
-      height: val,
-      radius: val / 100,
-      duration: 0.3,
+      height: valh,
+      width: valw,
+      duration: 2,
       ease: "power4.inOut"
     });
   }

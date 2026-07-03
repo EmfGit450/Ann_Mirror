@@ -49,10 +49,6 @@ let startNodeForPath;
   
   app.stage.addChild(view);
   
-  console.log('Canvas background:', app.canvas.style.backgroundColor);
-console.log('Renderer background alpha:', app.renderer.background.alpha);
-console.log('Renderer background color:', app.renderer.background.color);
-  
   setTimeout( () => {
     loadingScreen.classList.add("faded-out-loading-screen");
     loadingScreen.style.pointerEvents = "none";
@@ -62,7 +58,7 @@ console.log('Renderer background color:', app.renderer.background.color);
   const testd = new Neuron({x: 430, y: 330}, view)
    
 const test = new Layer({x: 400, y: 300}, view);
-setTimeout(() => test.setHeight(200), 10000)
+setTimeout(() => test.setDim(0, 0), 3000)
 console.log(test.nodes, test.id)
   //Pixi.js Setup End
   
