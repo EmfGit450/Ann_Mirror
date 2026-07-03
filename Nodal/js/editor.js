@@ -17,8 +17,6 @@ const btnHints = [ "Add", "Delete", "Path" ];
 
 const canvasContainer = document.querySelector(".pixi-canvas");
 
-let NodeCol = 0x5F81A8, PathCol = 0xFFFFFF;
-
 let Nodes = new Map();
 let Paths = new Map();
 
@@ -27,79 +25,6 @@ let startNodeForPath;
 
 //const codingPanel = document.querySelector(".coding-panel");
 //Later
-
-class Node {
-  constructor(props, viewport) {
-    this.x = props.x;
-    this.y = props.y;
-    this.id = crypto.randomUUID();
-    this.label = props.label ? props.label : this.id;
-    
-    this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(NodeCol);
-    this.pig.position.set(this.x, this.y);
-    this.pig.zIndex = 1;
-    this.pig.eventMode = "static";
-    this.pig.cursor = "pointer";
-    
-    this.pig.nodeId = this.id;
-    
-    this.selected = false;
-    this.isDragging = false;
-    this.dragOffset = {};
-    this.dragTimeout = 0;
-    this.pointerId = null;
-    
-    gsap.from(this.pig.scale, {
-      x: 0,
-      y: 0,
-      duration: 0.2,
-      ease: "power4.inOut"
-    });
-    
-    viewport.addChild(this.pig);
-  };
-  
-  delete() {
-    gsap.to(this.pig.scale, {
-      x: 0,
-      y: 0,
-      duration: 0.15,
-      ease: "power4.inOut",
-      onComplete: () => {
-        this.pig.destroy();
-      }
-    });
-  }
-  
-  update(props) {
-    if (props.x !== undefined) {
-      this.pig.position.x = props.x;
-      this.x = props.x;
-    }
-    if (props.y !== undefined) {
-      this.pig.position.y = props.y;
-      this.y = props.y;
-    }
-    if (props.label !== undefined) {
-      this.label = props.label;
-    }
-  }
-  
-  selectToggle(state) {
-    if (state === undefined) this.selected = !this.selected;
-    else this.selected = state;
-    
-    if (this.selected) {
-      this.pig.clear().circle(0, 0, 20).fill(NodeCol).stroke({width: 2, color: 0xFFFFFF});
-      this.pig.position.set(this.x, this.y);
-    }
-    else {
-      this.pig.clear().circle(0, 0, 20).fill(NodeCol);
-      this.pig.position.set(this.x, this.y);
-    }
-  }
-  
-}
 
 (async () => {
   //Pixi.js Setup Start
@@ -111,9 +36,11 @@ class Node {
     resizeTo: canvasContainer,
     resolution: window.devicePixelRatio || 1,
     autoDensity: true,
-    background: "#030303",
+    transparent: true,
     antialias: true
   });
+  app.renderer.background.alpha = 0;
+
   
   canvasContainer.appendChild(app.canvas);
   app.stage.eventMode = "static";
@@ -122,10 +49,21 @@ class Node {
   
   app.stage.addChild(view);
   
+  console.log('Canvas background:', app.canvas.style.backgroundColor);
+console.log('Renderer background alpha:', app.renderer.background.alpha);
+console.log('Renderer background color:', app.renderer.background.color);
+  
   setTimeout( () => {
     loadingScreen.classList.add("faded-out-loading-screen");
     loadingScreen.style.pointerEvents = "none";
   }, 450)
+  
+  
+  const testd = new Neuron({x: 430, y: 330}, view)
+   
+const test = new Layer({x: 400, y: 300}, view);
+setTimeout(() => test.setHeight(200), 10000)
+console.log(test.nodes, test.id)
   //Pixi.js Setup End
   
   //Button Toggling Start
@@ -166,109 +104,6 @@ class Node {
   //Button Toggling End
   
   //Visual Start
-  let lastTapTime = 0;
-  let lastTapNodeId = null;
-  
-  //CreateDeleteSelect Nodes Start
-  app.stage.on("pointerdown", (e) => {
-    //Add Node Start
-    if (addNodeBtn.classList.contains("active")) {
-      const worldPos = view.toLocal(e.global);
-      const [ex, ey] = [worldPos.x, worldPos.y]
-      
-      const newNode = new Node({x: ex, y: ey}, view);
-      Nodes.set(newNode.id, newNode);
-    }
-    //Add Node End
-    
-    //Delete Start
-    else if (deleteBtn.classList.contains("active")) {
-      if (e.target instanceof PIXI.Graphics) {
-        const schedno = Nodes.get(e.target.nodeId) //scheduled-death-of node
-        schedno.delete();
-        
-        Nodes.delete(schedno.id);
-      }
-    }
-    //Delete End
-    
-    //Select Nodes Start
-    else if (e.target instanceof PIXI.Graphics) {
-      const node = Nodes.get(e.target.nodeId);
-    
-      const now = performance.now();
-      const isDoubleTap = (now - lastTapTime < 300) && (lastTapNodeId === node.id);
-    
-      if (isDoubleTap) {
-        node.selectToggle();
-        e.target.zIndex = node.selected ? 2 : 1;
-  
-        lastTapTime = 0;
-        lastTapNodeId = null;
-        
-        node.isDragging = false;
-        node.pointerId = null;
-      }
-      else {
-        lastTapTime = now;
-        lastTapNodeId = node.id;
-  
-        node.isDragging = true;
-        node.pointerId = e.pointerId;
-  
-        const pointerLocal = node.pig.toLocal(e.global);
-        node.dragOffset = { offx: -pointerLocal.x, offy: -pointerLocal.y };
-      }
-    }
-    //Select Nodes End
-  });
-  //CreateDeleteSelect Nodes Emd
-  
-  //Drag Node Start
-  app.stage.on("pointerdown", (e) => {
-    if (e.target instanceof PIXI.Graphics && allCRUDInactive()) {
-      const dragno = Nodes.get(e.target.nodeId);
-      if (dragno.selected) {
-        dragno.isDragging = true;
-        dragno.pointerId = e.pointerId;
-        const pointerLocal = dragno.pig.toLocal(e.global);
-        dragno.dragOffset = { offx: -pointerLocal.x, offy: -pointerLocal.y };
-      }
-    }
-  });
-
-  app.stage.on("globalpointermove", (e) => {
-    Nodes.forEach((node) => {
-      if (node.pointerId === e.pointerId && node.isDragging) {
-        const worldPos = view.toLocal(e.global);
-        
-        node.pig.position.x = worldPos.x + node.dragOffset.offx;
-        node.pig.position.y = worldPos.y + node.dragOffset.offy;
-        
-        node.x = node.pig.position.x;
-        node.y = node.pig.position.y;
-      }
-    });
-  });
-
-  const clearNodeDragState = (e) => {
-    Nodes.forEach((node) => {
-      if (node.dragTimeout) {
-        clearTimeout(node.dragTimeout);
-        node.dragTimeout = null;
-      }
-    
-      if (node.pointerId === e.pointerId) {
-        node.isDragging = false;
-        node.pointerId = null;
-        node.dragOffset = {};
-      }
-    });
-  };
-  
-  app.stage.on("pointerup", clearNodeDragState);
-  app.stage.on("pointerupoutside", clearNodeDragState);
-  //Drag Nodes End
   
   //Visual End
   
