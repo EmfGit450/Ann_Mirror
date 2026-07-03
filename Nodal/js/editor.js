@@ -7,12 +7,12 @@ const codeEditorBtn = document.getElementById("code-editor");
 
 const addNodeBtn = document.getElementById("add-node");
 const deleteBtn = document.getElementById("delete");
-const pathBtn = document.getElementById("path");
+const connectBtn = document.getElementById("path");
 const clearBtn = document.getElementById("clear");
 
 const hintBox = document.getElementById("hintbox");
 
-const togglableBtns = [ addNodeBtn, deleteBtn, pathBtn ];
+const togglableBtns = [ addNodeBtn, deleteBtn, connectBtn ];
 const btnHints = [ "Add", "Delete", "Path" ];
 
 const canvasContainer = document.querySelector(".pixi-canvas");
@@ -58,7 +58,7 @@ let startNodeForPath;
   const testd = new Neuron({x: 430, y: 330}, view)
    
 const test = new Layer({x: 400, y: 300}, view);
-setTimeout(() => test.setDim(0, 0), 3000)
+setTimeout(() => test.setDim(240, 300), 3000)
 console.log(test.nodes, test.id)
   //Pixi.js Setup End
   
@@ -94,8 +94,8 @@ console.log(test.nodes, test.id)
     }
   }
   
-  pathBtn.onclick = () => {
-    toggleBtn(pathBtn, "Path")
+  connectBtn.onclick = () => {
+    toggleBtn(connectBtn, "Connect")
   }
   //Button Toggling End
   

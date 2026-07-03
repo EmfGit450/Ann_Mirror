@@ -88,8 +88,8 @@ class Layer {
     gsap.to(this.pig, {
       height: valh,
       width: valw,
-      duration: 2,
-      ease: "power4.inOut"
+      duration: 1,
+      ease: "elastic.inOut"
     });
   }
 }
