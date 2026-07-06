@@ -56,7 +56,7 @@ let Layers = new Map();
   const test = new Layer({x: 400, y: 300}, view);
   Layers.set(test.id, test);
   
-  setTimeout(() => test.setDim(240, 300), 3000);
+  test.addNeuron(testd);
   //Pixi.js Setup End
   
   //Button Toggling Start
@@ -89,14 +89,14 @@ let Layers = new Map();
   
   app.stage.on("pointerdown", (e) => {
     lastPtrDown = performance.now();
-    let eventTarget = e;
+    eventTarget = e.target;
   });
   
   app.stage.on("pointerup", (e) => {
     const now = performance.now();
     console.log(`Press time: ${(now - lastPtrDown)/1000}`); //DEBUG
     
-    if (e !== eventTarget) return;
+    if (e.target !== eventTarget) return;
     
     console.log(e.target.layerId)
     
@@ -105,7 +105,10 @@ let Layers = new Map();
       console.log(layer)
       if (addNeuronBtn.classList.contains("active")) {
         const pos = layer.nextPos();
+        layer.setDim(layer.nodes.size * 30, 60)
         const newNeuron = new Neuron({x: pos.x, y: pos.y}, view);
+        
+        layer.addNeuron(newNeuron);
       }
     }
   });

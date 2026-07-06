@@ -78,20 +78,29 @@ class Layer {
     this.x = props.x;
     this.y = props.y;
     
+    this.width = 60;
+    this.height = 60;
+    
     this.pig = new PIXI.Graphics().drawRect(0,0,60,60).fill({color: 0xFFFFFF, alpha: 0.2});
     this.pig.position.set(this.x, this.y);
+    this.pig.zIndex = 0;
+    
+    this.pig.eventMode = "static"
+    this.pig.cursor = "pointer"
     
     this.pig.layerId = this.id;
     
     viewport.addChild(this.pig);
   }
-  
+  redraw() {
+    this.pig.clear().drawRect(0, 0, this.width, this.height).fill({color: 0xFFFFFF, alpha: 0.2});
+  }
   addNeuron(neuron) {
     this.nodes.set(neuron.id, neuron);
   }
   
   nextPos() {
-    return {x: this.x + 30, y: 30 + 60 * this.nodes.size};
+    return {x: this.x + 30, y: this.y + 30 + 60 * this.nodes.size};
   }
   
   setDim(valh, valw) {
@@ -99,7 +108,8 @@ class Layer {
       height: valh,
       width: valw,
       duration: 0.8,
-      ease: "expo.inOut"
+      ease: "expo.inOut",
+      onUpdate: () => this.redraw()
     });
   }
 }
