@@ -5,9 +5,9 @@ class Neuron {
     this.id = crypto.randomUUID();
     this.label = props.label;
     
-    this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(0x5F81A8);
+    this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(0x8BBBF8);
     this.pig.position.set(this.x, this.y);
-    this.pig.zIndex = 1;
+    this.pig.zIndex = 2;
     this.pig.eventMode = "static";
     this.pig.cursor = "pointer";
     
@@ -54,21 +54,9 @@ class Neuron {
     }
   }
   
-  selectToggle(state) {
-    if (state === undefined) this.selected = !this.selected;
-    else this.selected = state;
-    
-    if (this.selected) {
-      this.pig.clear().circle(0, 0, 20).fill(NodeCol).stroke({width: 2, color: 0xFFFFFF});
-      this.pig.position.set(this.x, this.y);
-    }
-    else {
-      this.pig.clear().circle(0, 0, 20).fill(NodeCol);
-      this.pig.position.set(this.x, this.y);
-    }
-  }
-  
 }
+
+class Synapse {}
 
 class Layer {
   constructor(props, viewport) {
@@ -81,7 +69,7 @@ class Layer {
     this.width = 60;
     this.height = 60;
     
-    this.pig = new PIXI.Graphics().drawRect(0,0,60,60).fill({color: 0xFFFFFF, alpha: 0.2});
+    this.pig = new PIXI.Graphics().drawRoundedRect(0,0,60,60,8).fill({color: 0x3A3B47, alpha: 0.7});
     this.pig.position.set(this.x, this.y);
     this.pig.zIndex = 0;
     
@@ -93,7 +81,7 @@ class Layer {
     viewport.addChild(this.pig);
   }
   redraw() {
-    this.pig.clear().drawRect(0, 0, this.width, this.height).fill({color: 0xFFFFFF, alpha: 0.2});
+    this.pig.clear().drawRoundedRect(0, 0, this.width, this.height, 8).fill({color: 0x3A3B47, alpha: 0.7});
   }
   addNeuron(neuron) {
     this.nodes.set(neuron.id, neuron);
@@ -104,10 +92,10 @@ class Layer {
   }
   
   setDim(valh, valw) {
-    gsap.to(this.pig, {
+    gsap.to(this, {
       height: valh,
       width: valw,
-      duration: 0.8,
+      duration: 0.1,
       ease: "expo.inOut",
       onUpdate: () => this.redraw()
     });

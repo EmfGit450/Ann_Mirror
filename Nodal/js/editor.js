@@ -1,6 +1,7 @@
 const loadingScreen = document.querySelector(".loading-screen");
 
-const codeEditorBtn = document.getElementById("code-editor");
+//const codeEditorBtn = document.getElementById("code-editor");
+//Later
 
 //const settingsBtn = document.getElementById("editor-settings");
 //Later
@@ -10,10 +11,7 @@ const deleteBtn = document.getElementById("delete");
 const connectBtn = document.getElementById("path");
 const clearBtn = document.getElementById("clear");
 
-const hintBox = document.getElementById("hintbox");
-
 const togglableBtns = [ addNeuronBtn, deleteBtn, connectBtn ];
-const btnHints = [ "Add", "Delete", "Path" ];
 
 const canvasContainer = document.querySelector(".pixi-canvas");
 
@@ -63,23 +61,16 @@ let Layers = new Map();
    const toggleBtn = (btn, hint) => {
     btn.classList.toggle("active");
     togglableBtns.forEach(b => b !== btn && b.classList.remove("active"));
-      
-    if (btn.classList.contains("active")) {
-      ShowHint(hint);
-    }
-    else {
-      hintBox.innerHTML = "";
-    }
   }
   
   addNeuronBtn.onclick = () => {
-    toggleBtn(addNeuronBtn, "Add");
+    toggleBtn(addNeuronBtn);
   }
   deleteBtn.onclick = () => {
-    toggleBtn(deleteBtn, "Delete");
+    toggleBtn(deleteBtn);
   }
   connectBtn.onclick = () => {
-    toggleBtn(connectBtn, "Connect")
+    toggleBtn(connectBtn)
   }
   //Button Toggling End
   
@@ -98,17 +89,16 @@ let Layers = new Map();
     
     if (e.target !== eventTarget) return;
     
-    console.log(e.target.layerId)
-    
     if (e.target.layerId) {
       const layer = Layers.get(e.target.layerId);
-      console.log(layer)
+      
       if (addNeuronBtn.classList.contains("active")) {
         const pos = layer.nextPos();
-        layer.setDim(layer.nodes.size * 30, 60)
         const newNeuron = new Neuron({x: pos.x, y: pos.y}, view);
+        Neurons.set(newNeuron.id, newNeuron);
         
         layer.addNeuron(newNeuron);
+        layer.setDim(layer.nodes.size * 60, 60)
       }
     }
   });
