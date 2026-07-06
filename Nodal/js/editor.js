@@ -5,26 +5,21 @@ const codeEditorBtn = document.getElementById("code-editor");
 //const settingsBtn = document.getElementById("editor-settings");
 //Later
 
-const addNodeBtn = document.getElementById("add-node");
+const addNeuronBtn = document.getElementById("add-node");
 const deleteBtn = document.getElementById("delete");
 const connectBtn = document.getElementById("path");
 const clearBtn = document.getElementById("clear");
 
 const hintBox = document.getElementById("hintbox");
 
-const togglableBtns = [ addNodeBtn, deleteBtn, connectBtn ];
+const togglableBtns = [ addNeuronBtn, deleteBtn, connectBtn ];
 const btnHints = [ "Add", "Delete", "Path" ];
 
 const canvasContainer = document.querySelector(".pixi-canvas");
 
-let Nodes = new Map();
-let Paths = new Map();
-
-let pathCreateState = false;
-let startNodeForPath;
-
-//const codingPanel = document.querySelector(".coding-panel");
-//Later
+let Neurons = new Map();
+let Synapses = new Map();
+let Layers = new Map();
 
 (async () => {
   //Pixi.js Setup Start
@@ -55,11 +50,13 @@ let startNodeForPath;
   }, 450)
   
   
-  const testd = new Neuron({x: 430, y: 330}, view)
-   
-const test = new Layer({x: 400, y: 300}, view);
-setTimeout(() => test.setDim(240, 300), 3000)
-console.log(test.nodes, test.id)
+  const testd = new Neuron({x: 430, y: 330}, view);
+  Neurons.set(testd.id, testd);
+  
+  const test = new Layer({x: 400, y: 300}, view);
+  Layers.set(test.id, test);
+  
+  setTimeout(() => test.setDim(240, 300), 3000);
   //Pixi.js Setup End
   
   //Button Toggling Start
@@ -75,32 +72,43 @@ console.log(test.nodes, test.id)
     }
   }
   
-  addNodeBtn.onclick = () => {
-    toggleBtn(addNodeBtn, "Add");
+  addNeuronBtn.onclick = () => {
+    toggleBtn(addNeuronBtn, "Add");
   }
   deleteBtn.onclick = () => {
     toggleBtn(deleteBtn, "Delete");
-    
-    let noSelections = true;
-    Nodes.forEach((node, id) => {
-      if (node.selected) {
-        noSelections = false;
-        node.delete();
-        Nodes.delete(id);
-      }
-    });
-    if (!noSelections) {
-      setTimeout( () => toggleBtn(deleteBtn, ""), 300);
-    }
   }
-  
   connectBtn.onclick = () => {
     toggleBtn(connectBtn, "Connect")
   }
   //Button Toggling End
   
   //Visual Start
+  let lastPtrDown;
+  let eventTarget;
   
+  app.stage.on("pointerdown", (e) => {
+    lastPtrDown = performance.now();
+    let eventTarget = e;
+  });
+  
+  app.stage.on("pointerup", (e) => {
+    const now = performance.now();
+    console.log(`Press time: ${(now - lastPtrDown)/1000}`); //DEBUG
+    
+    if (e !== eventTarget) return;
+    
+    console.log(e.target.layerId)
+    
+    if (e.target.layerId) {
+      const layer = Layers.get(e.target.layerId);
+      console.log(layer)
+      if (addNeuronBtn.classList.contains("active")) {
+        const pos = layer.nextPos();
+        const newNeuron = new Neuron({x: pos.x, y: pos.y}, view);
+      }
+    }
+  });
   //Visual End
   
   //Camera Start
@@ -192,7 +200,7 @@ console.log(test.nodes, test.id)
   
   const allCRUDInactive = () => !togglableBtns.some(btn => btn.classList.contains("active"));
   const anyNodeDragging = () => {
-    for (const node of Nodes.values()) {
+    for (const node of Neurons.values()) {
       if (node.isDragging) return true;
     }
     return false;

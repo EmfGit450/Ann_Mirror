@@ -2,8 +2,8 @@ class Neuron {
   constructor(props, viewport) {
     this.x = props.x;
     this.y = props.y;
-    this.id = crypto.randomUUID().slice(5);
-    this.label = props.label ? props.label : this.id;
+    this.id = crypto.randomUUID();
+    this.label = props.label;
     
     this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(0x5F81A8);
     this.pig.position.set(this.x, this.y);
@@ -25,7 +25,6 @@ class Neuron {
       duration: 0.2,
       ease: "power4.inOut"
     });
-    console.log(this)
     viewport.addChild(this.pig);
   };
   
@@ -74,22 +73,33 @@ class Neuron {
 class Layer {
   constructor(props, viewport) {
     this.nodes = new Map();
-    this.id = crypto.randomUUID()
+    this.id = crypto.randomUUID();
+    this.label = props.label;
     this.x = props.x;
     this.y = props.y;
     
     this.pig = new PIXI.Graphics().drawRect(0,0,60,60).fill({color: 0xFFFFFF, alpha: 0.2});
     this.pig.position.set(this.x, this.y);
     
+    this.pig.layerId = this.id;
+    
     viewport.addChild(this.pig);
+  }
+  
+  addNeuron(neuron) {
+    this.nodes.set(neuron.id, neuron);
+  }
+  
+  nextPos() {
+    return {x: this.x + 30, y: 30 + 60 * this.nodes.size};
   }
   
   setDim(valh, valw) {
     gsap.to(this.pig, {
       height: valh,
       width: valw,
-      duration: 1,
-      ease: "elastic.inOut"
+      duration: 0.8,
+      ease: "expo.inOut"
     });
   }
 }
