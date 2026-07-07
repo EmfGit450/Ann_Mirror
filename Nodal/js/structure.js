@@ -11,7 +11,7 @@ class Neuron {
     this.label = props.label;
     this.layer = viewport.layerId;
     
-    this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(0x8BBBF8);
+    this.pig = new PIXI.Graphics().circle(0, 0, 20).fill("#8BBBF8");
     this.pig.position.set(this.x, this.y);
     this.pig.zIndex = 2;
     this.pig.eventMode = "static";
@@ -73,7 +73,7 @@ class Layer {
     this.width = 60;
     this.height = 60;
     
-    this.pig = new PIXI.Graphics().drawRoundedRect(0,0,60,60,8).fill({color: 0x3A3B47, alpha: 0.7});
+    this.pig = new PIXI.Graphics().drawRoundedRect(0,0,60,60,8).fill({color: "#3A3B47", alpha: 0.7});
     this.pig.position.set(this.x, this.y);
     this.pig.zIndex = 0;
     

@@ -55,12 +55,22 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
   
   app.stage.addChild(view);
   
+  //Test
+  const comment = new PIXI.Graphics().drawRoundedRect(0, 0, 100, 70, 10).fill("#3A4550");
+  const text = new PIXI.Text("MNSIT MLP", {
+    fontFamily: "Monospace",
+    fontSize: 20,
+    fill: "#FFFFFF"
+  });
+  view.addChild(comment);
+  comment.addChild(text);
+  //Test
+  
+  
   setTimeout( () => {
     loadingScreen.classList.add("faded-out-loading-screen");
     loadingScreen.style.pointerEvents = "none";
   }, 450);
-  
-  const test = new Layer({x: 200, y: 200}, view);
   //Pixi.js Setup End
   
   //Visual Start
