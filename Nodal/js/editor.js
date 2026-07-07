@@ -47,7 +47,6 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
     antialias: true
   });
   app.renderer.background.alpha = 0;
-
   
   canvasContainer.appendChild(app.canvas);
   app.stage.eventMode = "static";
@@ -59,14 +58,9 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
   setTimeout( () => {
     loadingScreen.classList.add("faded-out-loading-screen");
     loadingScreen.style.pointerEvents = "none";
-  }, 450)
+  }, 450);
   
-  
-  const testd = new Neuron({x: 430, y: 330}, view);
-  
-  const test = new Layer({x: 400, y: 300}, view);
-  
-  test.addNeuron();
+  const test = new Layer({x: 200, y: 200}, view);
   //Pixi.js Setup End
   
   //Visual Start
@@ -84,13 +78,38 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
     
     if (e.target !== eventTarget) return;
     
+    //Neuron CD Start
     if (e.target.layerId) {
       const layer = Layers.get(e.target.layerId);
       
       if (addNeuronBtn.classList.contains("active")) {
         layer.addNeuron();
       }
+      else if (deleteNeuronBtn.classList.contains("active")) {
+        layer.deleteNeuron();
+      }
+      
+      //Layer Delete
+      else if (deleteLayerBtn.classList.contains("active")) {
+        layer.delete();
+      }
+      //End
+      
     }
+    //Neuron CD End
+    
+    //Layer C Start
+    else if (addLayerBtn.classList.contains("active")) {
+      const rawPos = view.toLocal(e.global);
+      const pos = {
+        x: Math.round(rawPos.x/GridUnit) * GridUnit,
+        y: Math.round(rawPos.y/GridUnit) * GridUnit
+      }
+      
+      const newLayer = new Layer({x: pos.x - 30, y: pos.y - 30}, view); 
+    }
+    //Layer C End
+    
   });
   //Visual End
   

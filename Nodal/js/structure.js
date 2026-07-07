@@ -1,6 +1,8 @@
 let Synapses = new Map();
 let Layers = new Map();
 
+const GridUnit = 60;
+
 class Neuron {
   constructor(props, viewport) {
     this.x = props.x;
@@ -62,8 +64,7 @@ class Synapse {}
 
 class Layer {
   constructor(props, viewport) {
-    this.nodes = new Map();
-    console.log(this.nodes)
+    this.neurons = new Map();
     this.id = crypto.randomUUID();
     this.label = props.label;
     this.x = props.x;
@@ -83,12 +84,32 @@ class Layer {
     
     Layers.set(this.id, this);
     viewport.addChild(this.pig);
+    
+    
   }
   redraw() {
     this.pig.clear().drawRoundedRect(0, 0, this.width, this.height, 8).fill({color: 0x3A3B47, alpha: 0.7});
   }
   nextPos() {
-    return {x: 30, y: 30 + 60 * this.nodes.size};
+    return {x: 30, y: 30 + 60 * this.neurons.size};
+  }
+  lastNode() {
+    let last;
+    for (last of this.neurons.keys()) {}
+    return last;
+  }
+  
+  delete() {
+    this.neurons.forEach(neuron => neuron.delete());
+    gsap.to(this, {
+      height: 0,
+      duration: 0.3,
+      ease: "expo.inOut",
+      onUpdate: () => this.redraw(),
+      onComplete: () => {
+        this.neurons = null;
+      }
+    });
   }
   
   setShape(valh, valw) {
@@ -105,11 +126,19 @@ class Layer {
     const pos = this.nextPos();
     const newNeuron = new Neuron({x: pos.x, y: pos.y}, this.pig);
     
-    this.nodes.set(newNeuron.id, newNeuron);
+    this.neurons.set(newNeuron.id, newNeuron);
     
-    this.setShape(this.nodes.size * 60, 60)
+    this.setShape(this.neurons.size * 60, 60);
   }
   deleteNeuron(neuron) {
-    this.nodes.delete(neuron.id);
+    const targetId = neuron ? neuron.id : this.lastNode();
+    const target = this.neurons.get(targetId);
+    if (!target) return;
+    target.delete();
+    
+    this.neurons.delete(targetId);
+    
+    const rows = Math.max(1, this.neurons.size);
+    this.setShape(rows * 60, 60);
   }
 }
