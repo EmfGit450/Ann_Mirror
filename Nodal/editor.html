@@ -62,38 +62,48 @@
 		 <div class="center-editor">
 		   <div class="neuron-btns">
 		     <button id="add-node">
-.        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle r="6" cx="10" cy="10" />
-    <path d="M 12 3 L 12 21 M 3 12 L 21 12" transform="scale(0.3) translate(47, 47)" stroke-width="4" />
-  </svg>
-</button>
-<button id="delete-node">
-  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle r="6" cx="10" cy="10" />
-    <path d="M 4 12 L 20 12" transform="scale(0.3) translate(50, 50)" stroke-width="5" />
-  </svg>
-</button>
+           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round">
+             <circle r="6" cx="10" cy="10"/>
+             <path d="M 12 3 L 12 21 M 3 12 L 21 12" transform="scale(0.3) translate(47, 47)" stroke-width="4"/>
+           </svg>
+         </button>
+         <button id="delete-node">
+           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round">
+             <circle r="6" cx="10" cy="10"/>
+             <path d="M 4 12 L 20 12" transform="scale(0.3) translate(50, 50)" stroke-width="5"/>
+           </svg>
+         </button>
 		   </div>
+		   
 		   <div class="pixi-canvas">
 		    
 		   </div>
+		   
+		   <div class="layer-btns">
+		     <button id="add-layer">
+		       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="1.8" stroke-linecap="round">
+		         <rect x="5" y="5" width="10" height="10" rx="2" ry="2"/>
+		         <path d="M 12 3 L 12 21 M 3 12 L 21 12" transform="scale(0.3) translate(47, 47)" stroke-width="4"/>
+		       </svg>
+		     </button>
+		     <button id="delete-layer">
+		       <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="1.8" stroke-linecap="round">
+		         <rect x="5" y="5" width="10" height="10" rx="2" ry="2"/>
+		         <path d="M 4 12 L 20 12" transform="scale(0.3) translate(47, 47)" stroke-width="4"/>
+		       </svg>
+		     </button>
+		   </div>
+		   
 		 </div>
 		 
 		 <div class="bottom-editor">
 		   <div class="bottom-left-editor-btns">
-		      
 		      <button id="connect">
-	  	      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	  	      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="4" height="16"/>
               <rect x="16" y="4" width="4" height="16"/>
               
-              <path stroke-width="1.5" d="
-              M 7 7 L 16 7 
-              M 7 17 L 16 17
-              M 7 12 L 16 12
-              M 7 6 L 16 18 
-              M 7 18 L 16 6
-              "/>
+              <path stroke-width="1.5" d="M 7 7 L 16 7 M 7 17 L 16 17 M 7 12 L 16 12 M 7 6 L 16 18 M 7 18 L 16 6"/>
             </svg>
 	  	    </button>
 		      <button id="clear"> <!-- from feathericons.com -->
