@@ -70,10 +70,10 @@ class Layer {
     this.x = props.x;
     this.y = props.y;
     
-    this.width = 60;
-    this.height = 60;
+    this.width = 0;
+    this.height = 0;
     
-    this.pig = new PIXI.Graphics().drawRoundedRect(0,0,60,60,8).fill({color: "#3A3B47", alpha: 0.7});
+    this.pig = new PIXI.Graphics().drawRoundedRect(0,0,0,0,8).fill({color: "#3A3B47", alpha: 0.7});
     this.pig.position.set(this.x, this.y);
     this.pig.zIndex = 0;
     
@@ -85,7 +85,7 @@ class Layer {
     Layers.set(this.id, this);
     viewport.addChild(this.pig);
     
-    
+    this.setShape(60, 60, 0.4);
   }
   redraw() {
     this.pig.clear().drawRoundedRect(0, 0, this.width, this.height, 8).fill({color: 0x3A3B47, alpha: 0.7});
@@ -112,11 +112,11 @@ class Layer {
     });
   }
   
-  setShape(valh, valw) {
+  setShape(valh, valw, time) {
     gsap.to(this, {
       height: valh,
       width: valw,
-      duration: 0.1,
+      duration: time ? time : 0.1,
       ease: "expo.inOut",
       onUpdate: () => this.redraw()
     });
