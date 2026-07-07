@@ -7,17 +7,14 @@ const loadingScreen = document.querySelector(".loading-screen");
 //Later
 
 const addNeuronBtn = document.getElementById("add-node");
-const deleteBtn = document.getElementById("delete");
-const connectBtn = document.getElementById("path");
+const deleteNeuronBtn = document.getElementById("delete-node");
+const connectBtn = document.getElementById("connect");
 const clearBtn = document.getElementById("clear");
 
-const togglableBtns = [ addNeuronBtn, deleteBtn, connectBtn ];
+const togglableBtns = [ addNeuronBtn, deleteNeuronBtn, connectBtn ];
 
 const canvasContainer = document.querySelector(".pixi-canvas");
 
-let Neurons = new Map();
-let Synapses = new Map();
-let Layers = new Map();
 
 (async () => {
   //Pixi.js Setup Start
@@ -49,10 +46,8 @@ let Layers = new Map();
   
   
   const testd = new Neuron({x: 430, y: 330}, view);
-  Neurons.set(testd.id, testd);
   
   const test = new Layer({x: 400, y: 300}, view);
-  Layers.set(test.id, test);
   
   test.addNeuron(testd);
   //Pixi.js Setup End
@@ -66,8 +61,8 @@ let Layers = new Map();
   addNeuronBtn.onclick = () => {
     toggleBtn(addNeuronBtn);
   }
-  deleteBtn.onclick = () => {
-    toggleBtn(deleteBtn);
+  deleteNeuronBtn.onclick = () => {
+    toggleBtn(deleteNeuronBtn);
   }
   connectBtn.onclick = () => {
     toggleBtn(connectBtn)
@@ -93,12 +88,7 @@ let Layers = new Map();
       const layer = Layers.get(e.target.layerId);
       
       if (addNeuronBtn.classList.contains("active")) {
-        const pos = layer.nextPos();
-        const newNeuron = new Neuron({x: pos.x, y: pos.y}, view);
-        Neurons.set(newNeuron.id, newNeuron);
-        
-        layer.addNeuron(newNeuron);
-        layer.setDim(layer.nodes.size * 60, 60)
+        layer.addNeuron();
       }
     }
   });
@@ -140,7 +130,7 @@ let Layers = new Map();
       });
       
       this.app.stage.on("pointermove", (e) => {
-        if (!anyNodeDragging() && this.activePointers.size === 2 && this.activePointers.has(e.pointerId)) {
+        if (allCRUDInactive() && this.activePointers.size === 2 && this.activePointers.has(e.pointerId)) {
           this.activePointers.set(e.pointerId, {x: e.global.x, y: e.global.y});
           
           const fArr = [...this.activePointers.values()];
@@ -192,12 +182,6 @@ let Layers = new Map();
   const viewCamera = new Camera(app, view);
   
   const allCRUDInactive = () => !togglableBtns.some(btn => btn.classList.contains("active"));
-  const anyNodeDragging = () => {
-    for (const node of Neurons.values()) {
-      if (node.isDragging) return true;
-    }
-    return false;
-  }
   //Camera End
   
   //HintBox Start

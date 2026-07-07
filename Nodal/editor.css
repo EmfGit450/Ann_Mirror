@@ -57,7 +57,7 @@ body {
   width: 100dvw;
   height: 100dvh;
   z-index: 1000;
-  background: #000;
+  background: #000000DD;
   
   display: flex;
   justify-content: center;

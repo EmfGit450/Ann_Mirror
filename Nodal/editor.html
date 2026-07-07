@@ -59,23 +59,30 @@
 		     </button>
 		 </div>
 		 
-		 <div class="pixi-canvas">
+		 <div class="center-editor">
+		   <div class="neuron-btns">
+		     <button id="add-node">
+.        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle r="6" cx="10" cy="10" />
+    <path d="M 12 3 L 12 21 M 3 12 L 21 12" transform="scale(0.3) translate(47, 47)" stroke-width="4" />
+  </svg>
+</button>
+<button id="delete-node">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle r="6" cx="10" cy="10" />
+    <path d="M 4 12 L 20 12" transform="scale(0.3) translate(50, 50)" stroke-width="5" />
+  </svg>
+</button>
+		   </div>
+		   <div class="pixi-canvas">
 		    
+		   </div>
 		 </div>
 		 
 		 <div class="bottom-editor">
 		   <div class="bottom-left-editor-btns">
-		      <button id="add-node">
-		        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M 12 3 L 12 21 M 3 12 L 21 12"/>
-            </svg>
-	  	    </button>
-	  	    <button id="delete">
-	  	      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M 4 12 L 20 12"/>
-            </svg>
-		      </button>
-		      <button id="path">
+		      
+		      <button id="connect">
 	  	      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="4" height="16"/>
               <rect x="16" y="4" width="4" height="16"/>
@@ -96,15 +103,13 @@
             </svg>
   		    </button>
 		   </div>
-		   <div class="hintbox-div">
-		    <span id="hintbox"></span>
-		   </div>
+		   
 	   </div>
 	 </div>
 	 
 	 <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.19.0/dist/pixi.min.js"></script>
 	 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
-	 <script src="js/classes.js"></script>
+	 <script src="js/structure.js"></script>
    <script src="js/editor.js"></script>
   </body>
 </html>

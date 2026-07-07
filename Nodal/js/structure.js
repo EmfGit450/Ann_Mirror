@@ -1,9 +1,13 @@
+let Synapses = new Map();
+let Layers = new Map();
+
 class Neuron {
   constructor(props, viewport) {
     this.x = props.x;
     this.y = props.y;
     this.id = crypto.randomUUID();
     this.label = props.label;
+    this.layer = viewport.layerId;
     
     this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(0x8BBBF8);
     this.pig.position.set(this.x, this.y);
@@ -14,9 +18,6 @@ class Neuron {
     this.pig.nodeId = this.id;
     
     this.selected = false;
-    this.isDragging = false;
-    this.dragOffset = {};
-    this.dragTimeout = 0;
     this.pointerId = null;
     
     gsap.from(this.pig.scale, {
@@ -25,6 +26,7 @@ class Neuron {
       duration: 0.2,
       ease: "power4.inOut"
     });
+    
     viewport.addChild(this.pig);
   };
   
@@ -41,15 +43,15 @@ class Neuron {
   }
   
   update(props) {
-    if (props.x !== undefined) {
+    if (props.x) {
       this.pig.position.x = props.x;
       this.x = props.x;
     }
-    if (props.y !== undefined) {
+    if (props.y) {
       this.pig.position.y = props.y;
       this.y = props.y;
     }
-    if (props.label !== undefined) {
+    if (props.label) {
       this.label = props.label;
     }
   }
@@ -61,6 +63,7 @@ class Synapse {}
 class Layer {
   constructor(props, viewport) {
     this.nodes = new Map();
+    console.log(this.nodes)
     this.id = crypto.randomUUID();
     this.label = props.label;
     this.x = props.x;
@@ -78,20 +81,17 @@ class Layer {
     
     this.pig.layerId = this.id;
     
+    Layers.set(this.id, this);
     viewport.addChild(this.pig);
   }
   redraw() {
     this.pig.clear().drawRoundedRect(0, 0, this.width, this.height, 8).fill({color: 0x3A3B47, alpha: 0.7});
   }
-  addNeuron(neuron) {
-    this.nodes.set(neuron.id, neuron);
-  }
-  
   nextPos() {
-    return {x: this.x + 30, y: this.y + 30 + 60 * this.nodes.size};
+    return {x: 30, y: 30 + 60 * this.nodes.size};
   }
   
-  setDim(valh, valw) {
+  setShape(valh, valw) {
     gsap.to(this, {
       height: valh,
       width: valw,
@@ -99,5 +99,17 @@ class Layer {
       ease: "expo.inOut",
       onUpdate: () => this.redraw()
     });
+  }
+  
+  addNeuron() {
+    const pos = this.nextPos();
+    const newNeuron = new Neuron({x: pos.x, y: pos.y}, this.pig);
+    
+    this.nodes.set(newNeuron.id, newNeuron);
+    
+    this.setShape(this.nodes.size * 60, 60)
+  }
+  deleteNeuron(neuron) {
+    this.nodes.delete(neuron.id);
   }
 }
