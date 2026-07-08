@@ -60,13 +60,6 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
   view.sortableChildren = true;
   
   app.stage.addChild(view);
-  
-  
-  console.log(app.stage.eventMode);
-console.log(app.stage.hitArea);
-console.log(app.renderer.events); 
-console.log(app.renderer);
-console.log(PIXI.VERSION);
   //Test
 const commentContainer = new PIXI.Container(); // <- add this
 commentContainer.x = 50;
