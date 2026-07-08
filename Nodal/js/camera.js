@@ -1,4 +1,4 @@
-import * as PIXI from "pixi"
+import * as PIXI from "pixi";
 
 export class Camera {
   constructor(app, viewport) {

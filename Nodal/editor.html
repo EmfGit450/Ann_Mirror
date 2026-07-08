@@ -98,6 +98,11 @@
 		 
 		 <div class="bottom-editor">
 		   <div class="bottom-left-editor-btns">
+		      <button id="comment">
+		        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="1.6" stroke-linecap="round">
+		          <path d="M 6 20 L 9 4 M 15 20 L 18 4"/>
+		        </svg>
+		      </button>
 		      <button id="connect">
 	  	      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="4" height="16"/>
@@ -122,12 +127,11 @@
 	 <script type="importmap">
    {
      "imports": {
-       "pixi": "https://cdn.jsdelivr.net/npm/pixi.js@8.19.0/+esm",
-       "pixi-multistyle-text": "https://cdn.jsdelivr.net/npm/pixi-multistyle-text@5.0.4/+esm"
+       "pixi": "https://cdn.jsdelivr.net/npm/pixi.js@8.19.0/dist/pixi.mjs",
+       "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.15.0/+esm"
      }
    }
    </script>
-	 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
 	 
    <script type="module" src="js/editor.js"></script>
   </body>

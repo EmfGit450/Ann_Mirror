@@ -1,4 +1,5 @@
-import * as PIXI from "pixi"
+import * as PIXI from "pixi";
+import {gsap} from "gsap";
 
 export const Synapses = new Map();
 export const Layers = new Map();
@@ -13,7 +14,7 @@ export class Neuron {
     this.label = props.label;
     this.layer = viewport.layerId;
     
-    this.pig = new PIXI.Graphics().circle(0, 0, 20).fill("#8BBBF8");
+    this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(0x8BBBF8);
     this.pig.position.set(this.x, this.y);
     this.pig.zIndex = 2;
     this.pig.eventMode = "static";
@@ -75,7 +76,7 @@ export class Layer {
     this.width = 60;
     this.height = 0;
     
-    this.pig = new PIXI.Graphics().roundRect(0,0,60,0,8).fill({color: "#3A3B47", alpha: 0.7});
+    this.pig = new PIXI.Graphics().roundRect(0,0,60,0,8).fill({color: 0x3A3B47, alpha: 0.7});
     this.pig.position.set(this.x, this.y);
     this.pig.zIndex = 0;
     
@@ -88,6 +89,7 @@ export class Layer {
     viewport.addChild(this.pig);
     
     this.setShape(60, 60, 0.4);
+    console.log(this)
   }
   redraw() {
     this.pig.clear().roundRect(0, 0, this.width, this.height, 8).fill({color: 0x3A3B47, alpha: 0.7});

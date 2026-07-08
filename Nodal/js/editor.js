@@ -1,6 +1,7 @@
-import * as PIXI from "pixi"
-import {GridUnit,Neuron, Layer, Layers} from "./structure.js"
-import {Camera} from "./camera.js"
+import * as PIXI from "pixi";
+import {gsap} from "gsap";
+import {GridUnit,Neuron, Layer, Layers} from "./structure.js";
+import {Camera} from "./camera.js";
 
 const loadingScreen = document.querySelector(".loading-screen");
 
@@ -16,12 +17,13 @@ const deleteNeuronBtn = document.getElementById("delete-node");
 const addLayerBtn = document.getElementById("add-layer");
 const deleteLayerBtn = document.getElementById("delete-layer");
 
+const commentBtn = document.getElementById("comment");
 const connectBtn = document.getElementById("connect");
 const clearBtn = document.getElementById("clear");
 
 
 const allCRUDInactive = () => !togglableBtns.some(btn => btn.classList.contains("active"));
-const togglableBtns = [addNeuronBtn, deleteNeuronBtn, addLayerBtn, deleteLayerBtn, connectBtn];
+const togglableBtns = [addNeuronBtn, deleteNeuronBtn, addLayerBtn, deleteLayerBtn, commentBtn, connectBtn];
 
 
 const canvasContainer = document.querySelector(".pixi-canvas");
@@ -39,7 +41,6 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
 
 (async () => {
   //Pixi.js Setup Start
-  try {
   const app = new PIXI.Application();
   
   const view = new PIXI.Container();
@@ -60,19 +61,37 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
   
   app.stage.addChild(view);
   
+  
+  console.log(app.stage.eventMode);
+console.log(app.stage.hitArea);
+console.log(app.renderer.events); 
+console.log(app.renderer);
+console.log(PIXI.VERSION);
   //Test
-  const comment = new PIXI.Graphics().roundRect(0, 0, 100, 70, 10).fill("#3A4550");
-  const text = new PIXI.Text({
-    text: "MNIST MLP",
-    style: {
-      fontFamily: "Monospace",
-      fontSize: 20,
-      fill: "#FFFFFF"
-    }
-  });
-  view.addChild(comment);
-  comment.addChild(text);
-  //Test
+const commentContainer = new PIXI.Container(); // <- add this
+commentContainer.x = 50;
+commentContainer.y = 50;
+
+const comment = new PIXI.Graphics().roundRect(0, 0, 100, 70, 10).fill(0x3A4550);
+const text = new PIXI.Text({
+  text: "MNIST MLP",
+  style: {
+    fontFamily: "Monospace",
+    fontSize: 14,
+    fill: 0xFFFFFF
+  }
+});
+text.x = 50;
+text.y = 35;
+text.anchor.set(0.5);
+
+commentContainer.zIndex = 9999;
+commentContainer.eventMode = "none";
+
+commentContainer.addChild(comment); // Graphics -> Container
+commentContainer.addChild(text);    // Text -> Container
+view.addChild(commentContainer);    // Container -> view
+//Test
   
   
   setTimeout( () => {
@@ -124,7 +143,7 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
         y: Math.round(rawPos.y/GridUnit) * GridUnit
       }
       
-      const newLayer = new Layer({x: pos.x - 30, y: pos.y - 30}, view); 
+      const newLayer = new Layer({x: pos.x - 30, y: pos.y - 30}, view);
     }
     //Layer C End
     
@@ -134,10 +153,4 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
   //Camera Start
   const viewCamera = new Camera(app, view); //Camera class defined in ./camera.js
   //Camera End
-  }
-  
-  catch (err) {
-    alert(err);
-    return;
-  }
 })();
