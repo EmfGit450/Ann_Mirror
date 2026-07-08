@@ -39,6 +39,7 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
 
 (async () => {
   //Pixi.js Setup Start
+  try {
   const app = new PIXI.Application();
   
   const view = new PIXI.Container();
@@ -133,4 +134,10 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
   //Camera Start
   const viewCamera = new Camera(app, view); //Camera class defined in ./camera.js
   //Camera End
+  }
+  
+  catch (err) {
+    alert(err);
+    return;
+  }
 })();
