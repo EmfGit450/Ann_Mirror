@@ -13,6 +13,7 @@ export class Neuron {
     this.id = crypto.randomUUID();
     this.label = props.label;
     this.layer = viewport.layerId;
+    this.activationType = "identity";
     
     this.pig = new PIXI.Graphics().circle(0, 0, 20).fill(0x8BBBF8);
     this.pig.position.set(this.x, this.y);
@@ -70,6 +71,7 @@ export class Layer {
     this.neurons = new Map();
     this.id = crypto.randomUUID();
     this.label = props.label;
+    this.activationType = "identity";
     this.x = props.x;
     this.y = props.y;
     
@@ -77,19 +79,20 @@ export class Layer {
     this.height = 0;
     
     this.pig = new PIXI.Graphics().roundRect(0,0,60,0,8).fill({color: 0x3A3B47, alpha: 0.7});
-    this.pig.position.set(this.x, this.y);
-    this.pig.zIndex = 0;
+    this.pcontainer = new PIXI.Container();
     
-    this.pig.eventMode = "static"
-    this.pig.cursor = "pointer"
+    this.pcontainer.position.set(this.x, this.y);
+    this.pcontainer.zIndex = 0;
+    this.pcontainer.eventMode = "static";
+    this.pcontainer.cursor = "pointer";
+    this.pcontainer.layerId = this.id;
     
-    this.pig.layerId = this.id;
+    this.pcontainer.addChild(this.pig);
     
     Layers.set(this.id, this);
-    viewport.addChild(this.pig);
+    viewport.addChild(this.pcontainer);
     
     this.setShape(60, 60, 0.4);
-    console.log(this)
   }
   redraw() {
     this.pig.clear().roundRect(0, 0, this.width, this.height, 8).fill({color: 0x3A3B47, alpha: 0.7});
