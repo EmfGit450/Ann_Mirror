@@ -149,3 +149,18 @@ export class Layer {
     this.setShape(rows * 60, 60);
   }
 }
+
+export class Comment {
+  constructor(props, viewport) {
+    this.x = props.x;
+    this.y = props.y;
+    this.ptext = new PIXI.Text({
+      text: props.text,
+      style: {
+        fontFamily: "Jetbrains Mono",
+        fontSize: 16,
+        fill: 0xFFFFFF
+      }
+    });
+  }
+}
