@@ -1,3 +1,5 @@
+import * as PIXI from "pixi"
+
 export class Camera {
   constructor(app, viewport) {
     this.app = app;

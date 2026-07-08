@@ -1,5 +1,5 @@
 import * as PIXI from "pixi"
-import {GridUnit,Neuron, Layer} from "./structure.js"
+import {GridUnit,Neuron, Layer, Layers} from "./structure.js"
 import {Camera} from "./camera.js"
 
 const loadingScreen = document.querySelector(".loading-screen");
@@ -61,10 +61,13 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
   
   //Test
   const comment = new PIXI.Graphics().roundRect(0, 0, 100, 70, 10).fill("#3A4550");
-  const text = new PIXI.Text("MNIST MLP", {
-    fontFamily: "Monospace",
-    fontSize: 20,
-    fill: "#FFFFFF"
+  const text = new PIXI.Text({
+    text: "MNIST MLP",
+    style: {
+      fontFamily: "Monospace",
+      fontSize: 20,
+      fill: "#FFFFFF"
+    }
   });
   view.addChild(comment);
   comment.addChild(text);
