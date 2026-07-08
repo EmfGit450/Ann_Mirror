@@ -1,7 +1,7 @@
 import * as PIXI from "pixi"
 
-export let Synapses = new Map();
-export let Layers = new Map();
+export const Synapses = new Map();
+export const Layers = new Map();
 
 export const GridUnit = 60;
 
