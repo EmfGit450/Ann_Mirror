@@ -1,4 +1,4 @@
-class Camera {
+export class Camera {
   constructor(app, viewport) {
     this.app = app;
     this.viewport = viewport;
@@ -33,7 +33,7 @@ class Camera {
     });
       
     this.app.stage.on("pointermove", (e) => {
-      if (allCRUDInactive() && this.activePointers.size === 2 && this.activePointers.has(e.pointerId)) {
+      if (this.activePointers.size === 2 && this.activePointers.has(e.pointerId)) {
         this.activePointers.set(e.pointerId, {x: e.global.x, y: e.global.y});
           
         const fArr = [...this.activePointers.values()];

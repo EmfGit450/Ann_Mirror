@@ -1,3 +1,7 @@
+import * as PIXI from "pixi"
+import {GridUnit,Neuron, Layer} from "./structure.js"
+import {Camera} from "./camera.js"
+
 const loadingScreen = document.querySelector(".loading-screen");
 
 //const codeEditorBtn = document.getElementById("code-editor");
@@ -56,8 +60,8 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
   app.stage.addChild(view);
   
   //Test
-  const comment = new PIXI.Graphics().drawRoundedRect(0, 0, 100, 70, 10).fill("#3A4550");
-  const text = new PIXI.Text("MNSIT MLP", {
+  const comment = new PIXI.Graphics().roundRect(0, 0, 100, 70, 10).fill("#3A4550");
+  const text = new PIXI.Text("MNIST MLP", {
     fontFamily: "Monospace",
     fontSize: 20,
     fill: "#FFFFFF"

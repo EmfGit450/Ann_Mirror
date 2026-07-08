@@ -117,11 +117,20 @@
 	   </div>
 	 </div>
 	 
-	 <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.19.0/dist/pixi.min.js"></script>
+	 <!-- <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.19.0/dist/pixi.min.js"></script> -->
+	 
+	 <script type="importmap">
+   {
+     "imports": {
+       "pixi": "https://cdn.jsdelivr.net/npm/pixi.js@8.19.0/+esm",
+       "pixi-multistyle-text": "https://cdn.jsdelivr.net/npm/pixi-multistyle-text@5.0.4/+esm"
+     }
+   }
+   </script>
 	 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
 	 
-	 <script src="js/structure.js"></script>
-	 <script src="js/camera.js"></script>
-   <script src="js/editor.js"></script>
+	 <script type="module" src="js/structure.js"></script>
+	 <script type="module" src="js/camera.js"></script>
+   <script type="module" src="js/editor.js"></script>
   </body>
 </html>

@@ -1,9 +1,11 @@
+import * as PIXI from "pixi"
+
 let Synapses = new Map();
 let Layers = new Map();
 
-const GridUnit = 60;
+export const GridUnit = 60;
 
-class Neuron {
+export class Neuron {
   constructor(props, viewport) {
     this.x = props.x;
     this.y = props.y;
@@ -62,7 +64,7 @@ class Neuron {
 
 class Synapse {}
 
-class Layer {
+export class Layer {
   constructor(props, viewport) {
     this.neurons = new Map();
     this.id = crypto.randomUUID();
@@ -70,10 +72,10 @@ class Layer {
     this.x = props.x;
     this.y = props.y;
     
-    this.width = 0;
+    this.width = 60;
     this.height = 0;
     
-    this.pig = new PIXI.Graphics().drawRoundedRect(0,0,0,0,8).fill({color: "#3A3B47", alpha: 0.7});
+    this.pig = new PIXI.Graphics().roundRect(0,0,60,0,8).fill({color: "#3A3B47", alpha: 0.7});
     this.pig.position.set(this.x, this.y);
     this.pig.zIndex = 0;
     
@@ -88,7 +90,7 @@ class Layer {
     this.setShape(60, 60, 0.4);
   }
   redraw() {
-    this.pig.clear().drawRoundedRect(0, 0, this.width, this.height, 8).fill({color: 0x3A3B47, alpha: 0.7});
+    this.pig.clear().roundRect(0, 0, this.width, this.height, 8).fill({color: 0x3A3B47, alpha: 0.7});
   }
   nextPos() {
     return {x: 30, y: 30 + 60 * this.neurons.size};
