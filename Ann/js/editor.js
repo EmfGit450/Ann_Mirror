@@ -1,6 +1,6 @@
 import * as PIXI from "pixi";
 import {gsap} from "gsap";
-import {GridUnit,Neuron, Layer, Layers} from "./structure.js";
+import {GridPad, Neuron,Layer,Layers} from "./structure.js";
 import {Camera} from "./camera.js";
 
 const loadingScreen = document.querySelector(".loading-screen");
@@ -132,8 +132,8 @@ view.addChild(commentContainer);    // Container -> view
     else if (addLayerBtn.classList.contains("active")) {
       const rawPos = view.toLocal(e.global);
       const pos = {
-        x: Math.round(rawPos.x/GridUnit) * GridUnit,
-        y: Math.round(rawPos.y/GridUnit) * GridUnit
+        x: Math.round(rawPos.x/GridPad) * GridPad,
+        y: Math.round(rawPos.y/GridPad) * GridPad
       }
       
       const newLayer = new Layer({x: pos.x - 30, y: pos.y - 30}, view);

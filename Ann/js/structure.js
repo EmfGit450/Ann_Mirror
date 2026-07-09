@@ -4,7 +4,9 @@ import {gsap} from "gsap";
 export const Synapses = new Map();
 export const Layers = new Map();
 
-export const GridUnit = 60;
+export const Grid = 60;
+export const Pad = 6;
+export const GridPad = 66;
 
 export class Neuron {
   constructor(props, viewport) {
@@ -98,7 +100,7 @@ export class Layer {
     this.pig.clear().roundRect(0, 0, this.width, this.height, 8).fill({color: 0x3A3B47, alpha: 0.7});
   }
   nextPos() {
-    return {x: 30, y: 30 + 60 * this.neurons.size};
+    return {x: 30, y: 30 + this.neurons.size * (Grid+Pad)};
   }
   lastNode() {
     let last;
@@ -135,7 +137,8 @@ export class Layer {
     
     this.neurons.set(newNeuron.id, newNeuron);
     
-    this.setShape(this.neurons.size * 60, 60);
+    const index = this.neurons.size;
+    this.setShape(index * Grid + (index-1) * Pad, 60);
   }
   deleteNeuron(neuron) {
     const targetId = neuron ? neuron.id : this.lastNode();
@@ -146,7 +149,7 @@ export class Layer {
     this.neurons.delete(targetId);
     
     const rows = Math.max(1, this.neurons.size);
-    this.setShape(rows * 60, 60);
+    this.setShape(rows * Grid, 60);
   }
 }
 
