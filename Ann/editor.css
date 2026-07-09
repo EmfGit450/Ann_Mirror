@@ -46,7 +46,7 @@ body {
 	background: black;
 	display: flex;
 	flex-direction: column;
-	padding: 1.7rem;
+	padding: 0rem;
 }
 
 /*Loading Screen*/
@@ -84,6 +84,37 @@ body {
 }
 /*End*/
 
+/*General Modal*/
+.general-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #16263A;
+  border-radius: 1rem;
+  z-index: 1000;
+  height: 9rem;
+  width: 20rem;
+  font-family: "Jetbrains Mono", Monospace;
+  color: white;
+  padding: 1.6rem;
+  margin: 0;
+  
+  display: none;
+  pointer-events: none;
+}
+
+.general-modal input {
+  border: none;
+  border-radius: 1rem;
+  width: 100%;
+  height: 3rem;
+  margin-top: 1.3rem;
+  padding: 1rem;
+  font-family: "Jetbrains Mono", Monospace;
+}
+/*End*/
+
 /*Main Container*/
 .main-c {
   display: flex;
@@ -91,28 +122,14 @@ body {
   justify-content: space-between;
   gap: 0.5rem;
   
-  height: calc(100dvh - 2.4rem);
+  height: 100dvh;
   padding: 1rem;
-	background: #030303;
+	background: #040404;
 	border-radius: 1.5rem;
 	box-shadow: 0.2rem 0.2rem 1rem #1F1F1F;
 	      
 	font-family: "Jetbrains Mono", Monospace;
 	color: white;
-}
-/*End*/
-
-/*Coding Panel*/
-.coding-panel {
-  display: flex;
-  background: #6669;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 999;
-  width: 0;
-  height: 80dvh;
-  padding: 0;
 }
 /*End*/
 	    

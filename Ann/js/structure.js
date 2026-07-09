@@ -153,6 +153,8 @@ export class Layer {
   }
 }
 
+// CommentTextPadding = 4
+
 export class Comment {
   constructor(props, viewport) {
     this.x = props.x;
@@ -160,10 +162,23 @@ export class Comment {
     this.ptext = new PIXI.Text({
       text: props.text,
       style: {
-        fontFamily: "Jetbrains Mono",
+        fontFamily: "Monospace",
         fontSize: 16,
         fill: 0xFFFFFF
       }
     });
+    this.box = new PIXI.Graphics().roundRect(0, 0, this.ptext.width + 8, this.ptext.height + 8, 3).fill({color: 0x222222});
+    
+    this.pcontainer = new PIXI.Container();
+    this.pcontainer.addChild(this.box);
+    this.pcontainer.addChild(this.ptext);
+    
+    const bounds = this.ptext.getBounds();
+    const inset = this.pcontainer.toLocal(new PIXI.Point(bounds.x, bounds.y))
+    
+    this.box.position.set(this.x, this.y);
+    this.ptext.position.set(this.x + 4, this.y + 4);
+    
+    viewport.addChild(this.pcontainer);
   }
 }

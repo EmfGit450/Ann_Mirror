@@ -1,9 +1,11 @@
 import * as PIXI from "pixi";
 import {gsap} from "gsap";
-import {GridPad, Neuron,Layer,Layers} from "./structure.js";
+import {GridPad, Neuron,Layer,Layers, Comment} from "./structure.js";
 import {Camera} from "./camera.js";
 
 const loadingScreen = document.querySelector(".loading-screen");
+
+const generalModal = document.querySelector(".general-modal");
 
 //const codeEditorBtn = document.getElementById("code-editor");
 //Later
@@ -38,7 +40,71 @@ const toggleBtn = (btn) => {
 togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
 //Button Toggling End
 
+//General Modal Prompt Start
+function modalPrompt() {
+  return new Promise((resolve) => {
+    const input = generalModal.querySelector("input");
+    if (!input) return resolve(null);
 
+    let finished = false;
+
+    generalModal.style.display = "block";
+    generalModal.style.pointerEvents = "all";
+    input.value = "";
+    
+    gsap.fromTo(generalModal, 
+      {opacity: 0}, 
+      {
+        opacity: 1,
+        duration: 0.2,
+        onComplete: () => input.focus()
+        
+    });
+
+    function finish(val) {
+      if(finished) return;
+      finished = true;
+      
+      document.removeEventListener('keyup', onKey);
+      document.removeEventListener('pointerdown', onClickOutside, true);
+      input.removeEventListener('blur', onBlur);
+      
+      input.blur();
+      gsap.to(generalModal, {
+        opacity: 0,
+        duration: 0.3,
+        onComplete: () => {
+          generalModal.style.display = "none";
+          generalModal.style.pointerEvents = "none";
+        }
+      });
+      resolve(val);
+    }
+
+    function onKey(e) {
+      if (e.key === "Enter") finish(input.value.trim());
+      if (e.key === "Escape") finish(null);
+    }
+
+    function onBlur() {
+      requestAnimationFrame(() => {
+        if (!finished) finish(null);
+      });
+    }
+
+    function onClickOutside(e) {
+      if (!generalModal.contains(e.target)) {
+        e.stopPropagation();
+        finish(null);
+      }
+    }
+
+    document.addEventListener('keyup', onKey);
+    document.addEventListener('pointerdown', onClickOutside, true);
+    input.addEventListener('blur', onBlur);
+  });
+}
+//General Modal Prompt End
 (async () => {
   //Pixi.js Setup Start
   const app = new PIXI.Application();
@@ -60,32 +126,6 @@ togglableBtns.forEach(btn => btn.onclick = () => toggleBtn(btn));
   view.sortableChildren = true;
   
   app.stage.addChild(view);
-  //Test
-const commentContainer = new PIXI.Container(); // <- add this
-commentContainer.x = 50;
-commentContainer.y = 50;
-
-const comment = new PIXI.Graphics().roundRect(0, 0, 100, 70, 10).fill(0x3A4550);
-const text = new PIXI.Text({
-  text: "MNIST MLP",
-  style: {
-    fontFamily: "Monospace",
-    fontSize: 14,
-    fill: 0xFFFFFF
-  }
-});
-text.x = 50;
-text.y = 35;
-text.anchor.set(0.5);
-
-commentContainer.zIndex = 9999;
-commentContainer.eventMode = "none";
-
-commentContainer.addChild(comment); // Graphics -> Container
-commentContainer.addChild(text);    // Text -> Container
-view.addChild(commentContainer);    // Container -> view
-//Test
-  
   
   setTimeout( () => {
     loadingScreen.classList.add("faded-out-loading-screen");
@@ -102,7 +142,7 @@ view.addChild(commentContainer);    // Container -> view
     eventTarget = e.target;
   });
   
-  app.stage.on("pointerup", (e) => {
+  app.stage.on("pointerup", async (e) => {
     const now = performance.now();
     console.log(`Press time: ${(now - lastPtrDown)/1000}`); //DEBUG
     
@@ -139,6 +179,17 @@ view.addChild(commentContainer);    // Container -> view
       const newLayer = new Layer({x: pos.x - 30, y: pos.y - 30}, view);
     }
     //Layer C End
+    
+    //Comment Start
+    else if (commentBtn.classList.contains("active")) {
+      const pos = view.toLocal(e.global);
+      
+      const input = await modalPrompt();
+      if (!input) return;
+      
+      new Comment({x: pos.x, y: pos.y, text: input}, view);
+    }
+    //Comment End
     
   });
   //Visual End
