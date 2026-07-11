@@ -83,8 +83,8 @@
          </button>
 		   </div>
 		   
-		   <div class="pixi-canvas">
-		    
+		   <div class="babylonjs-canvas">
+		    <canvas id="mainCanvas"></canvas>
 		   </div>
 		   
 		   <div class="layer-btns">
@@ -130,15 +130,7 @@
 	   </div>
 	 </div>
 	 
-	 <script type="importmap">
-   {
-     "imports": {
-       "pixi": "https://cdn.jsdelivr.net/npm/pixi.js@8.19.0/dist/pixi.mjs",
-       "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.15.0/+esm"
-     }
-   }
-   </script>
-	 
-   <script type="module" src="js/editor.js"></script>
+   <script type="module" src="dist/editor.js"></script>
+   
   </body>
 </html>

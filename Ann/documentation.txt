@@ -422,3 +422,12 @@ June 20th 2026 13:35 - 19:38 {
   not Javascripts'. Add node ability is here, with Pixi.js.
   heard i can access the render pass inside pixi, so it might be easy for compute as well.
 }
+July 10th 2026 7:10 - 7:11 {
+  moving to babylonjs for transformers
+}
+July 11th 2026 15:33 - 15:46 {
+  i am in the acclimatization phase of using babylonjs. it is incredibly powerful, however, transitioning from 2d to 3d
+  is proving quite cumbersome.
+}
+//^
+//|Spans to 15:46 since i was making a 3d model in prisma 3d

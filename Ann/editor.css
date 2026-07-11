@@ -62,7 +62,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: all;
+  
+  /*FOR TESTING BABYLON*/
+  pointer-events: none;
+  display: none;
 }
 
 .faded-out-loading-screen {
@@ -124,8 +127,7 @@ body {
   
   height: 100dvh;
   padding: 1rem;
-	background: #040404;
-	border-radius: 1.5rem;
+	background: #000;
 	box-shadow: 0.2rem 0.2rem 1rem #1F1F1F;
 	      
 	font-family: "Jetbrains Mono", Monospace;
@@ -183,10 +185,11 @@ button.active svg * {
   flex-grow: 1;
   min-height: 0;
   align-items: stretch;
+  jus
   gap: 1rem;
 }
 
-.pixi-canvas {
+.babylonjs-canvas {
 	display: flex;
 	flex-grow: 1;
 	min-height: 0;
@@ -194,7 +197,7 @@ button.active svg * {
 	overflow: hidden;
 }
 
-.pixi-canvas canvas {
+.babylonjs-canvas canvas {
   display: block;
   position: absolute;
   top: 0;
