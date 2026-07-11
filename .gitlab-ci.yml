@@ -2,7 +2,7 @@ pages:
   stage: deploy
   script:
   - mkdir -p public
-  - cp -r Nodal/. public/
+  - cp -r Ann/. public/
   - cp index.html public/
   artifacts:
     paths:

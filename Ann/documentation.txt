@@ -429,5 +429,5 @@ July 11th 2026 15:33 - 15:46 {
   i am in the acclimatization phase of using babylonjs. it is incredibly powerful, however, transitioning from 2d to 3d
   is proving quite cumbersome.
 }
-//^
-//|Spans to 15:46 since i was making a 3d model in prisma 3d
+// ^
+// |  Spans to 15:46 since i was making a 3d model in prisma 3d
