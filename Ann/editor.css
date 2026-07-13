@@ -147,7 +147,7 @@ button {
 	width: 4.3rem;
 	height: 3.3rem;
 	background: radial-gradient(ellipse, #F7F7F7, #AAA);
-	box-shadow: 0.1rem 0.1rem 1rem #DCDCDC69;
+	box-shadow: 0.1rem 0.1rem 1rem #DCDCDC33;
 }
 button svg {
 	width: 1.8rem;
@@ -159,7 +159,7 @@ button svg * {
 
 button.active {
   background: radial-gradient(ellipse, #222, #070707);
-	box-shadow: 0.05rem 0.05rem 1rem #DCDCDCAA;
+	box-shadow: 0.05rem 0.05rem 1rem #DCDCDC55;
 	transform: scale(1.05);
 }
 

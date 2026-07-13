@@ -431,3 +431,7 @@ July 11th 2026 15:33 - 15:46 {
 }
 // ^
 // |  Spans to 15:46 since i was making a 3d model in prisma 3d
+July 11th 19:30 - {
+  i am simoly exhausted, however, i am planning to use indexedDB, i might as well play with it before sleeping,
+  i have 30 minutes left before wind down time.
+}
