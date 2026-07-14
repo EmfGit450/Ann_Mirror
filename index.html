@@ -38,44 +38,24 @@
 		  }
 	    body {
 		    background: black;
-		    padding: 27.2px;
-	    }
-	    
-	    .main-c {
-	      padding: 4rem;
-	      height: calc(100dvh - 64px);
-	      background: #030303;
-	      border-radius: 1.5rem;
-	      box-shadow: 0.1rem 0.1rem 1rem #121212;
-	      
-	      font-family: "Jetbrains Mono", Monospace;
+		    padding: 4rem;
+		    font-family: "Jetbrains Mono", Monospace;
 		    color: white;
 	    }
 	    
 	    header {
-		    user-select: none;
-		    
-		    animation-name: fade-in;
-		    animation-duration: 2s;
-		    
-		    display: flex;
-		    justify-content: center;
-		    align-items: center;
-		   
-		    transition: 0.3s ease-in-out;
-		    padding: 2rem;
-		    padding-bottom: 2rem;
-		    text-shadow: 0 0 1rem #E6E6E6DD;
+	      text-shadow: 0 0 1rem #ffffff59;
+	      font-size: 4.2rem;
 	    }
-	    header span {
-	      font-size: 13rem;
-	      letter-spacing: 3.5rem;
+	    p {
+	      text-shadow: 0 0 1rem #ffffff59;
+	      font-size: 2.4rem;
 	    }
 	    
 	    nav {
 	      display: flex;
 	      flex-direction: column;
-	      align-items: center;
+	      align-items: flex-start;
 	      gap: 2.5rem;
 	    }
 	    
@@ -89,12 +69,11 @@
 		    transition: 0.3s;
 		    box-shadow: 0 0 1rem #111111;
 		    background: linear-gradient(51deg, #070707, #080808);
-		    width: 23rem;
-		    text-align: center;
 		    color: white;
+		    width: 16rem;
 		    padding: 1.4rem;
 		    border-radius: 1rem;
-		    font-size: 5rem;
+		    font-size: 2.5rem;
 	    }
 	    nav a:last-child {
 	      animation-name: fade-in-up;
@@ -104,39 +83,17 @@
 		    background: linear-gradient(51deg, #BBBBBB, #EFEFEF);
 		    box-shadow: 0 0 1rem #D1D1D1;
 		    color: black;
-		    font-size: 5.2rem;
+		    transform: scale(1.04);
 		  }
-	    
-	    @media (max-width: 1200x), (max-height: 1000px) {
-	      header {
-	        margin-bottom: 3rem;
-	        margin-left: 1rem;
-	      }
-	      header span {
-	        font-size: 7.2rem;
-	        letter-spacing: 1.8rem;
-	      }
-	      
-	      nav a {
-	        font-size: 3rem;
-	      }
-	      nav a:hover, a:active {
-	        font-size: 3.1rem;
-	      }
-	      
-	    }
     </style>
   </head>
   <!-- resolution below 1320 x 1000 requires adjustment -->
   <body>
-	 <div class="main-c"> 
-         <header>
-           <span>Nodal</span>
-         </header>
-         <nav>
-             <a target="_blank" href="editor.html">Editor</a>
-             <a target="_blank" href="https://gitlab.com/EmfGit450/nodal">Code</a>
-         </nav>
-	 </div>
+    <header>Ann</header>
+    <p>A tool to create, train, infer, and inspect multi-layer perceptrons visually.</p>
+    <nav>
+      <a target="_blank" href="editor.html">Editor</a>
+      <a target="_blank" href="https://gitlab.com/EmfGit450/nodal">Code</a>
+    </nav>
   </body>
 </html>

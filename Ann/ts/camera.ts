@@ -27,14 +27,17 @@ export class AnnCamera {
     
     this.bnCamera.attachControl(props.canvas, true);
     
-    this.bnCamera.lowerRadiusLimit = 6.5;
-    this.bnCamera.upperRadiusLimit = 2000;
-    this.bnCamera.lowerBetaLimit = 1.5707963267948966;
-    this.bnCamera.upperBetaLimit = 1.5707963267948966;
-    this.bnCamera.lowerAlphaLimit = -1.5707963267948966;
-    this.bnCamera.upperAlphaLimit = -1.5707963267948966;
+    this.bnCamera.lowerRadiusLimit = 7;
+    this.bnCamera.upperRadiusLimit = 70;
+    
+    if (props.twodim) { 
+      this.bnCamera.lowerBetaLimit = 1.5707963267948966;
+      this.bnCamera.upperBetaLimit = 1.5707963267948966;
+      this.bnCamera.lowerAlphaLimit = -1.5707963267948966;
+      this.bnCamera.upperAlphaLimit = -1.5707963267948966;
+    }
+    
     this.bnCamera.panningSensibility = 200;
-
     this.bnCamera.wheelPrecision = 200;
   }
 }
