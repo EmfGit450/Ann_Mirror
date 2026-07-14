@@ -1,3 +1,5 @@
+console.log("started red");
+
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -15,7 +17,7 @@ const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
 const engine = new Engine(canvas, true);
 const scene = new Scene(engine);
 
-scene.clearColor = new Color4(0.01, 0.01, 0.01, 1);
+scene.clearColor = new Color4(1,0,0,1)//(0.01, 0.01, 0.01, 1);
 
 if (!engine.isWebGPU) console.warn("This website requires WebGPU for functionality");
 
