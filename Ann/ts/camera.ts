@@ -1,12 +1,17 @@
+import type { Scene } from "@babylonjs/core/scene";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 //bn -> babylonjs
 
 export class AnnCamera {
-  constructor(props) {
+  bnCanvas: HTMLCanvasElement;
+  bnScene: Scene;
+  bnCamera: ArcRotateCamera;
+  
+  constructor(props: { canvas: HTMLCanvasElement, scene: Scene, twodim: boolean }) {
     this.bnCamera = new ArcRotateCamera(
-      props.label ? props.label : "camera", 
+      "camera", 
       -1.5707963267948966,
       1.5707963267948966,
       20,

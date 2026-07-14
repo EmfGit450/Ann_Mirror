@@ -27,7 +27,7 @@ export interface LayerData {
 }
 
 export class Network {
-  memory: Map<number, InstancedMesh>;
+  memory: Map<number, Mesh | InstancedMesh>;
   scene: Scene;
   
   private baseNeuron: Mesh;
@@ -54,13 +54,13 @@ export class Network {
   }
   
   newNeuron(data: NeuronData) {
-    const neuron = this.baseNeuron.createInstance(data.id);
+    const neuron = this.baseNeuron.createInstance(`${data.id}`);
     neuron.position = new Vector3(data.layerOx, data.neuronOy, 0);
     
     this.memory.set(data.id, neuron);
   }
   
-  newSynapse(data: SynapseData) {
+  /*newSynapse(data: SynapseData) {
     const synapse = CreateTube(data.id, {
       path: [this.memory.get(data.start).position, this.memory.get(data.end).position],
       radius: 0.07,
@@ -70,6 +70,6 @@ export class Network {
     
     synapse.material = this.synapseMaterial;
     
-    this.memory.set(data.id, data);
-  }
+    this.memory.set(data.id, synapse);
+  }*/
 }
