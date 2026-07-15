@@ -11,9 +11,10 @@ const ctx = await esbuild.context({
     target: "es2022",
 
     sourcemap: true,
+    treeShaking: true,
     minify: true,
 
-    platform: "browser",
+    platform: "browser"
 });
 
 if (watch) {

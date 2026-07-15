@@ -1,11 +1,13 @@
 import type { Scene } from "@babylonjs/core/scene";
 import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
-import { CreateTube } from "@babylonjs/core/Meshes/Builders/tubeBuilder";
+import { CreateGreasedLine, GreasedLineMeshWidthDistribution } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
+import type { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineMesh";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import type { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 
 export interface NeuronData {
   id: number; 
@@ -22,12 +24,12 @@ export interface SynapseData {
 
 export interface LayerData {
   network: number; //network index
-  size: number;
+  size: number; 
   id: number;
 }
 
 export class Network {
-  memory: Map<number, Mesh | InstancedMesh>;
+  memory: Map<number, Mesh | GreasedLineMesh>;
   scene: Scene;
   
   private baseNeuron: Mesh;
@@ -40,17 +42,22 @@ export class Network {
     
     this.baseNeuron = CreateSphere("sourceNeuron", { diameter: 2, segments: 16 }, renderScene);
     
-    const neuronMaterial = new StandardMaterial("glowblue", renderScene);
+    const neuronMaterial = new StandardMaterial("glowblue", this.scene);
     neuronMaterial.diffuseColor = new Color3(0.2, 0.6, 1.0);
     neuronMaterial.emissiveColor = new Color3(0.1, 0.3, 0.5);
+
+    neuronMaterial.specularColor = new Color3(0,0,0);
+    neuronMaterial.specularPower = 1;
+    neuronMaterial.disableLighting = false;
+    
+    neuronMaterial.emissiveFresnelParameters = new FresnelParameters();
+    neuronMaterial.emissiveFresnelParameters.power = 1.5;
+    neuronMaterial.emissiveFresnelParameters.leftColor = new Color3(0.15, 0.35, 0.5);
+    neuronMaterial.emissiveFresnelParameters.rightColor = new Color3(0.3, 0.7, 1.0);
+   
     this.baseNeuron.material = neuronMaterial;
     
     this.baseNeuron.setEnabled(false);
-    
-    
-    this.synapseMaterial = new StandardMaterial("synapseMaterial", renderScene);
-    this.synapseMaterial.diffuseColor = new Color3(0.6, 0.6, 0.6);
-    this.synapseMaterial.emissiveColor = new Color3(0.4, 0.4, 0.4);
   }
   
   newNeuron(data: NeuronData) {
@@ -60,16 +67,15 @@ export class Network {
     this.memory.set(data.id, neuron);
   }
   
-  /*newSynapse(data: SynapseData) {
-    const synapse = CreateTube(data.id, {
-      path: [this.memory.get(data.start).position, this.memory.get(data.end).position],
-      radius: 0.07,
-      tessellation: 6,
-      cap: Mesh.CAP_NONE
+  newSynapse(data: SynapseData) {
+    const path = [this.memory.get(data.start).position, this.memory.get(data.end).position];
+    
+    const synapse = CreateGreasedLine(`${data.id}`, { points: path }, {
+        width: 1,
+        color: new Color4(1, 1, 1, 0.3),
+        dash: false,
     }, this.scene);
     
-    synapse.material = this.synapseMaterial;
-    
     this.memory.set(data.id, synapse);
-  }*/
+  }
 }

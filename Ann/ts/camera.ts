@@ -1,6 +1,8 @@
+import "@babylonjs/core/Culling/ray";
 import type { Scene } from "@babylonjs/core/scene";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 
 //bn -> babylonjs
 
@@ -33,7 +35,7 @@ export class AnnCamera {
     this.bnCamera.attachControl(props.canvas, true);
     
     this.bnCamera.lowerRadiusLimit = 7;
-    this.bnCamera.upperRadiusLimit = 70;
+    this.bnCamera.upperRadiusLimit = 100000;
     
     if (props.twodim) { 
       this.bnCamera.lowerBetaLimit = 1.5707963267948966;
@@ -42,7 +44,21 @@ export class AnnCamera {
       this.bnCamera.upperAlphaLimit = -1.5707963267948966;
     }
     
-    this.bnCamera.panningSensibility = 200;
-    this.bnCamera.wheelPrecision = 200;
+    this.bnCamera.wheelPrecision = 0;
+    this.bnCamera.useAutoRotationBehavior = false;
+
+    this.bnScene.onPointerObservable.add((pi) => {
+      if(pi.type === PointerEventTypes.POINTERWHEEL){
+        const delta = pi.event.deltaY;
+        const factor = Math.exp(-delta * 0.01);
+        
+        this.bnCamera.orthoTop *= factor;
+        this.bnCamera.orthoBottom *= factor;
+        this.bnCamera.orthoLeft *= factor;
+        this.bnCamera.orthoRight *= factor;
+        
+        this.bnCamera.panningSensibility = Math.max(2, Math.min(500, 200 / this.bnCamera.orthoTop));
+      }
+    });
   }
 }
