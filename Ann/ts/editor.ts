@@ -5,7 +5,7 @@ import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/instancedMesh";
-import { CreateGreasedLine, GreasedLineMeshWidthDistribution } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
+import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";
 
 import { Network, NeuronData, LayerData } from "./structure";
 import { AnnCamera } from "./camera";
@@ -46,38 +46,16 @@ for (let x = -21; x < 21; x+=3) {
   }
 }
 
-// Build all synapses for a layer pair in one go
-function connectLayers(
-  fromIds: number[], 
-  toIds: number[], 
-  net: Network, 
-  scene: Scene
-) {
-  const points: number[][] = [];
-  const widths: number[] = [];
-  
-  for (const fromId of fromIds) {
-    const fromPos = net.memory.get(fromId)?.position;
-    if (!fromPos) continue;
-    
-    for (const toId of toIds) {
-      const toPos = net.memory.get(toId)?.position;
-      if (!toPos) continue;
-      
-      points.push([fromPos.x, fromPos.y, fromPos.z]);
-      points.push([toPos.x, toPos.y, toPos.z]);
-      widths.push(0.02, 0.02);
-    }
-  }
-  
-  CreateGreasedLine("layer_0_to_1", { points, widths }, {
-    color: new Color4(1, 1, 1, 0.3)
-  }, scene);
-}
-// net.newSynapse({start: 31672903, end: 3638, id: 3609});
+const line = CreateLines("test_line", {
+  points: [new Vector3(0, -42, -42), new Vector3(0, -39, -42)],
+  colors: [new Color4(1, 0, 0, 1), new Color4(1, 0, 0, 1)]  // Red, fully opaque
+}, scene);
+
+console.log("Line material:", line.material);
+console.log("Line color:", line.color);
 //Tests End
 
-const editorCamera = new AnnCamera({scene: scene, canvas: canvas, twodim: true});
+const editorCamera = new AnnCamera({scene: scene, canvas: canvas, twodim: false});
 
 engine.runRenderLoop(() => {
   scene.render();
