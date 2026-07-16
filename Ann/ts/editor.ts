@@ -44,31 +44,24 @@ for (let x = -21; x < 21; x+=3) {
     net.newNeuron({id: id++, x: 30, y: y, z: x});
   }
 }
-
 import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";
-
-const allPoints: Vector3[] = [];
-const white = new Color4(1, 1, 1, 0.15);
-const allColors: Color4[] = [];
+const white = new Color4(1,1,1,0.02);
 
 for (let fromId = 1; fromId <= 784; fromId++) {
   const fromPos = net.memory.get(fromId)?.position;
   if (!fromPos) continue;
   
-  for (let toId = 785; toId <= 980; toId++) {
+  for (let c = 0; c < 5; c++) {
+    const toId = 785 + Math.floor(Math.random() * 196);
     const toPos = net.memory.get(toId)?.position;
     if (!toPos) continue;
     
-    allPoints.push(fromPos, toPos);
-    allColors.push(white, white);
+    CreateLines(`s_${fromId}_${c}`, {
+      points: [fromPos, toPos],
+      colors: [white, white]
+    }, scene);
   }
 }
-
-console.log(`Creating ${allPoints.length / 2} synapses`);
-CreateLines("all_synapses", {
-  points: allPoints,
-  colors: allColors
-}, scene);
 //Tests End
 
 const editorCamera = new AnnCamera({scene: scene, canvas: canvas, twodim: false});
