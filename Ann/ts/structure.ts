@@ -31,7 +31,7 @@ export interface LayerData {
 }
 
 export class Network {
-  neuronMemory: Map<number, InstancedMesh | GreasedLineMesh>;
+  memory: Map<number, InstancedMesh | GreasedLineMesh>;
   scene: Scene;
   
   private baseNeuron: Mesh;
