@@ -5,7 +5,6 @@ import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/instancedMesh";
-import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";
 
 import { Network, NeuronData, LayerData } from "./structure";
 import { AnnCamera } from "./camera";
@@ -46,13 +45,30 @@ for (let x = -21; x < 21; x+=3) {
   }
 }
 
-const line = CreateLines("test_line", {
-  points: [new Vector3(0, -42, -42), new Vector3(0, -39, -42)],
-  colors: [new Color4(1, 0, 0, 1), new Color4(1, 0, 0, 1)]  // Red, fully opaque
-}, scene);
+import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";
 
-console.log("Line material:", line.material);
-console.log("Line color:", line.color);
+const allPoints: Vector3[] = [];
+const white = new Color4(1, 1, 1, 0.15);
+const allColors: Color4[] = [];
+
+for (let fromId = 1; fromId <= 784; fromId++) {
+  const fromPos = net.memory.get(fromId)?.position;
+  if (!fromPos) continue;
+  
+  for (let toId = 785; toId <= 980; toId++) {
+    const toPos = net.memory.get(toId)?.position;
+    if (!toPos) continue;
+    
+    allPoints.push(fromPos, toPos);
+    allColors.push(white, white);
+  }
+}
+
+console.log(`Creating ${allPoints.length / 2} synapses`);
+CreateLines("all_synapses", {
+  points: allPoints,
+  colors: allColors
+}, scene);
 //Tests End
 
 const editorCamera = new AnnCamera({scene: scene, canvas: canvas, twodim: false});
