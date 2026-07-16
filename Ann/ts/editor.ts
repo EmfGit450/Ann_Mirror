@@ -2,12 +2,10 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import "@babylonjs/core/Meshes/instancedMesh";
-import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
+import "@babylonjs/core/Materials/GreasedLine/greasedLinePluginMaterial";
 
 import { Network, NeuronData, LayerData } from "./structure";
 import { AnnCamera } from "./camera";
@@ -41,9 +39,9 @@ const test: NeuronData = {
 
 const net = new Network(scene);
 
-const layerSizes = [1, 12, 12, 12, 12]; // matches your image
-const SPACING_X = 3.5;
-const SPACING_Y = 2.2;
+const layerSizes = [1,20, 16, 16, 10]; // matches your image
+const SPACING_X = 5.5;
+const SPACING_Y = 3;
 const layerMap = new Map<number, number[]>();
 let synapseId = 0;
 

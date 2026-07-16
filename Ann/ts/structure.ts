@@ -2,6 +2,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
 import { CreateGreasedLine, GreasedLineMeshWidthDistribution } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 import type { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineMesh";
+import { GreasedLinePluginMaterial } from "@babylonjs/core/Materials/GreasedLine/greasedLinePluginMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
@@ -29,11 +30,11 @@ export interface LayerData {
 }
 
 export class Network {
-  memory: Map<number, Mesh | GreasedLineMesh>;
+  memory: Map<number, InstancedMesh | GreasedLineMesh>;
   scene: Scene;
   
   private baseNeuron: Mesh;
-  private synapseMaterial: StandardMaterial;
+  private synapseMaterial: GreasedLinePluginMaterial;
   
   constructor(renderScene: Scene) {
     this.scene = renderScene;
@@ -42,7 +43,7 @@ export class Network {
     
     this.baseNeuron = CreateSphere("sourceNeuron", { diameter: 2, segments: 16 }, renderScene);
     
-    const neuronMaterial = new StandardMaterial("glowblue", this.scene);
+    const neuronMaterial = new StandardMaterial("hologramBlue", renderScene);
     neuronMaterial.diffuseColor = new Color3(0.2, 0.6, 1.0);
     neuronMaterial.emissiveColor = new Color3(0.1, 0.3, 0.5);
 
@@ -58,6 +59,7 @@ export class Network {
     this.baseNeuron.material = neuronMaterial;
     
     this.baseNeuron.setEnabled(false);
+    
   }
   
   newNeuron(data: NeuronData) {
@@ -70,11 +72,12 @@ export class Network {
   newSynapse(data: SynapseData) {
     const path = [this.memory.get(data.start).position, this.memory.get(data.end).position];
     
-    const synapse = CreateGreasedLine(`${data.id}`, { points: path }, {
-        width: 1,
-        color: new Color4(1, 1, 1, 0.3),
-        dash: false,
-    }, this.scene);
+    const synapse = CreateGreasedLine(`${data.id}`, { 
+      points: path,
+      widths: [0.05, 0.05, 0.05],
+    }, {
+        color: new Color4(1, 1, 1, 0.3)
+    }, this.scene) as GreasedLineMesh;
     
     this.memory.set(data.id, synapse);
   }

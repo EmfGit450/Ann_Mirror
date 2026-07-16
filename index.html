@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nodal</title>
     <style>
-	    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');	   
+	    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 		  
 		  @keyframes fade-in {
 		    0% { opacity: 0; transform: translateY(-100%); }
@@ -21,6 +21,14 @@
 		    50% { opacity: 0.75; transform: translateY(30%); }
 		    80% { opacity: 0.9; transform: translateY(5%); }
 		    100% { opacity: 1; transform: translateY(0); }
+		  }
+		  
+		  @keyframes fade-in-left {
+		    0% { opacity: 0; transform: translateX(-100%); }
+		    25% { opacity: 0; }
+		    50% { opacity: 0.75; transform: translateX(-30%); }
+		    80% { opacity: 0.9; transform: translateX(-5%); }
+		    100% { opacity: 1; transform: translateX(0); }
 		  }
 		  
 		  * {
@@ -39,17 +47,20 @@
 	    body {
 		    background: black;
 		    padding: 4rem;
-		    font-family: "Jetbrains Mono", Monospace;
+		    font-family: "Montserrat", Monospace;
 		    color: white;
 	    }
 	    
 	    header {
 	      text-shadow: 0 0 1rem #ffffff59;
 	      font-size: 4.2rem;
+	      animation-name: fade-in;
+	      animation-duration: 2s;
 	    }
 	    p {
 	      text-shadow: 0 0 1rem #ffffff59;
 	      font-size: 2.4rem;
+	      animation: fade-in-left 2s ease-in-out;
 	    }
 	    
 	    nav {
