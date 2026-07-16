@@ -12,10 +12,11 @@ import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 
 export interface NeuronData {
   id: number; 
-  type: number; //inside a layer or free floating
-  layerOx: number; //layer index
-  neuronOy: number; //neuron index
+  x: number; //x or layer index
+  y: number; //y or horizontal index
+  z: number; //z or vertical index
 }
+//Matrix shapes for layers
 
 export interface SynapseData {
   id: number;
@@ -30,11 +31,10 @@ export interface LayerData {
 }
 
 export class Network {
-  memory: Map<number, InstancedMesh | GreasedLineMesh>;
+  neuronMemory: Map<number, InstancedMesh | GreasedLineMesh>;
   scene: Scene;
   
   private baseNeuron: Mesh;
-  private synapseMaterial: GreasedLinePluginMaterial;
   
   constructor(renderScene: Scene) {
     this.scene = renderScene;
@@ -59,12 +59,12 @@ export class Network {
     this.baseNeuron.material = neuronMaterial;
     
     this.baseNeuron.setEnabled(false);
-    
   }
   
+  //1 = Neuron, 2 = Synapse
   newNeuron(data: NeuronData) {
-    const neuron = this.baseNeuron.createInstance(`${data.id}`);
-    neuron.position = new Vector3(data.layerOx, data.neuronOy, 0);
+    const neuron = this.baseNeuron.createInstance(`1_${data.id}`);
+    neuron.position = new Vector3(data.x, data.y, data.z);
     
     this.memory.set(data.id, neuron);
   }
@@ -72,11 +72,11 @@ export class Network {
   newSynapse(data: SynapseData) {
     const path = [this.memory.get(data.start).position, this.memory.get(data.end).position];
     
-    const synapse = CreateGreasedLine(`${data.id}`, { 
+    const synapse = CreateGreasedLine(`2_${data.id}`, { 
       points: path,
-      widths: [0.05, 0.05, 0.05],
+      widths: [0.02, 0.02, 0.02],
     }, {
-        color: new Color4(1, 1, 1, 0.3)
+        color: new Color4(1, 1, 1, 0.1)
     }, this.scene) as GreasedLineMesh;
     
     this.memory.set(data.id, synapse);

@@ -30,63 +30,33 @@ material.emissiveColor = new Color3(0.1, 0.3, 0.5);
 plane.material = material;*/
 
 //Tests Start
-const test: NeuronData = {
-  id: 31672903,
-  type: 1,
-  layerOx: 0,
-  neuronOy: 0
-}
-
 const net = new Network(scene);
 
-const layerSizes = [1,20, 16, 16, 10]; // matches your image
-const SPACING_X = 5.5;
-const SPACING_Y = 3;
-const layerMap = new Map<number, number[]>();
-let synapseId = 0;
+let id = 1;
 
-// 1. Create neurons per layer, centered
-for (let layer = 0; layer < layerSizes.length; layer++) {
-  const neuronsInLayer = layerSizes[layer];
-  layerMap.set(layer, []);
-  
-  for (let r = 0; r < neuronsInLayer; r++) {
-    const id = layer * 1000 + r; // unique: 0, 1000, 1001, 2000...
-    const yOffset = (r - (neuronsInLayer - 1) / 2) * SPACING_Y; // center vertically
-    
-    net.newNeuron({
-      id: id, 
-      type: 1, 
-      layerOx: (layer + 1) * SPACING_X, 
-      neuronOy: yOffset
-    });
-    layerMap.get(layer)!.push(id);
+for (let x = -42; x < 42; x+=3) {
+  for (let y = -42; y < 42; y+=3) {
+    net.newNeuron({id: id++, x: 0, y: y, z: x});
   }
 }
 
-// 2. Connect each layer to the next: full feedforward
-for (let layer = 0; layer < layerSizes.length - 1; layer++) {
-  const currentLayer = layerMap.get(layer)!;
-  const nextLayer = layerMap.get(layer + 1)!;
-
-  for (const startId of currentLayer) {
-    for (const endId of nextLayer) {
-      net.newSynapse({
-        start: startId, 
-        end: endId, 
-        id: synapseId++
-      });
-    }
+for (let x = -21; x < 21; x+=3) {
+  for (let y = -21; y < 21; y+=3) {
+    net.newNeuron({id: id++, x: 30, y: y, z: x});
   }
 }
 
+let synapseId = 100000;
 
-
-//net.newSynapse({start: 0, end: , id: 3609});
+for (let fromId = 1; fromId <= 784; fromId++) {
+  for (let toId = 785; toId <= 980; toId++) {
+    net.newSynapse({ start: fromId, end: toId, id: synapseId++ });
+  }
+}
 // net.newSynapse({start: 31672903, end: 3638, id: 3609});
 //Tests End
 
-const editorCamera = new AnnCamera({scene: scene, canvas: canvas, twodim: false});
+const editorCamera = new AnnCamera({scene: scene, canvas: canvas, twodim: true});
 
 engine.runRenderLoop(() => {
   scene.render();
