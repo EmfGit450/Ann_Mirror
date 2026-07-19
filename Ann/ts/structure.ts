@@ -1,8 +1,7 @@
 import type { Scene } from "@babylonjs/core/scene";
 import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
-import { CreateGreasedLine, GreasedLineMeshWidthDistribution } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
+import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 import type { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineMesh";
-import { GreasedLinePluginMaterial } from "@babylonjs/core/Materials/GreasedLine/greasedLinePluginMaterial";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
@@ -70,11 +69,11 @@ export class Network {
   }
   
   newSynapse(data: SynapseData) {
-    const path = [this.memory.get(data.start).position, this.memory.get(data.end).position];
+    const path = [this.memory.get(data.start)?.position, this.memory.get(data.end)?.position];
     
     const synapse = CreateGreasedLine(`2_${data.id}`, { 
       points: path,
-      widths: [0.02, 0.02, 0.02],
+      widths: [0.02, 0.02],
     }, {
         color: new Color4(1, 1, 1, 0.1)
     }, this.scene) as GreasedLineMesh;
