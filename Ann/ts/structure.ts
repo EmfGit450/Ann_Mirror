@@ -72,7 +72,7 @@ export class Network {
     const path = [this.memory.get(data.start)?.position, this.memory.get(data.end)?.position];
     
     const synapse = CreateGreasedLine(`2_${data.id}`, { 
-      points: path,
+      points: path as Vector3[],
       widths: [0.02, 0.02],
     }, {
         color: new Color4(1, 1, 1, 0.1)
