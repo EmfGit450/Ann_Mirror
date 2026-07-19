@@ -63,7 +63,7 @@ for (let fromId = 1; fromId <= 784; fromId++) {
 }
 //Tests End
 
-const editorCamera = new AnnCamera({scene: scene, canvas: canvas, twodim: false});
+new AnnCamera({scene: scene, canvas: canvas, twodim: false});
 
 engine.runRenderLoop(() => {
   scene.render();
