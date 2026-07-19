@@ -8,6 +8,8 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import {CreateBox} from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import {AnnCamera} from "./camera";
 
 export interface NeuronData {
   id: number; 
@@ -19,14 +21,14 @@ export interface NeuronData {
 
 export interface SynapseData {
   id: number;
-  start: number;
-  end: number;
+  start: number; //neuron or layer
+  end: number; //neuron or layer
 }
 
 export interface LayerData {
-  network: number; //network index
-  size: number; 
   id: number;
+  pos: Float32Array;
+  shape: Float32Array;
 }
 
 export class Network {
@@ -34,6 +36,7 @@ export class Network {
   scene: Scene;
   
   private baseNeuron: Mesh;
+  private layerMat: StandardMaterial;
   
   constructor(renderScene: Scene) {
     this.scene = renderScene;
@@ -58,26 +61,39 @@ export class Network {
     this.baseNeuron.material = neuronMaterial;
     
     this.baseNeuron.setEnabled(false);
+
+
+    this.layerMat = new StandardMaterial("mat", scene);
+    this.layerMat.diffuseColor = new Color3(0.22, 0.27, 0.85);
+    this.layerMat.alpha = 0.4;
+    this.layerMat.emissiveColor = new Color3(0.5, 0.5, 0.5);
   }
   
-  //1 = Neuron, 2 = Synapse
+  //0 = Layer, 1 = Neuron, 2 = Synapse
+  newLayer(data: LayerData) {
+    const mesh = CreateBox(`0_${data.id}`, { size: 1 }, this.scene);
+    mesh.material = this.layerMat;
+
+    mesh.position = new Vector3(data.pos[0], data.pos[1], data.pos[2]);
+  }
+
   newNeuron(data: NeuronData) {
-    const neuron = this.baseNeuron.createInstance(`1_${data.id}`);
-    neuron.position = new Vector3(data.x, data.y, data.z);
+    const mesh = this.baseNeuron.createInstance(`1_${data.id}`);
+    mesh.position = new Vector3(data.x, data.y, data.z);
     
-    this.memory.set(data.id, neuron);
+    this.memory.set(data.id, mesh);
   }
   
   newSynapse(data: SynapseData) {
     const path = [this.memory.get(data.start)?.position, this.memory.get(data.end)?.position];
     
-    const synapse = CreateGreasedLine(`2_${data.id}`, { 
+    const mesh = CreateGreasedLine(`2_${data.id}`, {
       points: path as Vector3[],
       widths: [0.02, 0.02],
     }, {
         color: new Color4(1, 1, 1, 0.1)
     }, this.scene) as GreasedLineMesh;
     
-    this.memory.set(data.id, synapse);
+    this.memory.set(data.id, mesh);
   }
 }
