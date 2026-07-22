@@ -21,7 +21,6 @@ new HemisphericLight("light", new Vector3(0, 80, 0), scene);
 //Tests Start
 const net = new Network(scene);
 
-/*
 let id = 1;
 
 for (let x = -42; x < 42; x+=3) {
@@ -53,7 +52,6 @@ for (let fromId = 1; fromId <= 784; fromId++) {
     }, scene);
   }
 }
-*/
 
 //Tests End
 

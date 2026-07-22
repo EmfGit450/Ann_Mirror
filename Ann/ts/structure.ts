@@ -63,7 +63,7 @@ export class Network {
     this.baseNeuron.setEnabled(false);
 
 
-    this.layerMat = new StandardMaterial("mat", scene);
+    this.layerMat = new StandardMaterial("mat", renderScene);
     this.layerMat.diffuseColor = new Color3(0.22, 0.27, 0.85);
     this.layerMat.alpha = 0.4;
     this.layerMat.emissiveColor = new Color3(0.5, 0.5, 0.5);
