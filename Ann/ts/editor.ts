@@ -25,13 +25,13 @@ let id = 1;
 
 for (let x = -42; x < 42; x+=3) {
   for (let y = -42; y < 42; y+=3) {
-    net.newNeuron({id: id++, x: 0, y: y, z: x});
+    net.newNeuron({id: id++, pos: new Float32Array([0, y, x])});
   }
 }
 
 for (let x = -21; x < 21; x+=3) {
   for (let y = -21; y < 21; y+=3) {
-    net.newNeuron({id: id++, x: 30, y: y, z: x});
+    net.newNeuron({id: id++, pos: [30, y, x]});
   }
 }
 import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";

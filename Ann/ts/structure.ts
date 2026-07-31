@@ -1,21 +1,18 @@
 import type { Scene } from "@babylonjs/core/scene";
 import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
-import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
-import type { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineMesh";
+import { CreateGreasedLines, CreateGreasedLineSystem } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import { GreasedLineMesh } from "@babylonjs/core/Meshes/greasedLineMesh";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import {CreateBox} from "@babylonjs/core/Meshes/Builders/boxBuilder";
-import {AnnCamera} from "./camera";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
 
 export interface NeuronData {
   id: number; 
-  x: number; //x or layer index
-  y: number; //y or horizontal index
-  z: number; //z or vertical index
+  pos: Float32Array;
 }
 //Matrix shapes for layers
 
@@ -28,7 +25,7 @@ export interface SynapseData {
 export interface LayerData {
   id: number;
   pos: Float32Array;
-  shape: Float32Array;
+  shape: Int8Array;
 }
 
 export class Network {
@@ -63,7 +60,7 @@ export class Network {
     this.baseNeuron.setEnabled(false);
 
 
-    this.layerMat = new StandardMaterial("mat", renderScene);
+    this.layerMat = new StandardMaterial("layerMat", renderScene);
     this.layerMat.diffuseColor = new Color3(0.22, 0.27, 0.85);
     this.layerMat.alpha = 0.4;
     this.layerMat.emissiveColor = new Color3(0.5, 0.5, 0.5);
@@ -84,16 +81,31 @@ export class Network {
     this.memory.set(data.id, mesh);
   }
   
-  newSynapse(data: SynapseData) {
-    const path = [this.memory.get(data.start)?.position, this.memory.get(data.end)?.position];
+  newSynapse(dataBatch: SynapseData[]) {
+    const linePoints = new Float32Array(dataBatch.length * 6); 
+    //each synapse has a start and end neuron, two vertices, each has x, y, z coords, 6
     
-    const mesh = CreateGreasedLine(`2_${data.id}`, {
-      points: path as Vector3[],
-      widths: [0.02, 0.02],
-    }, {
-        color: new Color4(1, 1, 1, 0.1)
+    for (let i = 0; i < linePoints.length; i += 6) {
+      const data = dataBatch[i / 6];
+      
+      const start = this.memory.get(data.start).position;
+      const end = this.memory.get(data.end).position;
+      
+      linePoints[i] = start.x;
+      linePoints[i+1] = start.y;
+      linePoints[i+2] = start.z;
+      
+      linePoints[i+3] = end.x;
+      linePoints[i+4] = end.y;
+      linePoints[i+5] = end.z;
+    }
+    
+    const mesh = CreateGreasedLineSystem(`2_${linePoints.length}`, {
+      lines: linePoints,
     }, this.scene) as GreasedLineMesh;
     
-    this.memory.set(data.id, mesh);
+    mesh.color = new Color3(1, 1, 1);
+    
+    this.memory.set(mesh.name, mesh);
   }
 }
