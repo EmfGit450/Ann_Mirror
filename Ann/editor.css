@@ -49,75 +49,6 @@ body {
 	padding: 0rem;
 }
 
-/*Loading Screen*/
-.loading-screen {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100dvw;
-  height: 100dvh;
-  z-index: 1000;
-  background: #000000DD;
-  
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-  /*FOR TESTING BABYLON*/
-  pointer-events: none;
-  display: none;
-}
-
-.faded-out-loading-screen {
-  transition: 1s ease;
-  opacity: 0;
-}
-
-.loading-screen svg {
-  width: 25vmin;
-  height: 25vmin;
-}
-
-.loadline {
-  animation: drawLine 3s ease infinite;
-}
-
-.loadcirc {
-  animation: pulse 2s ease infinite;
-}
-/*End*/
-
-/*General Modal*/
-.general-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #16263A;
-  border-radius: 1rem;
-  z-index: 1000;
-  height: 9rem;
-  width: 20rem;
-  font-family: "Jetbrains Mono", Monospace;
-  color: white;
-  padding: 1.6rem;
-  margin: 0;
-  
-  display: none;
-  pointer-events: none;
-}
-
-.general-modal input {
-  border: none;
-  border-radius: 1rem;
-  width: 100%;
-  height: 3rem;
-  margin-top: 1.3rem;
-  padding: 1rem;
-  font-family: "Jetbrains Mono", Monospace;
-}
-/*End*/
-
 /*Main Container*/
 .main-c {
   display: flex;
@@ -172,6 +103,7 @@ button.active svg * {
 .top-editor-btns {
 	display: flex;
   justify-content: space-between;
+  z-index: 1;
 }
 		 
 .blink-cursor {
@@ -185,16 +117,19 @@ button.active svg * {
   flex-grow: 1;
   min-height: 0;
   align-items: stretch;
-  jus
   gap: 1rem;
+  position: absolute;
+  z-index: 1;
 }
 
 .babylonjs-canvas {
 	display: flex;
 	flex-grow: 1;
-	min-height: 0;
-	position: relative;
+	height: calc(100dvh - 2rem);
+	width: calc(100dvw - 2rem);
+	position: absolute;
 	overflow: hidden;
+	z-index: 0;
 }
 
 .babylonjs-canvas canvas {
@@ -205,6 +140,7 @@ button.active svg * {
   width: 100%;
   height: 100%;
   border-radius: 1rem;
+  z-index: 0;
 }
 
 .neuron-btns, .layer-btns {
@@ -212,6 +148,8 @@ button.active svg * {
   flex-direction: column;
   justify-content: center;
   gap: 0.6rem;
+  position: absolute;
+  z-index: 1;
 }
 /*End*/
 		 
@@ -219,22 +157,14 @@ button.active svg * {
 .bottom-editor {
   display: flex;
   justify-content: space-between;
+  position: absolute;
+  z-index: 1;
 }
 
 .bottom-left-editor-btns {
   display: flex;
   gap: 0.6rem
-}
-
-.hintbox-div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 8rem;
-  border: 2px solid white;
-  border-radius: 1.3rem;
-  font-size: 0.9rem;
-  color: #FFF;
+  z-index: 1;
 }
 /*End*/
 		 

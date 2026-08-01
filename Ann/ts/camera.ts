@@ -6,12 +6,12 @@ import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 
 //bn -> babylonjs
 
-export class AnnCamera {
+export class Camera {
   bnCanvas: HTMLCanvasElement;
   bnScene: Scene;
   bnCamera: ArcRotateCamera;
   
-  constructor(props: { canvas: HTMLCanvasElement, scene: Scene, twodim: boolean }) {
+  constructor(props: { canvas: HTMLCanvasElement, scene: Scene }) {
     this.bnCamera = new ArcRotateCamera(
       "camera", 
       -1.5707963267948966,
@@ -37,13 +37,6 @@ export class AnnCamera {
     this.bnCamera.lowerRadiusLimit = 7;
     this.bnCamera.upperRadiusLimit = 260;
     
-    if (props.twodim) { 
-      this.bnCamera.lowerBetaLimit = 1.5707963267948966;
-      this.bnCamera.upperBetaLimit = 1.5707963267948966;
-      this.bnCamera.lowerAlphaLimit = -1.5707963267948966;
-      this.bnCamera.upperAlphaLimit = -1.5707963267948966;
-    }
-    
     this.bnCamera.wheelPrecision = 0;
     this.bnCamera.panningSensibility = 200;
     this.bnCamera.useAutoRotationBehavior = false;
@@ -62,4 +55,11 @@ export class AnnCamera {
       }
     });
   }
+  
+  /*toggleDim() {
+    this.bnCamera.lowerBetaLimit = 1.5707963267;
+    this.bnCamera.upperBetaLimit = 1.5707963267;
+    this.bnCamera.lowerAlphaLimit = -1.5707963267;
+    this.bnCamera.upperAlphaLimit = -1.5707963267;
+  }*/
 }
