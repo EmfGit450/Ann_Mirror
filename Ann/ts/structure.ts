@@ -105,6 +105,7 @@ export class Network {
   }
   
   newSynapseBatch(batch: SynapseBatchData) {
+    //BUG: STUPID LOGIC BUG, lines 112 - 133 positive diff
     let repedX = 0, repedY = 0, repedZ = 0;
     let repX, repY, repZ;
     
