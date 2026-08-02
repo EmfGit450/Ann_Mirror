@@ -18,18 +18,24 @@ export interface NeuronData {
 
 export interface SynapseData {
   id: number;
-  start: number; //neuron or layer
-  end: number; //neuron or layer
+  ft: BigInt64Array; //size 2. [fromId, toId]
+}
+
+export interface SynapseBatch {
+  id: number;
+  ids: BigInt64Array;
+  fts: BigInt64Array;
+  mid: Int32Array; //size 3. [x, y, z]
 }
 
 export interface LayerData {
   id: number;
   pos: Float32Array;
-  shape: Int16Array;
+  shape: Int32Array;
 }
 
 export class Network {
-  memory: Map<number, InstancedMesh | GreasedLineMesh>;
+  memory: Map<BigInt, InstancedMesh | GreasedLineMesh>;
   scene: Scene;
   
   private baseNeuron: Mesh;
@@ -85,6 +91,7 @@ export class Network {
     const linePoints = []; 
     //each synapse has a start and end neuron, two vertices, each has x, y, z coords, 6
     
+    const minmax = [];
     for (let i = 0; i < dataBatch.length; i++) {
       const data = dataBatch[i];
       

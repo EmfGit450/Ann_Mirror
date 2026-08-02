@@ -21,8 +21,8 @@ new HemisphericLight("light", new Vector3(0, 80, 0), scene);
 //Tests Start
 const net = new Network(scene);
 
-let neuronId = 1;
-let synapseId = 1000;
+let neuronId = 1n;
+let synapseId = 1000n;
 
 // Track IDs per layer to create fully-connected synapses
 const layer0: number[] = [];
@@ -31,9 +31,9 @@ const layer2: number[] = [];
 const layer3: number[] = [];
 
 // ===================================================
-// Layer 0: 16x16 Grid (256 Neurons) @ X = 0
+// Layer 0
 // ===================================================
-const l0Size = 28;
+const l0Size = 16;
 const l0Spacing = 2.5;
 const l0Offset = ((l0Size - 1) * l0Spacing) / 2;
 
@@ -53,7 +53,7 @@ for (let r = 0; r < l0Size; r++) {
 }
 
 // ===================================================
-// Layer 1: 6x6 Grid (36 Neurons) @ X = 25
+// Layer 1
 // ===================================================
 const l1Size = 10;
 const l1Spacing = 2.5;
@@ -75,9 +75,9 @@ for (let r = 0; r < l1Size; r++) {
 }
 
 // ===================================================
-// Layer 2: 4x4 Grid (16 Neurons) @ X = 50
+// Layer 2
 // ===================================================
-const l2Size = 10;
+const l2Size = 8;
 const l2Spacing = 2.5;
 const l2Offset = ((l2Size - 1) * l2Spacing) / 2;
 
@@ -97,7 +97,7 @@ for (let r = 0; r < l2Size; r++) {
 }
 
 // ===================================================
-// Layer 3: Vertical Stack (10 Neurons) @ X = 75
+// Layer 3: Vertical Stack
 // ===================================================
 const l3Count = 10;
 const l3Spacing = 2.5;
@@ -119,7 +119,7 @@ for (let i = 0; i < l3Count; i++) {
 // ===================================================
 // Generate Fully Connected Synapses
 // ===================================================
-const synapses: SynapseData[] = [];
+let synapses: SynapseData[] = [];
 
 function connectLayers(fromLayer: number[], toLayer: number[]) {
   for (const start of fromLayer) {
@@ -129,16 +129,27 @@ function connectLayers(fromLayer: number[], toLayer: number[]) {
   }
 }
 
-connectLayers(layer0, layer1); // 9,216 connections
-connectLayers(layer1, layer2); // 576 connections
-connectLayers(layer2, layer3); // 160 connections
+connectLayers(layer0, layer1);
+net.newSynapses(synapses);
+synapses = [];
+connectLayers(layer1, layer2);
+net.newSynapses(synapses);
+synapses = [];
+connectLayers(layer2, layer3);
+net.newSynapses(synapses);
 
-// Pass all 9,952 synapses in one single batch mesh call
 net.newSynapses(synapses);
 //Tests End
 
 new Camera({scene: scene, canvas: canvas});
 
+window.net = () => {
+  return `memory: ${[...net.memory.values()]}`
+}
+
+scene.registerBeforeRender(() => {
+    console.log("FPS:", Math.round(engine.getFps()));
+});
 engine.runRenderLoop(() => {
   scene.render();
 });
