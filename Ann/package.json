@@ -1,12 +1,11 @@
 {
   "sideEffects": false,
   "dependencies": {
-    "@babylonjs/core": "^9.16.1"
+    "@babylonjs/core": "^9.19.0"
   },
   "devDependencies": {
     "esbuild": "^0.28.1"
   },
-  
   "scripts": {
     "build": "node build.mjs",
     "watch": "node build.mjs --watch",

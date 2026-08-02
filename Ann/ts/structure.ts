@@ -1,4 +1,5 @@
 import type { Scene } from "@babylonjs/core/scene";
+import { Camera } from "./camera";
 import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -10,43 +11,59 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
 
+//IMP:
+//Float64 is used for ids, since that gives 2^53 = 9,007,199,254,740,991(9 quintillion) possible integer ids
+//Float32 is too low, 2^24 = 16,777,216(just 16 million)
+
+//Using Float32 for pos since there needs to be a large network before i need Float64
+
 export interface NeuronData {
   id: number; 
   pos: Float32Array;
 }
-//Matrix shapes for layers
+
+export interface NeuronBatchData {
+  ids: Float64Array;
+  pos: Float32Array
+}
 
 export interface SynapseData {
   id: number;
-  ft: BigInt64Array; //size 2. [fromId, toId]
+  ft: Float64Array; //size 6 [fx, fy, fz, ex, ey, ez]
 }
 
-export interface SynapseBatch {
+export interface SynapseBatchData {
   id: number;
-  ids: BigInt64Array;
-  fts: BigInt64Array;
-  mid: Int32Array; //size 3. [x, y, z]
+  ids: Float64Array;
+  fts: number[][]; //[fx, fy, fz, ex, ey, ez, ...]. using number[][] since babylonjs
+  mid: Float32Array; //size 3. [x, y, z]
 }
 
 export interface LayerData {
   id: number;
   pos: Float32Array;
-  shape: Int32Array;
+  shape: Int32Array; //Tensor visual thing
 }
 
+
 export class Network {
-  memory: Map<BigInt, InstancedMesh | GreasedLineMesh>;
+  memory: Map<number, InstancedMesh | GreasedLineMesh>;
   scene: Scene;
+  camera: Camera;
   
   private baseNeuron: Mesh;
   private layerMat: StandardMaterial;
   
-  constructor(renderScene: Scene) {
+  constructor(renderScene: Scene, renderCam: Camera) {
     this.scene = renderScene;
+    this.camera = renderCam;
+    
     this.memory = new Map();
     
-    
-    this.baseNeuron = CreateSphere("sourceNeuron", { diameter: 2, segments: 16 }, renderScene);
+    this.baseNeuron = CreateSphere("sourceNeuron", { 
+      diameter: 2,
+      segments: 14
+    }, renderScene);
     
     const neuronMaterial = new StandardMaterial("hologramBlue", renderScene);
     neuronMaterial.diffuseColor = new Color3(0.2, 0.6, 1.0);
@@ -72,7 +89,7 @@ export class Network {
     this.layerMat.emissiveColor = new Color3(0.5, 0.5, 0.5);
   }
   
-  //0 = Layer, 1 = Neuron, 2 = SynapseBatch
+  //0 = Layer, 1 = Neuron, 3 = NeuronBatch 2 = Synapse, 4 = SynapseBatch
   newLayer(data: LayerData) {
     const mesh = CreateBox(`0_${data.id}`, { size: 1 }, this.scene);
     mesh.material = this.layerMat;
@@ -87,36 +104,45 @@ export class Network {
     this.memory.set(data.id, mesh);
   }
   
-  newSynapses(dataBatch: SynapseData[]) {
-    const linePoints = []; 
-    //each synapse has a start and end neuron, two vertices, each has x, y, z coords, 6
+  newSynapseBatch(batch: SynapseBatchData) {
+    let repedX = 0, repedY = 0, repedZ = 0;
+    let repX, repY, repZ;
     
-    const minmax = [];
-    for (let i = 0; i < dataBatch.length; i++) {
-      const data = dataBatch[i];
+    for (let i = 0; i < batch.fts.length; i++) {
+      const startX = batch.fts[i][0];
+      const startY = batch.fts[i][1];
+      const startZ = batch.fts[i][2];
       
-      const start = this.memory.get(data.start).position;
-      const end = this.memory.get(data.end).position;
+      const endX = batch.fts[i][3];
+      const endY = batch.fts[i][4];
+      const endZ = batch.fts[i][5];
       
-      const line = new Array(6);
-      line[0] = start.x;
-      line[1] = start.y;
-      line[2] = start.z;
-      
-      line[3] = end.x;
-      line[4] = end.y;
-      line[5] = end.z;
-      
-      linePoints.push(line);
+      if (startX === repX) {
+        repedX++;
+        if (repedX > 100) batch.fts.splice(i, i);
+      }
+      else if (startY === repY) {
+        repedY++;
+        if (repedY > 100) batch.fts.splice(i, i);
+      }
+      else if (startZ === repZ) {
+        repedZ++;
+        if (repedZ > 100) batch.fts.splice(i, i);
+      }
     }
-    
-    const mesh = CreateGreasedLine(`2_${linePoints.length}`, {
-      points: linePoints
+    const mesh = CreateGreasedLine(`2_${batch.id}`, {
+      points: batch.fts
     }, {
       color: new Color3(1, 1, 1),
-      width: 0.04
+      width: 0.03
     },  this.scene) as GreasedLineMesh;
     
-    this.memory.set(linePoints.length, mesh);
+    this.memory.set(batch.id, mesh);
   }
+  
+  renderSynapseBatches() {
+    
+  }
+  
+  
 }
