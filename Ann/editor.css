@@ -98,6 +98,15 @@ button.active svg * {
   stroke: #FFF;
 }
 /*End*/
+
+/*FPS COUNTER*/
+#fps-counter {
+  position: absolute;
+  font-size: 2rem;
+  color: #ff2525;
+  z-index: 9999;
+}
+/*End*/
 		  
 /*Top Editor Buttons*/
 .top-editor-btns {

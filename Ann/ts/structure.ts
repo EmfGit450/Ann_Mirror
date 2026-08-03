@@ -1,5 +1,4 @@
 import type { Scene } from "@babylonjs/core/scene";
-import { Camera } from "./camera";
 import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -7,7 +6,7 @@ import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { GreasedLineMesh } from "@babylonjs/core/Meshes/greasedLineMesh";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3, Matrix } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
 
@@ -23,8 +22,9 @@ export interface NeuronData {
 }
 
 export interface NeuronBatchData {
+  id: number;
   ids: Float64Array;
-  pos: Float32Array
+  pos: Float32Array; // [x, y, z, x, y, z, ...]
 }
 
 export interface SynapseData {
@@ -35,29 +35,25 @@ export interface SynapseData {
 export interface SynapseBatchData {
   id: number;
   ids: Float64Array;
-  fts: number[][]; //[fx, fy, fz, ex, ey, ez, ...]. using number[][] since babylonjs
-  mid: Float32Array; //size 3. [x, y, z]
+  fts: number[][]; //[fx, fy, fz, ex, ey, ez, ...]. using number[][] since babylonjs 
 }
 
 export interface LayerData {
   id: number;
   pos: Float32Array;
   shape: Int32Array; //Tensor visual thing
+  ids: Float64Array; //child neuron ids
 }
-
 
 export class Network {
   memory: Map<number, InstancedMesh | GreasedLineMesh>;
   scene: Scene;
-  camera: Camera;
   
   private baseNeuron: Mesh;
   private layerMat: StandardMaterial;
   
-  constructor(renderScene: Scene, renderCam: Camera) {
+  constructor(renderScene: Scene) {
     this.scene = renderScene;
-    this.camera = renderCam;
-    
     this.memory = new Map();
     
     this.baseNeuron = CreateSphere("sourceNeuron", { 
@@ -104,34 +100,38 @@ export class Network {
     this.memory.set(data.id, mesh);
   }
   
-  newSynapseBatch(batch: SynapseBatchData) {
-    //BUG: STUPID LOGIC BUG, lines 112 - 133 positive diff
-    let repedX = 0, repedY = 0, repedZ = 0;
-    let repX, repY, repZ;
+  newNeuronBatch(batch: NeuronBatchData) {
+    const masterMesh = this.baseNeuron.clone(`3_${batch.id}`);
+    masterMesh.setEnabled(true);
+    masterMesh.thinInstanceEnable = true;
     
-    for (let i = 0; i < batch.fts.length; i++) {
-      const startX = batch.fts[i][0];
-      const startY = batch.fts[i][1];
-      const startZ = batch.fts[i][2];
-      
-      const endX = batch.fts[i][3];
-      const endY = batch.fts[i][4];
-      const endZ = batch.fts[i][5];
-      
-      if (startX === repX) {
-        repedX++;
-        if (repedX > 100) batch.fts.splice(i, i);
-      }
-      else if (startY === repY) {
-        repedY++;
-        if (repedY > 100) batch.fts.splice(i, i);
-      }
-      else if (startZ === repZ) {
-        repedZ++;
-        if (repedZ > 100) batch.fts.splice(i, i);
-      }
+    const thinInstanceMatrix = [];
+    
+    for (let i = 0; i < batch.pos.length; i += 3) {
+      const matrix = Matrix.Translation(
+        batch.pos[i],   //x
+        batch.pos[i+1], //y
+        batch.pos[i+2]  //z
+      );
+      thinInstanceMatrix.push(matrix);
     }
-    const mesh = CreateGreasedLine(`2_${batch.id}`, {
+    
+    masterMesh.thinInstanceAdd(thinInstanceMatrix);
+  }
+  
+  newSynapse(data: SynapseData) {
+    const mesh = CreateGreasedLine(`2_${data.id}`, {
+      points: data.ft
+    }, {
+      color: new Color3(1, 1, 1),
+      width: 0.03
+    },  this.scene) as GreasedLineMesh;
+    
+    this.memory.set(data.id, mesh);
+  }
+  
+  newSynapseBatch(batch: SynapseBatchData) {
+    const mesh = CreateGreasedLine(`4_${batch.id}`, {
       points: batch.fts
     }, {
       color: new Color3(1, 1, 1),
@@ -139,10 +139,6 @@ export class Network {
     },  this.scene) as GreasedLineMesh;
     
     this.memory.set(batch.id, mesh);
-  }
-  
-  renderSynapseBatches() {
-    
   }
   
   
