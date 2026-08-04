@@ -108,30 +108,16 @@ button.active svg * {
   z-index: 9999;
 }
 /*End*/
-		  
-/*Top Editor Buttons*/
+
+/*Top Editor*/
 .top-editor-btns {
-	display: flex;
+  display: flex;
   justify-content: space-between;
   z-index: 1;
-}
-		 
-.blink-cursor {
-	animation: blink 0.7s infinite none;
 }
 /*End*/
 		  
 /*Center Editor*/
-.center-editor {
-  display: flex;
-  flex-grow: 1;
-  min-height: 0;
-  align-items: stretch;
-  gap: 1rem;
-  position: absolute;
-  z-index: 1;
-}
-
 .babylonjs-canvas {
 	display: flex;
 	flex-grow: 1;
@@ -152,32 +138,8 @@ button.active svg * {
   border-radius: 1rem;
   z-index: 0;
 }
-
-.neuron-btns, .layer-btns {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.6rem;
-  position: absolute;
-  z-index: 1;
-}
 /*End*/
-		 
-/*Bottom Editor Buttons*/
-.bottom-editor {
-  display: flex;
-  justify-content: space-between;
-  position: absolute;
-  z-index: 1;
-}
 
-.bottom-left-editor-btns {
-  display: flex;
-  gap: 0.6rem
-  z-index: 1;
-}
-/*End*/
-		 
 @media (max-width: 700px), (max-height: 1000px) {
 	button {
 		width: 3.8rem;
