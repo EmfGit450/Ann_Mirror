@@ -9,6 +9,7 @@ import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
 import { Vector3, Matrix } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import "@babylonjs/core/Meshes/thinInstanceMesh";
 
 //IMP:
 //Float64 is used for ids, since that gives 2^53 = 9,007,199,254,740,991(9 quintillion) possible integer ids
@@ -101,22 +102,26 @@ export class Network {
   }
   
   newNeuronBatch(batch: NeuronBatchData) {
-    const masterMesh = this.baseNeuron.clone(`3_${batch.id}`);
-    masterMesh.setEnabled(true);
+    const masterMesh = CreateSphere(`3_${batch.id}`,{
+      diameter: 2,
+      segments: 14
+    }, this.scene);
+    masterMesh.material = this.baseNeuron.material;
+    
     masterMesh.thinInstanceEnable = true;
+
+    const thinInstanceMatrix = new Float32Array(batch.ids.length * 16);
     
-    const thinInstanceMatrix = [];
-    
+    //using pos.length and not ids.length due to its convenience(personally) in grabbing positions
     for (let i = 0; i < batch.pos.length; i += 3) {
-      const matrix = Matrix.Translation(
+      Matrix.Translation(
         batch.pos[i],   //x
         batch.pos[i+1], //y
         batch.pos[i+2]  //z
-      );
-      thinInstanceMatrix.push(matrix);
+      ).copyToArray(thinInstanceMatrix, (i/3) * 16)
     }
     
-    masterMesh.thinInstanceAdd(thinInstanceMatrix);
+    masterMesh.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16);
   }
   
   newSynapse(data: SynapseData) {
