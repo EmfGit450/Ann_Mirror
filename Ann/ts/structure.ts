@@ -22,12 +22,6 @@ export interface NeuronData {
   pos: Float32Array;
 }
 
-export interface NeuronBatchData {
-  id: number;
-  ids: Float64Array;
-  pos: Float32Array; // [x, y, z, x, y, z, ...]
-}
-
 export interface SynapseData {
   id: number;
   ft: Float64Array; //size 6 [fx, fy, fz, ex, ey, ez]
@@ -42,7 +36,7 @@ export interface SynapseBatchData {
 export interface LayerData {
   id: number;
   pos: Float32Array;
-  shape: Int32Array; //Tensor visual thing
+  shape: UInt32Array; //Tensor visual thing
   ids: Float64Array; //child neuron ids
 }
 
@@ -86,14 +80,7 @@ export class Network {
     this.layerMat.emissiveColor = new Color3(0.5, 0.5, 0.5);
   }
   
-  //0 = Layer, 1 = Neuron, 3 = NeuronBatch 2 = Synapse, 4 = SynapseBatch
-  newLayer(data: LayerData) {
-    const mesh = CreateBox(`0_${data.id}`, { size: 1 }, this.scene);
-    mesh.material = this.layerMat;
-
-    mesh.position = new Vector3(data.pos[0], data.pos[1], data.pos[2]);
-  }
-
+  //0 = Layer, 1 = Neuron, 2 = Synapse, 4 = SynapseBatch
   newNeuron(data: NeuronData) {
     const mesh = this.baseNeuron.createInstance(`1_${data.id}`);
     mesh.position = new Vector3(data.pos[0], data.pos[1], data.pos[2]);
@@ -101,27 +88,31 @@ export class Network {
     this.memory.set(data.id, mesh);
   }
   
-  newNeuronBatch(batch: NeuronBatchData) {
-    const masterMesh = CreateSphere(`3_${batch.id}`,{
+  newLayer(batch: LayerData, neuronSpacing) {
+    const masterNeuron = CreateSphere(`3_${batch.id}`,{
       diameter: 2,
       segments: 14
     }, this.scene);
-    masterMesh.material = this.baseNeuron.material;
+    masterNeuron.material = this.baseNeuron.material;
     
-    masterMesh.thinInstanceEnable = true;
+    masterNeuron.thinInstanceEnable = true;
 
     const thinInstanceMatrix = new Float32Array(batch.ids.length * 16);
     
     //using pos.length and not ids.length due to its convenience(personally) in grabbing positions
-    for (let i = 0; i < batch.pos.length; i += 3) {
-      Matrix.Translation(
-        batch.pos[i],   //x
-        batch.pos[i+1], //y
-        batch.pos[i+2]  //z
-      ).copyToArray(thinInstanceMatrix, (i/3) * 16)
+    for (let i = 0; i < batch.shape[0]; i++) {
+      for (let j = 0; j < batch.shape[1]; j++) {
+        for (let k = 0; k < batch.shape[2]; k++) {
+          Matrix.Translation(
+            batch.pos[0] + i * neuronSpacing,
+            batch.pos[1] + j * neuronSpacing,
+            batch.pos[2] + k * neuronSpacing
+          ).copyToArray(thinInstanceMatrix, ((i * batch.shape[1] + j) * batch.shape[2] + k) * 16);
+        }
+      }
     }
     
-    masterMesh.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16);
+    masterNeuron.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16);
   }
   
   newSynapse(data: SynapseData) {
@@ -136,11 +127,19 @@ export class Network {
   }
   
   newSynapseBatch(batch: SynapseBatchData) {
+    let lineWidth = 0.04;
+    
+    if (batch.fts.length > 400 && batch.fts.length < 1024) {
+      lineWidth = 0.028;
+    }
+    else if (batch.fts.length > 567) {
+      lineWidth = 0.024;
+    }
     const mesh = CreateGreasedLine(`4_${batch.id}`, {
       points: batch.fts
     }, {
       color: new Color3(1, 1, 1),
-      width: 0.03
+      width: lineWidth
     },  this.scene) as GreasedLineMesh;
     
     this.memory.set(batch.id, mesh);

@@ -34,7 +34,7 @@ export class Camera {
     
     this.bnCamera.attachControl(props.canvas, true);
     
-    this.bnCamera.lowerRadiusLimit = 7;
+    this.bnCamera.lowerRadiusLimit = 4;
     this.bnCamera.upperRadiusLimit = 260;
     
     this.bnCamera.wheelPrecision = 0;
