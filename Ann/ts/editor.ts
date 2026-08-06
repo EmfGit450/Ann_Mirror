@@ -1,11 +1,10 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import "@babylonjs/core/Meshes/instancedMesh";
-
-import { Network, NeuronData, LayerData } from "./structure";
+import { Network, LayerData } from "./structure";
 import { Camera } from "./camera";
 
 const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;

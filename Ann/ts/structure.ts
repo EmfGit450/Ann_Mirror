@@ -1,15 +1,18 @@
 import type { Scene } from "@babylonjs/core/scene";
+
 import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
+
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
-import { GreasedLineMesh } from "@babylonjs/core/Meshes/greasedLineMesh";
+import { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineMesh";
+import "@babylonjs/core/Meshes/thinInstanceMesh";
+
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
+
 import { Vector3, Matrix } from "@babylonjs/core/Maths/math.vector";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
-import "@babylonjs/core/Meshes/thinInstanceMesh";
 
 //IMP:
 //Float64 is used for ids, since that gives 2^53 = 9,007,199,254,740,991(9 quintillion) possible integer ids
@@ -24,7 +27,7 @@ export interface NeuronData {
 
 export interface SynapseData {
   id: number;
-  ft: Float64Array; //size 6 [fx, fy, fz, ex, ey, ez]
+  ft: Float32Array; //size 6 [fx, fy, fz, ex, ey, ez]
 }
 
 export interface SynapseBatchData {
@@ -36,7 +39,7 @@ export interface SynapseBatchData {
 export interface LayerData {
   id: number;
   pos: Float32Array;
-  shape: UInt32Array; //Tensor visual thing
+  shape: Uint32Array; //Tensor visual thing
   ids: Float64Array; //child neuron ids
 }
 
@@ -88,26 +91,25 @@ export class Network {
     this.memory.set(data.id, mesh);
   }
   
-  newLayer(batch: LayerData, neuronSpacing) {
+  newLayer(batch: LayerData, neuronSpacing: number) {
     const masterNeuron = CreateSphere(`3_${batch.id}`,{
       diameter: 2,
+      diameterZ: 2.5,
       segments: 14
     }, this.scene);
     masterNeuron.material = this.baseNeuron.material;
-    
-    masterNeuron.thinInstanceEnable = true;
 
     const thinInstanceMatrix = new Float32Array(batch.ids.length * 16);
     
     //using pos.length and not ids.length due to its convenience(personally) in grabbing positions
-    for (let i = 0; i < batch.shape[0]; i++) {
-      for (let j = 0; j < batch.shape[1]; j++) {
-        for (let k = 0; k < batch.shape[2]; k++) {
+    for (let i = 0; i < batch.shape[0]!; i++) {
+      for (let j = 0; j < batch.shape[1]!; j++) {
+        for (let k = 0; k < batch.shape[2]!; k++) {
           Matrix.Translation(
-            batch.pos[0] + i * neuronSpacing,
-            batch.pos[1] + j * neuronSpacing,
-            batch.pos[2] + k * neuronSpacing
-          ).copyToArray(thinInstanceMatrix, ((i * batch.shape[1] + j) * batch.shape[2] + k) * 16);
+            batch.pos[0]! + i * neuronSpacing,
+            batch.pos[1]! + j * neuronSpacing,
+            batch.pos[2]! + k * neuronSpacing
+          ).copyToArray(thinInstanceMatrix, ((i * batch.shape[1]! + j) * batch.shape[2]! + k) * 16);
         }
       }
     }
