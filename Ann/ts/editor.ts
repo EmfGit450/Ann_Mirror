@@ -1,11 +1,15 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
+
+import { Camera } from "./camera";
+
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
+
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+
+import { Network, LayerData, SynapseBatchData } from "./structure";
 import "@babylonjs/core/Meshes/instancedMesh";
-import { Network, LayerData } from "./structure";
-import { Camera } from "./camera";
 
 const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
 const engine = new Engine(canvas, true);
@@ -60,9 +64,9 @@ function createLayer(
         neuronPos.set(
           id,
           new Float32Array([
-            corner[0] + i * spacing,
-            corner[1] + j * spacing,
-            corner[2] + k * spacing
+            corner[0]! + i * spacing,
+            corner[1]! + j * spacing,
+            corner[2]! + k * spacing
           ])
         );
       }
@@ -85,7 +89,7 @@ const layer0 = createLayer(
   0,   // center x
   0,   // center y
   0,   // center z
-  1, 8, 8
+  8, 8, 8
 );
 
 const layer1 = createLayer(
@@ -129,8 +133,8 @@ function connectLayersBatch(
       ids.push(synapseId++);
 
       fts.push([
-        startPos[0], startPos[1], startPos[2],
-        endPos[0],   endPos[1],   endPos[2]
+        startPos[0]!, startPos[1]!, startPos[2]!,
+        endPos[0]!,   endPos[1]!,   endPos[2]!
       ]);
     }
   }
@@ -142,7 +146,7 @@ function connectLayersBatch(
   };
 }
 
-net.newSynapseBatch(connectLayersBatch(layer0, layer1));
+//net.newSynapseBatch(connectLayersBatch(layer0, layer1));
 net.newSynapseBatch(connectLayersBatch(layer1, layer2));
 //}
 //Tests End
@@ -154,11 +158,12 @@ engine.runRenderLoop(() => {
 });
 
 //Debugger Start
-const Debugger = document.getElementById("debugger");
+const Debugger = document.getElementById("debugger")!;
 setInterval(() => {
   Debugger.innerHTML = `fps - ${Math.round(engine.getFps())}<br>cam - rad: ${(camera.bnCamera.radius).toPrecision(4)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pos: x = ${(camera.bnCamera.position.x).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y = ${(camera.bnCamera.position.y).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;z = ${(camera.bnCamera.position.z).toPrecision(3)}`;
 }, 500);
 
+//@ts-ignore
 window.debug = () => net.scene;
 //Debugger End
 

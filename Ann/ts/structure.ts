@@ -12,7 +12,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
 
 import { Vector3, Matrix } from "@babylonjs/core/Maths/math.vector";
-import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 //IMP:
 //Float64 is used for ids, since that gives 2^53 = 9,007,199,254,740,991(9 quintillion) possible integer ids
@@ -44,7 +44,7 @@ export interface LayerData {
 }
 
 export class Network {
-  memory: Map<number, InstancedMesh | GreasedLineMesh>;
+  memory: Map<string, InstancedMesh | GreasedLineMesh>;
   scene: Scene;
   
   private baseNeuron: Mesh;
@@ -88,22 +88,23 @@ export class Network {
     const mesh = this.baseNeuron.createInstance(`1_${data.id}`);
     mesh.position = new Vector3(data.pos[0], data.pos[1], data.pos[2]);
     
-    this.memory.set(data.id, mesh);
+    this.memory.set(`1_${data.id}`, mesh);
   }
   
   newLayer(batch: LayerData, neuronSpacing: number) {
-    const masterNeuron = CreateSphere(`3_${batch.id}`,{
+    const masterNeuron = CreateSphere(`0_${batch.id}`,{
       diameter: 2,
-      diameterZ: 2.5,
       segments: 14
     }, this.scene);
     masterNeuron.material = this.baseNeuron.material;
+    masterNeuron.material!.wireframe = true;
 
     const thinInstanceMatrix = new Float32Array(batch.ids.length * 16);
     
     //using pos.length and not ids.length due to its convenience(personally) in grabbing positions
     
     //bunch of suppresion '!' since i know what im doing(probably)
+    //batch.pos[0:2] will never be null.
     for (let i = 0; i < batch.shape[0]!; i++) {
       for (let j = 0; j < batch.shape[1]!; j++) {
         for (let k = 0; k < batch.shape[2]!; k++) {
@@ -117,6 +118,8 @@ export class Network {
     }
     
     masterNeuron.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16);
+
+    this.memory.set(`0_${batch.id}`, masterNeuron);
   }
   
   newSynapse(data: SynapseData) {
@@ -127,26 +130,56 @@ export class Network {
       width: 0.03
     },  this.scene) as GreasedLineMesh;
     
-    this.memory.set(data.id, mesh);
+    this.memory.set(`2_${data.id}`, mesh);
   }
   
   newSynapseBatch(batch: SynapseBatchData) {
     let lineWidth = 0.04;
     
-    if (batch.fts.length > 400 && batch.fts.length < 1024) {
+    if (batch.fts.length > 400 && batch.fts.length < 567) {
       lineWidth = 0.028;
     }
     else if (batch.fts.length > 567) {
       lineWidth = 0.024;
     }
+
     const mesh = CreateGreasedLine(`4_${batch.id}`, {
       points: batch.fts
     }, {
       color: new Color3(1, 1, 1),
       width: lineWidth
-    },  this.scene) as GreasedLineMesh;
+    }, this.scene) as GreasedLineMesh;
     
-    this.memory.set(batch.id, mesh);
+    this.memory.set(`4_${batch.id}`, mesh);
+  }
+
+  newSynapseBatchMinibatched(batch: SynapseBatchData, chunkSize: number = 10000) {
+    let lineWidth = 0.04;
+    
+    if (batch.fts.length > 400 && batch.fts.length < 567) {
+      lineWidth = 0.028;
+    }
+    else if (batch.fts.length > 567) {
+      lineWidth = 0.024;
+    }
+
+    const miniBatchNum = Math.ceil(batch.fts.length / chunkSize);
+
+    for (let chunk = 0; chunk < miniBatchNum; chunk++) {
+      const start = chunk * chunkSize;
+      const end = Math.min(start + chunkSize, batch.fts.length);
+
+      const ftsBatch = batch.fts.slice(start, end);
+
+      const mesh = CreateGreasedLine(`3_${batch.id}_${chunk}`, {
+        points: ftsBatch
+      }, {
+        color: new Color3(1, 1, 1),
+        width: lineWidth
+      }, this.scene) as GreasedLineMesh;
+
+      this.memory.set(`3_${batch.id}_${chunk}`, mesh);
+    }
   }
   
   
