@@ -102,6 +102,8 @@ export class Network {
     const thinInstanceMatrix = new Float32Array(batch.ids.length * 16);
     
     //using pos.length and not ids.length due to its convenience(personally) in grabbing positions
+    
+    //bunch of suppresion '!' since i know what im doing(probably)
     for (let i = 0; i < batch.shape[0]!; i++) {
       for (let j = 0; j < batch.shape[1]!; j++) {
         for (let k = 0; k < batch.shape[2]!; k++) {
