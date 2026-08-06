@@ -2,7 +2,6 @@ import "@babylonjs/core/Culling/ray";
 import type { Scene } from "@babylonjs/core/scene";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { PointerEventTypes } from "@babylonjs/core/Events/pointerEvents";
 
 //bn -> babylonjs
 

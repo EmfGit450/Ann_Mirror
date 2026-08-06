@@ -44,7 +44,7 @@ export interface LayerData {
 }
 
 export class Network {
-  memory: Map<string, InstancedMesh | GreasedLineMesh>;
+  memory: Map<string, Mesh | InstancedMesh | GreasedLineMesh>;
   scene: Scene;
   
   private baseNeuron: Mesh;
@@ -69,8 +69,8 @@ export class Network {
     
     neuronMaterial.emissiveFresnelParameters = new FresnelParameters();
     neuronMaterial.emissiveFresnelParameters.power = 1.5;
-    neuronMaterial.emissiveFresnelParameters.leftColor = new Color3(0.15, 0.35, 0.5);
-    neuronMaterial.emissiveFresnelParameters.rightColor = new Color3(0.3, 0.7, 1.0);
+    neuronMaterial.emissiveFresnelParameters.leftColor = new Color3(0.1, 0.2, 0.3);
+    neuronMaterial.emissiveFresnelParameters.rightColor = new Color3(0.15, 0.35, 0.5);
    
     this.baseNeuron.material = neuronMaterial;
     
@@ -97,7 +97,6 @@ export class Network {
       segments: 14
     }, this.scene);
     masterNeuron.material = this.baseNeuron.material;
-    masterNeuron.material!.wireframe = true;
 
     const thinInstanceMatrix = new Float32Array(batch.ids.length * 16);
     
