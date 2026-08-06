@@ -89,18 +89,18 @@ const layer0 = createLayer(
   0,   // center x
   0,   // center y
   0,   // center z
-  8, 8, 8
+  2, 8, 8
 );
 
 const layer1 = createLayer(
-  25,
+  12,
   0,
   0,
   1, 4, 4
 );
 
 const layer2 = createLayer(
-  50,
+  24,
   0,
   0,
   1, 3, 3
@@ -146,7 +146,7 @@ function connectLayersBatch(
   };
 }
 
-//net.newSynapseBatch(connectLayersBatch(layer0, layer1));
+net.newSynapseBatch(connectLayersBatch(layer0, layer1));
 net.newSynapseBatch(connectLayersBatch(layer1, layer2));
 //}
 //Tests End
