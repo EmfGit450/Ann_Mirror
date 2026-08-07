@@ -151,34 +151,29 @@ export class Network {
     
     this.memory.set(`4_${batch.id}`, mesh);
   }
-
-  newSynapseBatchMinibatched(batch: SynapseBatchData, chunkSize: number = 10000) {
+  
+  //Why is, basically a copy, of the newSynapseBatch function here?
+  //its because all we need is a way to find the parent batch of a chunk, and the chunk index
+  newSynapseBatchChunk(batchChunk: SynapseBatchData, chunkIndex: number) {
     let lineWidth = 0.04;
     
-    if (batch.fts.length > 400 && batch.fts.length < 567) {
+    if (batchChunk.fts.length > 400 && batchChunk.fts.length < 567) {
       lineWidth = 0.028;
     }
-    else if (batch.fts.length > 567) {
+    else if (batchChunk.fts.length > 567) {
       lineWidth = 0.024;
     }
 
-    const miniBatchNum = Math.ceil(batch.fts.length / chunkSize);
+    //batchChunk.id is actuallly the id of the parent. 
+    //thats confusing, but if it aint broke, dont fix it
+    const mesh = CreateGreasedLine(`3_${batchChunk.id}_${chunkIndex}`, {
+      points: batchChunk.fts
+    }, {
+      color: new Color3(1, 1, 1),
+      width: lineWidth
+    }, this.scene) as GreasedLineMesh;
 
-    for (let chunk = 0; chunk < miniBatchNum; chunk++) {
-      const start = chunk * chunkSize;
-      const end = Math.min(start + chunkSize, batch.fts.length);
-
-      const ftsBatch = batch.fts.slice(start, end);
-
-      const mesh = CreateGreasedLine(`3_${batch.id}_${chunk}`, {
-        points: ftsBatch
-      }, {
-        color: new Color3(1, 1, 1),
-        width: lineWidth
-      }, this.scene) as GreasedLineMesh;
-
-      this.memory.set(`3_${batch.id}_${chunk}`, mesh);
-    }
+    this.memory.set(`3_${batchChunk.id}_${chunkIndex}`, mesh)
   }
   
   
