@@ -89,7 +89,7 @@ const layer0 = createLayer(
   0,   // center x
   0,   // center y
   0,   // center z
-  2, 8, 8
+  10, 10, 10
 );
 
 const layer1 = createLayer(
