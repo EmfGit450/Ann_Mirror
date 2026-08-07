@@ -33,7 +33,7 @@ export interface SynapseData {
 export interface SynapseBatchData {
   id: number;
   ids: Float64Array;
-  fts: number[][]; //[fx, fy, fz, ex, ey, ez, ...]. using number[][] since babylonjs 
+  fts: number[][]; //[fx, fy, fz, ex, ey, ez, ...]. using number[][] since babylonjs
 }
 
 export interface LayerData {
@@ -154,6 +154,7 @@ export class Network {
   
   //Why is, basically a copy, of the newSynapseBatch function here?
   //its because all we need is a way to find the parent batch of a chunk, and the chunk index
+  //and this works
   newSynapseBatchChunk(batchChunk: SynapseBatchData, chunkIndex: number) {
     let lineWidth = 0.04;
     
