@@ -89,26 +89,34 @@ const layer0 = createLayer(
   0,   // center x
   0,   // center y
   0,   // center z
-  10, 10, 10
+  1, 28, 28
 );
 
 const layer1 = createLayer(
-  12,
+  25,
   0,
   0,
   1, 4, 4
 );
 
 const layer2 = createLayer(
-  24,
+  40,
   0,
   0,
-  1, 3, 3
+  1, 4, 4
+);
+
+const layer3 = createLayer(
+  55,
+  0,
+  0,
+  1, 10, 1
 );
 
 net.newLayer(layer0, spacing);
 net.newLayer(layer1, spacing);
 net.newLayer(layer2, spacing);
+net.newLayer(layer3, spacing);
 
 // ===================================================
 // Fully connected synapse batches
@@ -148,6 +156,7 @@ function connectLayersBatch(
 
 net.newSynapseBatch(connectLayersBatch(layer0, layer1));
 net.newSynapseBatch(connectLayersBatch(layer1, layer2));
+net.newSynapseBatch(connectLayersBatch(layer2, layer3));
 //}
 //Tests End
 
@@ -160,7 +169,7 @@ engine.runRenderLoop(() => {
 //Debugger Start
 const Debugger = document.getElementById("debugger")!;
 setInterval(() => {
-  Debugger.innerHTML = `fps - ${Math.round(engine.getFps())}<br>cam - rad: ${(camera.bnCamera.radius).toPrecision(4)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pos: x = ${(camera.bnCamera.position.x).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y = ${(camera.bnCamera.position.y).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;z = ${(camera.bnCamera.position.z).toPrecision(3)}`;
+  Debugger.innerHTML = `fps - ${Math.round(engine.getFps())}<br>cam - rad: ${(camera.bnCamera.radius).toPrecision(4)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pos: x = ${(camera.bnCamera.position.x).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs28y = ${(camera.bnCamera.position.y).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;z = ${(camera.bnCamera.position.z).toPrecision(3)}`;
 }, 500);
 
 //@ts-ignore
