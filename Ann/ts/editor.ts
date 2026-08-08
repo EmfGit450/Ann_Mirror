@@ -89,7 +89,7 @@ const layer0 = createLayer(
   0,   // center x
   0,   // center y
   0,   // center z
-  1, 28, 28
+  3, 20, 20
 );
 
 const layer1 = createLayer(
@@ -103,7 +103,7 @@ const layer2 = createLayer(
   40,
   0,
   0,
-  1, 4, 4
+  1, 10, 10
 );
 
 const layer3 = createLayer(
@@ -169,7 +169,7 @@ engine.runRenderLoop(() => {
 //Debugger Start
 const Debugger = document.getElementById("debugger")!;
 setInterval(() => {
-  Debugger.innerHTML = `fps - ${Math.round(engine.getFps())}<br>cam - rad: ${(camera.bnCamera.radius).toPrecision(4)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pos: x = ${(camera.bnCamera.position.x).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs28y = ${(camera.bnCamera.position.y).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;z = ${(camera.bnCamera.position.z).toPrecision(3)}`;
+  Debugger.innerHTML = `fps - ${Math.round(engine.getFps())}<br>cam - rad: ${(camera.bnCamera.radius).toPrecision(4)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pos: x = ${(camera.bnCamera.position.x).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;y = ${(camera.bnCamera.position.y).toPrecision(3)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;z = ${(camera.bnCamera.position.z).toPrecision(3)}`;
 }, 500);
 
 //@ts-ignore

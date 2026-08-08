@@ -30,10 +30,11 @@ export interface SynapseData {
   ft: Float32Array; //size 6 [fx, fy, fz, ex, ey, ez]
 }
 
-export interface SynapseBatchData {
+export interface SynapseBatchData { //one weight matrix
   id: number;
   ids: Float64Array;
   fts: number[][]; //[fx, fy, fz, ex, ey, ez, ...]. using number[][] since babylonjs
+  HDPoint: Float32Array; //[x, y, z]. HyperDensityPoint, HDPoint
 }
 
 export interface LayerData {
@@ -133,49 +134,26 @@ export class Network {
   }
   
   newSynapseBatch(batch: SynapseBatchData) {
-    let lineWidth = 0.04;
+    let synapses: number[][] = [];
     
-    if (batch.fts.length > 400 && batch.fts.length < 567) {
-      lineWidth = 0.028;
-    }
-    else if (batch.fts.length > 567) {
-      lineWidth = 0.024;
+    const mid = batch.HDPoint;
+    
+    for (let i = 0; i < batch.fts.length; i++) {
+      const line = batch.fts[i]!;
+      
+      if ( Math.abs( (line[0]! - mid[0]!) + (line[1]! - mid[1]!) + (line[2]! - mid[2]!) ) < 5 ) {
+        continue;
+      }
+      else {
+        synapses.push(line);
+      }
     }
 
     const mesh = CreateGreasedLine(`4_${batch.id}`, {
-      points: batch.fts
+      points: synapses
     }, {
-      color: new Color3(1, 1, 1),
-      width: lineWidth
-    }, this.scene) as GreasedLineMesh;
-    
-    this.memory.set(`4_${batch.id}`, mesh);
+      width: 0.02
+    })
   }
-  
-  //Why is, basically a copy, of the newSynapseBatch function here?
-  //its because all we need is a way to find the parent batch of a chunk, and the chunk index
-  //and this works
-  newSynapseBatchChunk(batchChunk: SynapseBatchData, chunkIndex: number) {
-    let lineWidth = 0.04;
-    
-    if (batchChunk.fts.length > 400 && batchChunk.fts.length < 567) {
-      lineWidth = 0.028;
-    }
-    else if (batchChunk.fts.length > 567) {
-      lineWidth = 0.024;
-    }
-
-    //batchChunk.id is actuallly the id of the parent. 
-    //thats confusing, but if it aint broke, dont fix it
-    const mesh = CreateGreasedLine(`3_${batchChunk.id}_${chunkIndex}`, {
-      points: batchChunk.fts
-    }, {
-      color: new Color3(1, 1, 1),
-      width: lineWidth
-    }, this.scene) as GreasedLineMesh;
-
-    this.memory.set(`3_${batchChunk.id}_${chunkIndex}`, mesh)
-  }
-  
   
 }
