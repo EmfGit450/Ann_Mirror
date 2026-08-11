@@ -89,7 +89,7 @@ const layer0 = createLayer(
   0,   // center x
   0,   // center y
   0,   // center z
-  3, 20, 20
+  1, 15, 15
 );
 
 const layer1 = createLayer(
@@ -103,7 +103,7 @@ const layer2 = createLayer(
   40,
   0,
   0,
-  1, 10, 10
+  1, 6, 6
 );
 
 const layer3 = createLayer(
@@ -130,13 +130,13 @@ function connectLayersBatch(
   const ids: number[] = [];
   const fts: number[][] = [];
 
-  for (const startId of from.ids) {
+  for (const endId of from.ids) {
 
-    const startPos = neuronPos.get(startId)!;
+    const endPos = neuronPos.get(endId)!;
 
-    for (const endId of to.ids) {
+    for (const startId of to.ids) {
 
-      const endPos = neuronPos.get(endId)!;
+      const startPos = neuronPos.get(startId)!;
 
       ids.push(synapseId++);
 
@@ -150,7 +150,8 @@ function connectLayersBatch(
   return {
     id: batchId++,
     ids: new Float64Array(ids),
-    fts
+    fts: fts,
+    ftshape: new Float32Array([from.shape[0], from.shape[1], from.shape[2], to.shape[0], to.shape[1], to.shape[2]])
   };
 }
 

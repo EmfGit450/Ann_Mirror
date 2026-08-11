@@ -34,7 +34,7 @@ export interface SynapseBatchData { //one weight matrix
   id: number;
   ids: Float64Array;
   fts: number[][]; //[fx, fy, fz, ex, ey, ez, ...]. using number[][] since babylonjs
-  HDPoint: Float32Array; //[x, y, z]. HyperDensityPoint, HDPoint
+  ftshape: Float32Array; //[fx, fy, fz, tx, ty, tz]
 }
 
 export interface LayerData {
@@ -103,16 +103,32 @@ export class Network {
     
     //using pos.length and not ids.length due to its convenience(personally) in grabbing positions
     
-    //bunch of suppresion '!' since i know what im doing(probably)
+    //lots of suppresion '!'
     //batch.pos[0:2] will never be null.
+    let offset = 0;
+    
     for (let i = 0; i < batch.shape[0]!; i++) {
       for (let j = 0; j < batch.shape[1]!; j++) {
         for (let k = 0; k < batch.shape[2]!; k++) {
-          Matrix.Translation(
-            batch.pos[0]! + i * neuronSpacing,
-            batch.pos[1]! + j * neuronSpacing,
-            batch.pos[2]! + k * neuronSpacing
-          ).copyToArray(thinInstanceMatrix, ((i * batch.shape[1]! + j) * batch.shape[2]! + k) * 16);
+          //babylonjs uses column major notation
+          thinInstanceMatrix[offset] = 1;
+          thinInstanceMatrix[offset + 1] = 0;
+          thinInstanceMatrix[offset + 2] = 0;
+          thinInstanceMatrix[offset + 3] = 0;
+          thinInstanceMatrix[offset + 4] = 0;
+          thinInstanceMatrix[offset + 5] = 1;
+          thinInstanceMatrix[offset + 6] = 0;
+          thinInstanceMatrix[offset + 7] = 0;
+          thinInstanceMatrix[offset + 8] = 0;
+          thinInstanceMatrix[offset + 9] = 0;
+          thinInstanceMatrix[offset + 10] = 1;
+          thinInstanceMatrix[offset + 11] = 0;
+          thinInstanceMatrix[offset + 12] = batch.pos[0]! + i * neuronSpacing;
+          thinInstanceMatrix[offset + 13] = batch.pos[1]! + j * neuronSpacing;
+          thinInstanceMatrix[offset + 14] = batch.pos[2]! + k * neuronSpacing;
+          thinInstanceMatrix[offset + 15] = 1;
+          
+          offset += 16;
         }
       }
     }
@@ -134,23 +150,42 @@ export class Network {
   }
   
   newSynapseBatch(batch: SynapseBatchData) {
-    let synapses: number[][] = [];
+    const from1 = [batch.fts[0][0], batch.fts[0][1], batch.fts[0][2]];
+    const from2 = [batch.fts[1][0], batch.fts[1][1], batch.fts[1][2]];
+    const from3 = [batch.fts[batch.ftshape[2]][0], batch.fts[batch.ftshape[2]][1], batch.fts[batch.ftshape[2]][2]]; //batch.ftshape[2] is the z-shape of the 'from' layer
     
-    const mid = batch.HDPoint;
+    const to = [batch.fts[0][3], batch.fts[0][4], batch.fts[0][5]];
     
-    for (let i = 0; i < batch.fts.length; i++) {
-      const line = batch.fts[i]!;
-      
-      if ( Math.abs( (line[0]! - mid[0]!) + (line[1]! - mid[1]!) + (line[2]! - mid[2]!) ) < 5 ) {
-        continue;
-      }
-      else {
-        synapses.push(line);
-      }
-    }
-
+    const vRef = [from1[0] - to[0], from1[1] - to[1], from1[2] - to[2]];
+    const vZ = [from2[0] - to[0], from2[1] - to[1], from2[2] - to[2]];
+    const vY = [from3[0] - to[0], from3[1] - to[1], from3[2] - to[2]];
+    
+    const vRef_mag = Math.sqrt(vRef[0] * vRef[0] + vRef[1] * vRef[1] + vRef[2] * vRef[2]);
+    const vZ_mag = Math.sqrt(vZ[0] * vZ[0] + vZ[1] * vZ[1] + vZ[2] * vZ[2]);
+    const vY_mag = Math.sqrt(vY[0] * vY[0] + vY[1] * vY[1] + vY[2] * vY[2]);
+    
+    //normalised so larger vectors dont affect density
+    vRef[0] /= vRef_mag;
+    vRef[1] /= vRef_mag;
+    vRef[2] /= vRef_mag;
+    
+    vZ[0] /= vZ_mag;
+    vZ[1] /= vZ_mag;
+    vZ[2] /= vZ_mag;
+    
+    vY[0] /= vY_mag;
+    vY[1] /= vY_mag;
+    vY[2] /= vY_mag;
+    
+    const dot_z = vRef[0] * vZ[0] + vRef[1] * vZ[1] + vRef[2] * vZ[2];
+    const dot_y = vRef[0] * vY[0] + vRef[1] * vY[1] + vRef[2] * vY[2];
+    
+    console.log(`id: ${batch.id}\ndot_z: ${dot_z}\ndot_y: ${dot_y}`);
+    
+    //Hyperdensity, 9.976
+    
     const mesh = CreateGreasedLine(`4_${batch.id}`, {
-      points: synapses
+      points: batch.fts
     }, {
       width: 0.02
     })
