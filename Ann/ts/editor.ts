@@ -130,11 +130,11 @@ function connectLayersBatch(
   const ids: number[] = [];
   const fts: number[][] = [];
 
-  for (const endId of from.ids) {
+  for (const endId of to.ids) {
 
     const endPos = neuronPos.get(endId)!;
 
-    for (const startId of to.ids) {
+    for (const startId of from.ids) {
 
       const startPos = neuronPos.get(startId)!;
 
@@ -151,7 +151,7 @@ function connectLayersBatch(
     id: batchId++,
     ids: new Float64Array(ids),
     fts: fts,
-    ftshape: new Float32Array([from.shape[0], from.shape[1], from.shape[2], to.shape[0], to.shape[1], to.shape[2]])
+    ftshape: new Float32Array([from.shape[0]!, from.shape[1]!, from.shape[2]!, to.shape[0]!, to.shape[1]!, to.shape[2]!])
   };
 }
 

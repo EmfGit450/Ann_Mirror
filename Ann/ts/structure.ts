@@ -11,7 +11,7 @@ import "@babylonjs/core/Meshes/thinInstanceMesh";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
 
-import { Vector3, Matrix } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 //IMP:
@@ -150,35 +150,37 @@ export class Network {
   }
   
   newSynapseBatch(batch: SynapseBatchData) {
-    const from1 = [batch.fts[0][0], batch.fts[0][1], batch.fts[0][2]];
-    const from2 = [batch.fts[1][0], batch.fts[1][1], batch.fts[1][2]];
-    const from3 = [batch.fts[batch.ftshape[2]][0], batch.fts[batch.ftshape[2]][1], batch.fts[batch.ftshape[2]][2]]; //batch.ftshape[2] is the z-shape of the 'from' layer
+    const toc = batch.ftshape[3]! * batch.ftshape[4]! * batch.ftshape[5]! //toc - to-count
+
+    const from1 = [batch.fts[0]![0], batch.fts[0]![1], batch.fts[0]![2]];
+    const from2 = [batch.fts[toc]![0], batch.fts[toc]![1], batch.fts[toc]![2]];
+    const from3 = [batch.fts[batch.ftshape[2]! * toc]![0], batch.fts[batch.ftshape[2]! * toc]![1], batch.fts[batch.ftshape[2]! * toc]![2]]; //batch.ftshape[2] is the z-shape of the 'from' layer
     
-    const to = [batch.fts[0][3], batch.fts[0][4], batch.fts[0][5]];
+    const to = [batch.fts[0]![3], batch.fts[0]![4], batch.fts[0]![5]];
     
-    const vRef = [from1[0] - to[0], from1[1] - to[1], from1[2] - to[2]];
-    const vZ = [from2[0] - to[0], from2[1] - to[1], from2[2] - to[2]];
-    const vY = [from3[0] - to[0], from3[1] - to[1], from3[2] - to[2]];
+    const vRef = [from1[0]! - to[0]!, from1[1]! - to[1]!, from1[2]! - to[2]!];
+    const vZ = [from2[0]! - to[0]!, from2[1]! - to[1]!, from2[2]! - to[2]!];
+    const vY = [from3[0]! - to[0]!, from3[1]! - to[1]!, from3[2]! - to[2]!];
     
-    const vRef_mag = Math.sqrt(vRef[0] * vRef[0] + vRef[1] * vRef[1] + vRef[2] * vRef[2]);
-    const vZ_mag = Math.sqrt(vZ[0] * vZ[0] + vZ[1] * vZ[1] + vZ[2] * vZ[2]);
-    const vY_mag = Math.sqrt(vY[0] * vY[0] + vY[1] * vY[1] + vY[2] * vY[2]);
+    const vRef_mag = Math.sqrt(vRef[0]! * vRef[0]! + vRef[1]! * vRef[1]! + vRef[2]! * vRef[2]!);
+    const vZ_mag = Math.sqrt(vZ[0]! * vZ[0]! + vZ[1]! * vZ[1]! + vZ[2]! * vZ[2]!);
+    const vY_mag = Math.sqrt(vY[0]! * vY[0]! + vY[1]! * vY[1]! + vY[2]! * vY[2]!);
     
     //normalised so larger vectors dont affect density
-    vRef[0] /= vRef_mag;
-    vRef[1] /= vRef_mag;
-    vRef[2] /= vRef_mag;
+    vRef[0]! /= vRef_mag;
+    vRef[1]! /= vRef_mag;
+    vRef[2]! /= vRef_mag;
     
-    vZ[0] /= vZ_mag;
-    vZ[1] /= vZ_mag;
-    vZ[2] /= vZ_mag;
+    vZ[0]! /= vZ_mag;
+    vZ[1]! /= vZ_mag;
+    vZ[2]! /= vZ_mag;
     
-    vY[0] /= vY_mag;
-    vY[1] /= vY_mag;
-    vY[2] /= vY_mag;
+    vY[0]! /= vY_mag;
+    vY[1]! /= vY_mag;
+    vY[2]! /= vY_mag;
     
-    const dot_z = vRef[0] * vZ[0] + vRef[1] * vZ[1] + vRef[2] * vZ[2];
-    const dot_y = vRef[0] * vY[0] + vRef[1] * vY[1] + vRef[2] * vY[2];
+    const dot_z = vRef[0]! * vZ[0]! + vRef[1]! * vZ[1]! + vRef[2]! * vZ[2]!;
+    const dot_y = vRef[0]! * vY[0]! + vRef[1]! * vY[1]! + vRef[2]! * vY[2]!;
     
     console.log(`id: ${batch.id}\ndot_z: ${dot_z}\ndot_y: ${dot_y}`);
     
@@ -188,7 +190,9 @@ export class Network {
       points: batch.fts
     }, {
       width: 0.02
-    })
+    }, this.scene);
+
+    this.memory.set(`4_${batch.id}`, mesh);
   }
   
 }
