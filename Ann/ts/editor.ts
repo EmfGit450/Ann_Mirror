@@ -89,14 +89,14 @@ const layer0 = createLayer(
   0,   // center x
   0,   // center y
   0,   // center z
-  1, 15, 15
+  1, 28, 28
 );
 
 const layer1 = createLayer(
   25,
   0,
   0,
-  1, 4, 4
+  1, 3, 3
 );
 
 const layer2 = createLayer(
@@ -151,7 +151,7 @@ function connectLayersBatch(
     id: batchId++,
     ids: new Float64Array(ids),
     fts: fts,
-    ftshape: new Float32Array([from.shape[0]!, from.shape[1]!, from.shape[2]!, to.shape[0]!, to.shape[1]!, to.shape[2]!])
+    ftshape: new Float32Array([from.shape[0], from.shape[1], from.shape[2], to.shape[0], to.shape[1], to.shape[2]])
   };
 }
 
