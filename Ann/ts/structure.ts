@@ -184,13 +184,23 @@ export class Network {
     
     console.log(`id: ${batch.id}\nZ_dot_angle: ${dot_z}, ${Math.acos(dot_z) * DEG180BYPI} \nY_dot_angle: ${dot_y}, ${Math.acos(dot_y) * DEG180BYPI}`);
     
-    //Hyperdensity, 9.976
-    
     const mesh = CreateGreasedLine(`4_${batch.id}`, {
       points: batch.fts
     }, {
       width: 0.02
     }, this.scene);
+
+    return { z: Math.acos(dot_z) * DEG180BYPI, y: Math.acos(dot_y) * DEG180BYPI };
+  }
+  
+
+  ABSTcreateLayer(attrs: {
+    id: number | undefined,
+    center: Float32Array, 
+    shape: Uint32Array,
+    spacing: number
+  }) { //center x,y,z, shape x,y,z
+    this.newLayer({id: }, spacing ? spacing : 2.5);
   }
   
 }
