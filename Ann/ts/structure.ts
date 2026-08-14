@@ -1,6 +1,6 @@
 import type { Scene } from "@babylonjs/core/scene";
 
-import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
+import { CreateIcoSphere } from "@babylonjs/core/Meshes/Builders/icoSphereBuilder";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -21,6 +21,18 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 //Using Float32 for pos since there needs to be a large network before i need Float64
 
 const DEG180BYPI = 57.2957795147;
+
+export function randInt53(): number {
+  const buf = new Uint8Array(7);
+  crypto.getRandomValues(buf);
+  buf[0] &= 0b00011111;
+
+  const view = new DataView(buf.buffer, buf.byteOffset);
+  // Read as little-endian, handling the 7-byte limitation
+  return view.getUint32(0, true) + view.getUint16(4, true) * 0x100000000 + buf[6] * 0x10000000000;
+}
+
+console.log(randInt53());
 
 export interface NeuronData {
   id: number; 
@@ -43,7 +55,7 @@ export interface LayerData {
   id: number;
   pos: Float32Array;
   shape: Uint32Array; //Tensor visual thing
-  ids: Float64Array; //child neuron ids
+  ids: Float64Array | undefined; //child neuron ids
 }
 
 export class Network {
@@ -57,23 +69,18 @@ export class Network {
     this.scene = renderScene;
     this.memory = new Map();
     
-    this.baseNeuron = CreateSphere("sourceNeuron", { 
-      diameter: 2,
-      segments: 14
+    this.baseNeuron = CreateIcoSphere("sourceNeuron", {
+      subdivisions: 4,
+      diameter: 2
     }, renderScene);
     
     const neuronMaterial = new StandardMaterial("hologramBlue", renderScene);
     neuronMaterial.diffuseColor = new Color3(0.2, 0.6, 1.0);
-    neuronMaterial.emissiveColor = new Color3(0.1, 0.3, 0.5);
+    neuronMaterial.emissiveColor = new Color3(0.05, 0.15, 0.25);
 
     neuronMaterial.specularColor = new Color3(0,0,0);
     neuronMaterial.specularPower = 1;
     neuronMaterial.disableLighting = false;
-    
-    neuronMaterial.emissiveFresnelParameters = new FresnelParameters();
-    neuronMaterial.emissiveFresnelParameters.power = 1.5;
-    neuronMaterial.emissiveFresnelParameters.leftColor = new Color3(0.1, 0.2, 0.3);
-    neuronMaterial.emissiveFresnelParameters.rightColor = new Color3(0.15, 0.35, 0.5);
    
     this.baseNeuron.material = neuronMaterial;
     
@@ -95,13 +102,19 @@ export class Network {
   }
   
   newLayer(batch: LayerData, neuronSpacing: number) {
-    const masterNeuron = CreateSphere(`0_${batch.id}`,{
-      diameter: 2,
-      segments: 14
+    const masterNeuron = CreateIcoSphere("sourceNeuron", {
+      subdivisions: 4,
+      diameter: 2
     }, this.scene);
     masterNeuron.material = this.baseNeuron.material;
 
-    const thinInstanceMatrix = new Float32Array(batch.ids.length * 16);
+    const sx = batch.pos[0] - ((batch.shape[0]! - 1) * neuronSpacing) / 2;
+    const sy = batch.pos[1] - ((batch.shape[1]! - 1) * neuronSpacing) / 2;
+    const sz = batch.pos[2] - ((batch.shape[2]! - 1) * neuronSpacing) / 2;
+
+    const idsUndefined = batch.ids ? true : false;
+    
+    const thinInstanceMatrix = new Float32Array(idsUndefined ? batch.ids.length * 16 : (batch.shape[0] * batch.shape[1] * batch.shape[2]) * 16);
     
     //using pos.length and not ids.length due to its convenience(personally) in grabbing positions
     
@@ -110,24 +123,19 @@ export class Network {
     let offset = 0;
     
     for (let i = 0; i < batch.shape[0]!; i++) {
+      const x = sx + i * neuronSpacing;
       for (let j = 0; j < batch.shape[1]!; j++) {
+        const y = sy + j * neuronSpacing;
         for (let k = 0; k < batch.shape[2]!; k++) {
+          const z = sz + k * neuronSpacing;
+          
           //babylonjs uses column major notation
           thinInstanceMatrix[offset] = 1;
-          thinInstanceMatrix[offset + 1] = 0;
-          thinInstanceMatrix[offset + 2] = 0;
-          thinInstanceMatrix[offset + 3] = 0;
-          thinInstanceMatrix[offset + 4] = 0;
           thinInstanceMatrix[offset + 5] = 1;
-          thinInstanceMatrix[offset + 6] = 0;
-          thinInstanceMatrix[offset + 7] = 0;
-          thinInstanceMatrix[offset + 8] = 0;
-          thinInstanceMatrix[offset + 9] = 0;
           thinInstanceMatrix[offset + 10] = 1;
-          thinInstanceMatrix[offset + 11] = 0;
-          thinInstanceMatrix[offset + 12] = batch.pos[0]! + i * neuronSpacing;
-          thinInstanceMatrix[offset + 13] = batch.pos[1]! + j * neuronSpacing;
-          thinInstanceMatrix[offset + 14] = batch.pos[2]! + k * neuronSpacing;
+          thinInstanceMatrix[offset + 12] = x;
+          thinInstanceMatrix[offset + 13] = y;
+          thinInstanceMatrix[offset + 14] = z;
           thinInstanceMatrix[offset + 15] = 1;
           
           offset += 16;
@@ -135,7 +143,7 @@ export class Network {
       }
     }
     
-    masterNeuron.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16);
+    masterNeuron.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16, true);
 
     this.memory.set(`0_${batch.id}`, masterNeuron);
   }
@@ -200,7 +208,30 @@ export class Network {
     shape: Uint32Array,
     spacing: number
   }) { //center x,y,z, shape x,y,z
-    this.newLayer({id: }, spacing ? spacing : 2.5);
+    const neuronCount = attrs.shape[0] * attrs.shape[1] * attrs.shape[2];
+    
+    let childIds = new Float64Array(neuronCount);
+    
+    for (let i = 0; i < neuronCount; i++) {
+      childIds[i] = randInt53();
+    }
+    
+    const sx = (attrs.shape[0]! - 1) * attrs.spacing;
+    const sy = (attrs.shape[1]! - 1) * attrs.spacing;
+    const sz = (attrs.shape[2]! - 1) * attrs.spacing;
+
+    const basePos = new Float32Array([
+      attrs.center[0] - sx / 2,
+      attrs.center[1] - sy / 2,
+      attrs.center[2] - sz / 2
+    ]);
+    
+    this.newLayer({
+      id: attrs.id,
+      pos: basePos,
+      shape: attrs.shape,
+      ids: childIds 
+    }, attrs.spacing ? attrs.spacing : 2.5);
   }
   
 }
