@@ -98,16 +98,16 @@ export class Network {
     this.memory.set(`1_${data.id}`, mesh);
   }
   
-  newLayer(batch: LayerData, neuronSpacing: number) {
+  newLayer(batch: LayerData) {
     const masterNeuron = CreateSphere(`0_${batch.id}`, {
       diameter: 2,
       segments: 14
     }, this.scene);
     masterNeuron.material = this.baseNeuron.material;
 
-    const sx = batch.pos[0]! - ((batch.shape[0]! - 1) * neuronSpacing) / 2;
-    const sy = batch.pos[1]! - ((batch.shape[1]! - 1) * neuronSpacing) / 2;
-    const sz = batch.pos[2]! - ((batch.shape[2]! - 1) * neuronSpacing) / 2;
+    const sx = batch.pos[0]! - ((batch.shape[0]! - 1) * 2.5) / 2;
+    const sy = batch.pos[1]! - ((batch.shape[1]! - 1) * 2.5) / 2;
+    const sz = batch.pos[2]! - ((batch.shape[2]! - 1) * 2.5) / 2;
 
     const idsUndefined = batch.ids ? true : false;
     
@@ -120,11 +120,11 @@ export class Network {
     let offset = 0;
     
     for (let i = 0; i < batch.shape[0]!; i++) {
-      const x = sx + i * neuronSpacing;
+      const x = sx + i * 2.5;
       for (let j = 0; j < batch.shape[1]!; j++) {
-        const y = sy + j * neuronSpacing;
+        const y = sy + j * 2.5;
         for (let k = 0; k < batch.shape[2]!; k++) {
-          const z = sz + k * neuronSpacing;
+          const z = sz + k * 2.5;
           
           //babylonjs uses column major notation
           thinInstanceMatrix[offset] = 1;
@@ -211,10 +211,19 @@ export class Network {
     //lxnC = layer x neuron count
     const lAnC = layerA.shape[0]! * layerA.shape[1]! * layerA.shape[2]!
     const lBnC = layerB.shape[0]! * layerB.shape[1]! * layerB.shape[2]!
+
+    const lAneurons = (this.memory.get(`0_${layerA.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
+    const lBneurons = (this.memory.get(`0_${layerB.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
     
-    for (let end = 0; end < lAnC; end += 3) {
-      for (let start = 0; start < lBnC; start += 3) {
-        
+    for (let end = 1; end < lAnC; end++) {
+      const currEndMat = end * 16;
+      for (let start = 0; start < lBnC; start++) {
+        const currStartMat = start * 16;
+        fts.push(new Float32Array([
+          lAneurons[currEndMat + 12]!, lAneurons[currEndMat + 13]!, lAneurons[currEndMat + 14]!,
+          lBneurons[currEndMat + 12]!, lAneurons[currEndMat + 13]!, lAneurons[currEndMat + 14]!,
+          lAneurons[currEndMat - 4]!, lAneurons[currEndMat - 3]!, lAneurons[currEndMat - 2]!
+        ]));
       }
     }
   }

@@ -31,7 +31,7 @@ net.newLayer({
   pos: new Float32Array([0, 0, 0]),
   shape: new Uint32Array([1, 16, 16]),
   ids: undefined
-}, 2.5);
+});
 
 
 
@@ -42,7 +42,7 @@ import { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineM
 const test = CreateGreasedLine("test", {
   points: [new Float32Array([0, 0, 0, 5, 0, 0, 5, 5, 5]), new Float32Array([0, 5, 0, 5, 5, 0])]
 }, {
-  width: 0.4
+  width: 0.05
 }, scene);
 
 (window as any).test = test;
