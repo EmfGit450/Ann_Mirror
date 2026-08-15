@@ -1,6 +1,6 @@
 import type { Scene } from "@babylonjs/core/scene";
 
-import { CreateIcoSphere } from "@babylonjs/core/Meshes/Builders/icoSphereBuilder";
+import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -9,9 +9,8 @@ import { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineM
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters";
 
-import { Vector3, Matrix } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 //IMP:
@@ -25,11 +24,11 @@ const DEG180BYPI = 57.2957795147;
 export function randInt53(): number {
   const buf = new Uint8Array(7);
   crypto.getRandomValues(buf);
-  buf[0] &= 0b00011111;
+  buf[0]! &= 0b00011111;
 
   const view = new DataView(buf.buffer, buf.byteOffset);
   // Read as little-endian, handling the 7-byte limitation
-  return view.getUint32(0, true) + view.getUint16(4, true) * 0x100000000 + buf[6] * 0x10000000000;
+  return view.getUint32(0, true) + view.getUint16(4, true) * 0x100000000 + buf[6]! * 0x10000000000;
 }
 
 console.log(randInt53());
@@ -69,9 +68,9 @@ export class Network {
     this.scene = renderScene;
     this.memory = new Map();
     
-    this.baseNeuron = CreateIcoSphere("sourceNeuron", {
-      subdivisions: 4,
-      diameter: 2
+    this.baseNeuron = CreateSphere("sourceNeuron", {
+      diameter: 2,
+      segments: 14
     }, renderScene);
     
     const neuronMaterial = new StandardMaterial("hologramBlue", renderScene);
@@ -102,19 +101,19 @@ export class Network {
   }
   
   newLayer(batch: LayerData, neuronSpacing: number) {
-    const masterNeuron = CreateIcoSphere("sourceNeuron", {
-      subdivisions: 4,
-      diameter: 2
+    const masterNeuron = CreateSphere(`0_${batch.id}`, {
+      diameter: 2,
+      segments: 14
     }, this.scene);
     masterNeuron.material = this.baseNeuron.material;
 
-    const sx = batch.pos[0] - ((batch.shape[0]! - 1) * neuronSpacing) / 2;
-    const sy = batch.pos[1] - ((batch.shape[1]! - 1) * neuronSpacing) / 2;
-    const sz = batch.pos[2] - ((batch.shape[2]! - 1) * neuronSpacing) / 2;
+    const sx = batch.pos[0]! - ((batch.shape[0]! - 1) * neuronSpacing) / 2;
+    const sy = batch.pos[1]! - ((batch.shape[1]! - 1) * neuronSpacing) / 2;
+    const sz = batch.pos[2]! - ((batch.shape[2]! - 1) * neuronSpacing) / 2;
 
     const idsUndefined = batch.ids ? true : false;
     
-    const thinInstanceMatrix = new Float32Array(idsUndefined ? batch.ids.length * 16 : (batch.shape[0] * batch.shape[1] * batch.shape[2]) * 16);
+    const thinInstanceMatrix = new Float32Array(idsUndefined ? batch.ids!.length * 16 : (batch.shape[0]! * batch.shape[1]! * batch.shape[2]!) * 16);
     
     //using pos.length and not ids.length due to its convenience(personally) in grabbing positions
     
@@ -160,35 +159,35 @@ export class Network {
   }
   
   newSynapseBatch(batch: SynapseBatchData) {
-    const from1 = [batch.fts[0][0], batch.fts[0][1], batch.fts[0][2]];
-    const from2 = [batch.fts[1][0], batch.fts[1][1], batch.fts[1][2]];
-    const from3 = [batch.fts[batch.ftshape[2]][0], batch.fts[batch.ftshape[2]][1], batch.fts[batch.ftshape[2]][2]]; //batch.ftshape[2] is the z-shape of the 'from' layer
+    const from1 = [batch.fts[0]![0], batch.fts[0]![1], batch.fts[0]![2]];
+    const from2 = [batch.fts[1]![0], batch.fts[1]![1], batch.fts[1]![2]];
+    const from3 = [batch.fts[batch.ftshape[2]!]![0], batch.fts[batch.ftshape[2]!]![1], batch.fts[batch.ftshape[2]!]![2]]; //batch.ftshape[2] is the z-shape of the 'from' layer
     
-    const to = [batch.fts[0][3], batch.fts[0][4], batch.fts[0][5]];
+    const to = [batch.fts[0]![3], batch.fts[0]![4], batch.fts[0]![5]];
     
-    const vRef = [from1[0] - to[0], from1[1] - to[1], from1[2] - to[2]];
-    const vZ = [from2[0] - to[0], from2[1] - to[1], from2[2] - to[2]];
-    const vY = [from3[0] - to[0], from3[1] - to[1], from3[2] - to[2]];
+    const vRef = [from1[0]! - to[0]!, from1[1]! - to[1]!, from1[2]! - to[2]!];
+    const vZ = [from2[0]! - to[0]!, from2[1]! - to[1]!, from2[2]! - to[2]!];
+    const vY = [from3[0]! - to[0]!, from3[1]! - to[1]!, from3[2]! - to[2]!];
     
-    const vRef_mag = Math.sqrt(vRef[0] * vRef[0] + vRef[1] * vRef[1] + vRef[2] * vRef[2]);
-    const vZ_mag = Math.sqrt(vZ[0] * vZ[0] + vZ[1] * vZ[1] + vZ[2] * vZ[2]);
-    const vY_mag = Math.sqrt(vY[0] * vY[0] + vY[1] * vY[1] + vY[2] * vY[2]);
+    const vRef_mag = Math.sqrt(vRef[0]! * vRef[0]! + vRef[1]! * vRef[1]! + vRef[2]! * vRef[2]!);
+    const vZ_mag = Math.sqrt(vZ[0]! * vZ[0]! + vZ[1]! * vZ[1]! + vZ[2]! * vZ[2]!);
+    const vY_mag = Math.sqrt(vY[0]! * vY[0]! + vY[1]! * vY[1]! + vY[2]! * vY[2]!);
     
     //normalised so larger vectors dont affect density
-    vRef[0] /= vRef_mag;
-    vRef[1] /= vRef_mag;
-    vRef[2] /= vRef_mag;
+    vRef[0]! /= vRef_mag;
+    vRef[1]! /= vRef_mag;
+    vRef[2]! /= vRef_mag;
     
-    vZ[0] /= vZ_mag;
-    vZ[1] /= vZ_mag;
-    vZ[2] /= vZ_mag;
+    vZ[0]! /= vZ_mag;
+    vZ[1]! /= vZ_mag;
+    vZ[2]! /= vZ_mag;
     
-    vY[0] /= vY_mag;
-    vY[1] /= vY_mag;
-    vY[2] /= vY_mag;
+    vY[0]! /= vY_mag;
+    vY[1]! /= vY_mag;
+    vY[2]! /= vY_mag;
     
-    const dot_z = vRef[0] * vZ[0] + vRef[1] * vZ[1] + vRef[2] * vZ[2];
-    const dot_y = vRef[0] * vY[0] + vRef[1] * vY[1] + vRef[2] * vY[2];
+    const dot_z = vRef[0]! * vZ[0]! + vRef[1]! * vZ[1]! + vRef[2]! * vZ[2]!;
+    const dot_y = vRef[0]! * vY[0]! + vRef[1]! * vY[1]! + vRef[2]! * vY[2]!;
     
     console.log(`id: ${batch.id}\nZ_dot_angle: ${dot_z}, ${Math.acos(dot_z) * DEG180BYPI} \nY_dot_angle: ${dot_y}, ${Math.acos(dot_y) * DEG180BYPI}`);
     
@@ -197,41 +196,15 @@ export class Network {
     }, {
       width: 0.02
     }, this.scene);
+    
+    //@ts-ignore
+    mesh.annInfo ??= { density: {} }
+    //@ts-ignore
+    mesh.annInfo.density.z_dot = dot_z;
+    //@ts-ignore
+    mesh.annInfo.density.y_dot = dot_y;
 
-    return { z: Math.acos(dot_z) * DEG180BYPI, y: Math.acos(dot_y) * DEG180BYPI };
-  }
-  
-
-  ABSTcreateLayer(attrs: {
-    id: number | undefined,
-    center: Float32Array, 
-    shape: Uint32Array,
-    spacing: number
-  }) { //center x,y,z, shape x,y,z
-    const neuronCount = attrs.shape[0] * attrs.shape[1] * attrs.shape[2];
-    
-    let childIds = new Float64Array(neuronCount);
-    
-    for (let i = 0; i < neuronCount; i++) {
-      childIds[i] = randInt53();
-    }
-    
-    const sx = (attrs.shape[0]! - 1) * attrs.spacing;
-    const sy = (attrs.shape[1]! - 1) * attrs.spacing;
-    const sz = (attrs.shape[2]! - 1) * attrs.spacing;
-
-    const basePos = new Float32Array([
-      attrs.center[0] - sx / 2,
-      attrs.center[1] - sy / 2,
-      attrs.center[2] - sz / 2
-    ]);
-    
-    this.newLayer({
-      id: attrs.id,
-      pos: basePos,
-      shape: attrs.shape,
-      ids: childIds 
-    }, attrs.spacing ? attrs.spacing : 2.5);
+    this.memory.set(`4_${batch.id}`, mesh);
   }
   
 }

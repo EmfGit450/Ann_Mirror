@@ -30,7 +30,15 @@ net.newLayer({
   id: randInt53(),
   pos: new Float32Array([0, 0, 0]),
   shape: new Uint32Array([1, 28, 28]),
+  ids: undefined
 }, 2.5);
+
+net.newSynapseBatch({
+  id: randInt53(),
+  ids: new Float64Array([randInt53(), randInt53(), randInt53()]),
+  fts: [[0, 5, 0, 5, 0, 0],[0, 0, 0, 5, 0, 0],[0, -5, 0, 5, 0, 0]],
+  ftshape: new Float32Array([1, 3, 1, 1, 1, 1])
+})
 
 //Tests End
 
