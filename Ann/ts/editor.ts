@@ -29,7 +29,7 @@ const net = new Network(scene);
 net.newLayer({
   id: randInt53(),
   pos: new Float32Array([0, 0, 0]),
-  shape: new Uint32Array([1, 28, 28]),
+  shape: new Uint32Array([16, 16, 16]),
   ids: undefined
 }, 2.5);
 

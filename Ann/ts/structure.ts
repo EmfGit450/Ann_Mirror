@@ -206,5 +206,17 @@ export class Network {
 
     this.memory.set(`4_${batch.id}`, mesh);
   }
+
+  fullyConnectLayers(layerA: LayerData, layerB: LayerData) {
+    let fts: number[][] = [];
+    
+    const lAneuronCount = layerA.shape[0]! * layerA.shape[1]! * layerA.shape[2]!
+    const lBneuronCount = layerB.shape[0]! * layerB.shape[1]! * layerB.shape[2]!
+    for (let end = 0; end < lBneuronCount; end += 3) {
+      for (let start = 0; start < lAneuronCount; start += 3) {
+        
+      }
+    }
+  }
   
 }
