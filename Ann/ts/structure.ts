@@ -31,8 +31,6 @@ export function randInt53(): number {
   return view.getUint32(0, true) + view.getUint16(4, true) * 0x100000000 + buf[6]! * 0x10000000000;
 }
 
-console.log(randInt53());
-
 export interface NeuronData {
   id: number; 
   pos: Float32Array;
@@ -208,12 +206,14 @@ export class Network {
   }
 
   fullyConnectLayers(layerA: LayerData, layerB: LayerData) {
-    let fts: number[][] = [];
+    let fts: Float32Array[] = [];
+
+    //lxnC = layer x neuron count
+    const lAnC = layerA.shape[0]! * layerA.shape[1]! * layerA.shape[2]!
+    const lBnC = layerB.shape[0]! * layerB.shape[1]! * layerB.shape[2]!
     
-    const lAneuronCount = layerA.shape[0]! * layerA.shape[1]! * layerA.shape[2]!
-    const lBneuronCount = layerB.shape[0]! * layerB.shape[1]! * layerB.shape[2]!
-    for (let end = 0; end < lBneuronCount; end += 3) {
-      for (let start = 0; start < lAneuronCount; start += 3) {
+    for (let end = 0; end < lAnC; end += 3) {
+      for (let start = 0; start < lBnC; start += 3) {
         
       }
     }
