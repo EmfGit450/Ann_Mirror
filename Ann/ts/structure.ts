@@ -44,7 +44,8 @@ export interface SynapseData {
 export interface SynapseBatchData { //one weight matrix
   id: number;
   ids: Float64Array;
-  fts: number[][]; //[fx, fy, fz, ex, ey, ez, ...]. using number[][] since babylonjs
+  //CHANGE TO Float32Array[] FOR TESTING
+  fts: Float32Array[]; //[fx, fy, fz, ex, ey, ez, ...]. using number[][] since babylonjs
   ftshape: Float32Array; //[fx, fy, fz, tx, ty, tz]
 }
 
@@ -205,7 +206,8 @@ export class Network {
     this.memory.set(`4_${batch.id}`, mesh);
   }
 
-  fullyConnectLayers(layerA: LayerData, layerB: LayerData) {
+  newDenseSynapseBatch(layerA: LayerData, layerB: LayerData) {
+    //NO ID CONFIG FOR NOW, ONLY PERFORMANCE TESTING
     let fts: Float32Array[] = [];
 
     //lxnC = layer x neuron count
@@ -215,17 +217,24 @@ export class Network {
     const lAneurons = (this.memory.get(`0_${layerA.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
     const lBneurons = (this.memory.get(`0_${layerB.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
     
-    for (let end = 1; end < lAnC; end++) {
-      const currEndMat = end * 16;
-      for (let start = 0; start < lBnC; start++) {
-        const currStartMat = start * 16;
+    for (let start = 1; start < lAnC; start += 2) {
+      const currStartOff = start * 16;
+      for (let end = 0; end < lBnC; end++) {
+        const currEndOff = end * 16;
         fts.push(new Float32Array([
-          lAneurons[currEndMat + 12]!, lAneurons[currEndMat + 13]!, lAneurons[currEndMat + 14]!,
-          lBneurons[currEndMat + 12]!, lAneurons[currEndMat + 13]!, lAneurons[currEndMat + 14]!,
-          lAneurons[currEndMat - 4]!, lAneurons[currEndMat - 3]!, lAneurons[currEndMat - 2]!
+          lAneurons[currStartOff + 12]!, lAneurons[currStartOff + 13]!, lAneurons[currStartOff + 14]!,
+          lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!,
+          lAneurons[currStartOff - 4]!, lAneurons[currStartOff - 3]!, lAneurons[currStartOff - 2]!
         ]));
       }
     }
+
+    const mesh = CreateGreasedLine(`4_${randInt53()}`, {
+      points: fts
+    }, {
+      width: 0.02
+    }, this.scene);
+    
   }
   
 }
