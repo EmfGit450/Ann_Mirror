@@ -80,6 +80,7 @@ button.active svg * {
 #debugger {
   position: absolute;
   font-size: 1.3rem;
+  background: #3336;
   color: #f0e5e5;
   text-shadow: 0 0 1rem #443838;
   z-index: 9999;

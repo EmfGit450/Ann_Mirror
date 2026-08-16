@@ -217,23 +217,54 @@ export class Network {
     const lAneurons = (this.memory.get(`0_${layerA.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
     const lBneurons = (this.memory.get(`0_${layerB.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
     
+    const vRef = [lBneurons[12]! - lAneurons[12]!, lBneurons[13]! - lAneurons[13]!, lBneurons[14]! - lAneurons[14]!];
+    const vZ = [lBneurons[12]! - lAneurons[28]!, lBneurons[13]! - lAneurons[29]!, lBneurons[14]! - lAneurons[30]!];
+
+    const vRef_mag = Math.sqrt(vRef[0]! * vRef[0]! + vRef[1]! * vRef[1]! + vRef[2]! * vRef[2]!);
+    const vZ_mag = Math.sqrt(vZ[0]! * vZ[0]! + vZ[1]! * vZ[1]! + vZ[2]! * vZ[2]!);
+
+    //normalised so larger vectors dont affect density
+    vRef[0]! /= vRef_mag;
+    vRef[1]! /= vRef_mag;
+    vRef[2]! /= vRef_mag;
+    
+    vZ[0]! /= vZ_mag;
+    vZ[1]! /= vZ_mag;
+    vZ[2]! /= vZ_mag;
+
+    const dot_z = vRef[0]! * vZ[0]! + vRef[1]! * vZ[1]! + vRef[2]! * vZ[2]!;
+
+    let skipMod = dot_z > 0.999 ? 2 : 1;
+    skipMod = dot_z > 0.9995 ? 3 : skipMod
+    
+    let synapseIdx = 0;
+
     for (let start = 1; start < lAnC; start += 2) {
       const currStartOff = start * 16;
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
-        fts.push(new Float32Array([
-          lAneurons[currStartOff + 12]!, lAneurons[currStartOff + 13]!, lAneurons[currStartOff + 14]!,
-          lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!,
-          lAneurons[currStartOff - 4]!, lAneurons[currStartOff - 3]!, lAneurons[currStartOff - 2]!
-        ]));
+
+        if (synapseIdx % skipMod == 0) {
+          fts.push(new Float32Array([
+            lAneurons[currStartOff + 12]!, lAneurons[currStartOff + 13]!, lAneurons[currStartOff + 14]!,
+            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!,
+            lAneurons[currStartOff - 4]!, lAneurons[currStartOff - 3]!, lAneurons[currStartOff - 2]!
+          ]));
+        }
+
+        synapseIdx++;
       }
     }
+
+    console.log(`dot: ${dot_z}\nangle(deg): ${Math.acos(dot_z) * DEG180BYPI}`)
 
     const mesh = CreateGreasedLine(`4_${randInt53()}`, {
       points: fts
     }, {
       width: 0.02
     }, this.scene);
+
+    console.log(`fts.length: ${fts.length}`)
     
   }
   
