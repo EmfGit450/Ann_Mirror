@@ -13,8 +13,6 @@ import { Network, LayerData, SynapseBatchData } from "./structure";
 
 import "@babylonjs/core/Meshes/instancedMesh";
 
-import '@babylonjs/inspector';
-
 const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
 const engine = new Engine(canvas, true);
 const scene = new Scene(engine);
