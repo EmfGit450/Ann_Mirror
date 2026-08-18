@@ -28,15 +28,15 @@ const net = new Network(scene);
 const layer0: LayerData = {
   id: 1,
   pos: new Float32Array([0, 0, 0]),
-  shape: new Uint32Array([1, 32, 32]),
-  ids: new Float64Array(4225)
+  shape: new Uint32Array([1, 28, 28]),
+  ids: new Float64Array(1024)
 };
 
 const layer1: LayerData = {
   id: 2,
   pos: new Float32Array([40, 0, 0]),
-  shape: new Uint32Array([1, 16, 16]),
-  ids: new Float64Array(256)
+  shape: new Uint32Array([1, 4, 4]),
+  ids: new Float64Array(16)
 };
 
 const layer2: LayerData = {
@@ -73,7 +73,7 @@ engine.runRenderLoop(() => {
 //Debugger Start
 const Debugger = document.getElementById("debugger")!;
 setInterval(() => {
-  Debugger.innerHTML = `fps - ${Math.round(engine.getFps())}<br>cam - rad: ${(camera.bnCamera.radius).toPrecision(4)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pos: [ x: ${(camera.bnCamera.position.x).toPrecision(3)}, y: ${(camera.bnCamera.position.y).toPrecision(3)}, z:  ${(camera.bnCamera.position.z).toPrecision(3)} ]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target: [ x: ${(camera.bnCamera.target.x).toPrecision(3)}, y: ${(camera.bnCamera.target.y).toPrecision(3)}, z: ${(camera.bnCamera.target.z).toPrecision(3)} ]`;
+  Debugger.innerHTML = `fps - ${engine.getFps()}<br>cam - rad: ${(camera.bnCamera.radius).toPrecision(4)}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pos: [ x: ${(camera.bnCamera.position.x).toPrecision(3)}, y: ${(camera.bnCamera.position.y).toPrecision(3)}, z:  ${(camera.bnCamera.position.z).toPrecision(3)} ]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;target: [ x: ${(camera.bnCamera.target.x).toPrecision(3)}, y: ${(camera.bnCamera.target.y).toPrecision(3)}, z: ${(camera.bnCamera.target.z).toPrecision(3)} ]`;
 }, 150);
 
 //@ts-ignore

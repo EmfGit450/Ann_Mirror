@@ -226,8 +226,10 @@ export class Network {
 
     const dot_z = (vRef[0]! * vZ[0]! + vRef[1]! * vZ[1]! + vRef[2]! * vZ[2]!) * (1 / (vRef_mag * vZ_mag));
 
-    let skipMod = dot_z > 0.999 ? 2 : 1;
-    skipMod = dot_z > 0.9995 ? 3 : skipMod
+    let skipMod = dot_z > 0.99802 ? 2 : 1;    // ~3.5°
+    skipMod = dot_z > 0.99926  ? 3 : skipMod; // ~2.2°
+    skipMod = dot_z > 0.99965 ? 4 : skipMod;  // ~1.5°
+
     
     const centerV = [layerB.pos[0]! - layerA.pos[0]!, layerB.pos[1]! - layerA.pos[1]!, layerB.pos[2]! - layerA.pos[2]!]
     const centerV_mag = Math.sqrt(centerV[0]! * centerV[0]! + centerV[1]! * centerV[1]! + centerV[2]! * centerV[2]!)
@@ -245,13 +247,6 @@ export class Network {
         const dot1xz = (centerV[0]! * lAneurons[currStart + 12]! + centerV[1]! * lAneurons[currStart + 13]! + centerV[2]! * lAneurons[currStart + 14]!) * (1 / (centerV_mag * source1_mag));
         const dot2xz = (centerV[0]! * lAneurons[currStart - 4]! + centerV[1]! * lAneurons[currStart - 3]! + centerV[2]! * lAneurons[currStart - 2]!) * (1 / (centerV_mag * source2_mag));
         
-        if (dot1xz >= 0.866025404 && dot2xz >= 0.866025404) { //
-          detail_fts.push(new Float32Array([
-            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
-            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
-          ]));
-        }
         if (synapseCounter % skipMod == 0) {
           base_fts.push(new Float32Array([
             lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
@@ -259,16 +254,39 @@ export class Network {
             lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
           ]));
         }
+        else if (dot1xz >= 0.866025404 || dot2xz >= 0.866025404) { //
+          detail_fts.push(new Float32Array([
+            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
+            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
+            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
+          ]));
+        }
+        else { //
+          detail_fts.push(new Float32Array([
+            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
+            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
+            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
+          ]));
+        }
+
+        synapseCounter++;
       }
     }
 
     console.log(`dot: ${dot_z}\nangle(deg): ${Math.acos(dot_z) * DEG180BYPI}`)
 
-    const mesh = CreateGreasedLine(`4_${randInt53()}`, {
+    const baseMesh = CreateGreasedLine(`4_${randInt53()}_B}`, {
       points: base_fts
     }, {
       width: 0.02
     }, this.scene);
+
+    const detailMesh = CreateGreasedLine(`4_${randInt53()}_D`, {
+      points: detail_fts
+    }, {
+      width: 0.02
+    }, this.scene);
+    detailMesh.setEnabled(false);
 
     console.log(`fts.length: ${base_fts.length}`)
     
