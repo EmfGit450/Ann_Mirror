@@ -208,8 +208,9 @@ export class Network {
 
   newDenseSynapseBatch(layerA: LayerData, layerB: LayerData) {
     //NO ID CONFIG FOR NOW, ONLY PERFORMANCE TESTING
-    let fts: Float32Array[] = [];
-
+    let base_fts: Float32Array[] = [];
+    let detail_fts: Float32Array[] = [];
+ 
     //lxnC = layer x neuron count
     const lAnC = layerA.shape[0]! * layerA.shape[1]! * layerA.shape[2]!
     const lBnC = layerB.shape[0]! * layerB.shape[1]! * layerB.shape[2]!
@@ -223,48 +224,53 @@ export class Network {
     const vRef_mag = Math.sqrt(vRef[0]! * vRef[0]! + vRef[1]! * vRef[1]! + vRef[2]! * vRef[2]!);
     const vZ_mag = Math.sqrt(vZ[0]! * vZ[0]! + vZ[1]! * vZ[1]! + vZ[2]! * vZ[2]!);
 
-    //normalised so larger vectors dont affect density
-    vRef[0]! /= vRef_mag;
-    vRef[1]! /= vRef_mag;
-    vRef[2]! /= vRef_mag;
-    
-    vZ[0]! /= vZ_mag;
-    vZ[1]! /= vZ_mag;
-    vZ[2]! /= vZ_mag;
-
-    const dot_z = vRef[0]! * vZ[0]! + vRef[1]! * vZ[1]! + vRef[2]! * vZ[2]!;
+    const dot_z = (vRef[0]! * vZ[0]! + vRef[1]! * vZ[1]! + vRef[2]! * vZ[2]!) * (1 / (vRef_mag * vZ_mag));
 
     let skipMod = dot_z > 0.999 ? 2 : 1;
     skipMod = dot_z > 0.9995 ? 3 : skipMod
     
-    let synapseIdx = 0;
+    const centerV = [layerB.pos[0]! - layerA.pos[0]!, layerB.pos[1]! - layerA.pos[1]!, layerB.pos[2]! - layerA.pos[2]!]
+    const centerV_mag = Math.sqrt(centerV[0]! * centerV[0]! + centerV[1]! * centerV[1]! + centerV[2]! * centerV[2]!)
+    
+    let synapseCounter = 0;
 
     for (let start = 1; start < lAnC; start += 2) {
-      const currStartOff = start * 16;
+      const currStart = start * 16;
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
+        
+        const source1_mag = Math.sqrt(lAneurons[currStart + 12]! * lAneurons[currStart + 12]! + lAneurons[currStart + 13]! * lAneurons[currStart + 13]! + lAneurons[currStart + 14]! * lAneurons[currStart + 14]!);
+        const source2_mag = Math.sqrt(lAneurons[currStart - 4]! * lAneurons[currStart - 4]! + lAneurons[currStart - 3]! * lAneurons[currStart - 3]! + lAneurons[currStart - 2]! * lAneurons[currStart - 2]!);
 
-        if (synapseIdx % skipMod == 0) {
-          fts.push(new Float32Array([
-            lAneurons[currStartOff + 12]!, lAneurons[currStartOff + 13]!, lAneurons[currStartOff + 14]!,
-            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!,
-            lAneurons[currStartOff - 4]!, lAneurons[currStartOff - 3]!, lAneurons[currStartOff - 2]!
+        const dot1xz = (centerV[0]! * lAneurons[currStart + 12]! + centerV[1]! * lAneurons[currStart + 13]! + centerV[2]! * lAneurons[currStart + 14]!) * (1 / (centerV_mag * source1_mag));
+        const dot2xz = (centerV[0]! * lAneurons[currStart - 4]! + centerV[1]! * lAneurons[currStart - 3]! + centerV[2]! * lAneurons[currStart - 2]!) * (1 / (centerV_mag * source2_mag));
+        
+        if (dot1xz >= 0.866025404 && dot2xz >= 0.866025404) { //
+          detail_fts.push(new Float32Array([
+            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
+            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
+            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
           ]));
         }
-
-        synapseIdx++;
+        if (synapseCounter % skipMod == 0) {
+          base_fts.push(new Float32Array([
+            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
+            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
+            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
+          ]));
+        }
       }
     }
 
     console.log(`dot: ${dot_z}\nangle(deg): ${Math.acos(dot_z) * DEG180BYPI}`)
 
     const mesh = CreateGreasedLine(`4_${randInt53()}`, {
-      points: fts
+      points: base_fts
     }, {
       width: 0.02
     }, this.scene);
 
-    console.log(`fts.length: ${fts.length}`)
+    console.log(`fts.length: ${base_fts.length}`)
     
   }
   
