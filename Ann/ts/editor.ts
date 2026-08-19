@@ -62,7 +62,6 @@ net.newDenseSynapseBatch(layer0, layer1);
 net.newDenseSynapseBatch(layer1, layer2);
 net.newDenseSynapseBatch(layer2, layer3);
 //Tests End
-//Tests End
 
 const camera = new Camera({scene: scene, canvas: canvas});
 
