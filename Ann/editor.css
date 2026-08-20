@@ -34,7 +34,6 @@ body {
   gap: 0.5rem;
   
   height: 100dvh;
-  padding: 1rem;
 	background: #000;
 	box-shadow: 0.2rem 0.2rem 1rem #1F1F1F;
 	      
@@ -52,9 +51,9 @@ button {
 	border-radius: 1.5rem;
 		    
 	transition: 0.3s ease;
-	width: 4.3rem;
+	width: 3.6rem;
 	height: 3.3rem;
-	background: radial-gradient(ellipse, #F7F7F7, #AAA);
+	background: radial-gradient(ellipse, #F7F7F7, #DEDEDE);
 	box-shadow: 0.1rem 0.1rem 1rem #DCDCDC33;
 }
 button svg {
@@ -85,6 +84,8 @@ button.active svg * {
   text-shadow: 0 0 1rem #443838;
   z-index: 9999;
   font-family: "Jetbrains Mono";
+
+  display: none;
 }
 /*End*/
 
@@ -92,9 +93,8 @@ button.active svg * {
 .top-editor-btns {
   display: flex;
   justify-content: space-between;
+  margin: 1rem;
   z-index: 1;
-
-  display: none; /*FOR NOW. IT WAS COVERING DEBUGGER*/
 }
 /*End*/
 		  
@@ -102,8 +102,8 @@ button.active svg * {
 .babylonjs-canvas {
 	display: flex;
 	flex-grow: 1;
-	height: calc(100dvh - 2rem);
-	width: calc(100dvw - 2rem);
+	height: 100dvh;
+	width: 100dvw;
 	position: absolute;
 	overflow: hidden;
 	z-index: 0;
@@ -116,14 +116,6 @@ button.active svg * {
   left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 1rem;
   z-index: 0;
 }
 /*End*/
-
-@media (max-width: 700px), (max-height: 1000px) {
-	button {
-		width: 3.8rem;
-		height: 2.8rem;
-	}
-}

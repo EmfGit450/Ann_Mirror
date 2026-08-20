@@ -63,44 +63,54 @@
 	    }
 	    
 	    nav {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-			column-gap: 0.5rem;
-            row-gap: 2rem;
-            justify-items: center;
-            align-items: center;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+		  column-gap: 0.5rem;
+          row-gap: 2rem;
+          justify-items: center;
+          align-items: center;
         }
 		.main-links {
-			margin-top: 2rem;
+		  margin-top: 2rem;
 		}
 	    
 	    nav a {
-		    user-select: none;
-		    text-decoration: none;
-		    
-		    animation-name: fade-in;
-		    animation-duration: 1.3s;
-		    
-		    transition: 0.3s;
-		    box-shadow: 0 0 1rem #111111;
-		    background: linear-gradient(51deg, #090909, #151515);
-		    color: white;
-		    width: 100%;
-			max-width: 24rem;
-		    padding: 1.4rem;
-		    border-radius: 1rem;
-		    font-size: 2.5rem;
+		  user-select: none;
+		  text-decoration: none;
+		  
+		  animation-name: fade-in;
+		  animation-duration: 1.3s;
+		  
+		  transition: 0.3s;
+		  box-shadow: 0 0 1rem #111111;
+		  background: linear-gradient(51deg, #090909, #151515);
+		  color: white;
+		  width: 100%;
+		  max-width: 24rem;
+		  padding: 1.1rem;
+		  border-radius: 1rem;
+		  font-size: 2.5rem;
 	    }
 	    nav a:nth-child(3), a:nth-child(4) {
 	      animation-name: fade-in-up;
 	    }
 	    nav a:hover, a:active {
-		    transition: 0.3s ease-in-out;
-		    background: linear-gradient(51deg, #BBBBBB, #EFEFEF);
-		    box-shadow: 0 0 1rem #D1D1D1;
-		    color: black;
-		    transform: scale(1.04);
+		  transition: 0.3s ease-in-out;
+		  background: linear-gradient(51deg, #BBBBBB, #EFEFEF);
+		  box-shadow: 0 0 1rem #D1D1D1;
+		  color: black;
+		  transform: scale(1.04);
+		}
+
+		@media (max-width: 940px) {
+          nav a {
+			font-size: 1.9rem;
+		    max-width: 17rem;
+	      }
+		  p {
+		    font-size: 2rem;
 		  }
+        }
     </style>
   </head>
   <!-- resolution below 1320 x 1000 requires adjustment -->

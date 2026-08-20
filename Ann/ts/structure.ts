@@ -87,15 +87,14 @@ export class Network {
     
     this.scene.registerBeforeRender(() => {
       [...this.memory.values()].forEach(mesh => {
-        if (!mesh.annMeta) return;
+        //if (mesh.annMeta.visible === undefined) return;
+        
+        
+        if (mesh.name[0] == "0") {
+          
+        }
 
-        const meshPos = mesh.annMeta.center;
-        const camPos = this.scene.activeCamera.position;
 
-        const vDist = [camPos.x - meshPos[0], camPos.y - meshPos[1], camPos.z - meshPos[2]]
-        const dist = Math.sqrt(vDist[0] * vDist[0] + vDist[1] * vDist[1] + vDist[2] * vDist[2]);
-
-        console.log(`Dist to ${mesh.name} = ${dist}`); 
       });
     });
   }
@@ -148,12 +147,6 @@ export class Network {
     
     masterNeuron.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16, true);
     
-    //@ts-ignore
-    masterNeuron.annMeta = {
-      shape: batch.shape,
-      center: batch.pos
-    }
-
     this.memory.set(`0_${batch.id}`, masterNeuron);
   }
   
@@ -303,7 +296,8 @@ export class Network {
     const metadata = {
       sourceCenter: layerA.pos,
       targetCenter: layerB.pos,
-      density: undefined
+      density: undefined,
+      visible: undefined
     }
 
     const baseMesh = CreateGreasedLine(`4_${randInt53()}_B}`, {
@@ -311,8 +305,10 @@ export class Network {
     }, {
       width: 0.02
     }, this.scene);
-
+    
+    //@ts-ignore
     baseMesh.annMeta = metadata;
+    //@ts-ignore
     baseMesh.annMeta.density = {
       xz: Math.acos(dot_xz) * DEG180BYPI,
       xy: Math.acos(dot_xy) * DEG180BYPI
@@ -326,9 +322,11 @@ export class Network {
       }, {
         width: 0.02
       }, this.scene);
-      detailMesh.setEnabled(false);
-
+      
+      //@ts-ignore
       detailMesh.annMeta = metadata;
+      //@ts-ignore
+      detailMesh.annMeta.visible = false;
 
       this.memory.set(`4_${detailMesh.name}_D`, detailMesh);
     }
@@ -339,9 +337,11 @@ export class Network {
       }, {
         width: 0.02
       }, this.scene);
-      highDetailMesh.setEnabled(false);
-
+      
+      //@ts-ignore
       highDetailMesh.annMeta = metadata;
+      //@ts-ignore
+      highDetailMesh.annMeta.visible = false;
 
       this.memory.set(`4_${highDetailMesh.name}_D`, highDetailMesh);
     }
