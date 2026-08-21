@@ -10,12 +10,15 @@
    <div id="debugger">
      
    </div>
+   <div id="general-modal">
+     Multilayer Perceptrons.
+   </div>
 	 <div class="main-c">
 		 <div class="top-editor-btns">
 		     <button id="code-editor">
 		        <svg viewBox="0 0 24 24">
-		           <path d="M 2 6 L 9 13 M 9 13 L 2 20" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-		           <path class="blink-cursor" d="M 12 21 L 21 21" stroke="black" stroke-width="3" stroke-linecap="round"/>
+		           <path d="M 2 6 L 9 13 M 9 13 L 2 20" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" transform-origin="50% 50%" transform="rotate(180) translate(14.1, -2)"/>
+		           <path d="M 2 6 L 9 13 M 9 13 L 2 20" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" transform="translate(14.1, 0)"/>
 		        </svg>
 		     </button>
 		     <button id="editor-settings"> <!-- path from feathericons.com -->
@@ -34,9 +37,6 @@
 	 </div>
 	 
    <script type="module" src="dist/editor.js"></script>
-
-   <script src="//cdn.jsdelivr.net/npm/eruda"></script>
-   <script>eruda.init();</script>
 
   </body>
 </html>

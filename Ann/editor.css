@@ -1,9 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');	   
-
-@keyframes appear {
-  from { opacity: 0; }
-  
-}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 		  
 * {
   --webkit-tap-highlight-color: transparent;
@@ -37,7 +32,7 @@ body {
 	background: #000;
 	box-shadow: 0.2rem 0.2rem 1rem #1F1F1F;
 	      
-	font-family: "Jetbrains Mono", Monospace;
+	font-family: "Monserrat";
 	color: white;
 }
 /*End*/
@@ -53,7 +48,7 @@ button {
 	transition: 0.3s ease;
 	width: 3.6rem;
 	height: 3.3rem;
-	background: radial-gradient(ellipse, #F7F7F7, #DEDEDE);
+	background: radial-gradient(ellipse, #F7F7F7, #DDDDDD);
 	box-shadow: 0.1rem 0.1rem 1rem #DCDCDC33;
 }
 button svg {
@@ -81,10 +76,36 @@ button.active svg * {
   font-size: 1.3rem;
   background: #3336;
   color: #f0e5e5;
+  border-radius: 1rem;
+  padding: 0.2rem;
   text-shadow: 0 0 1rem #443838;
   z-index: 9999;
-  font-family: "Jetbrains Mono";
+  font-family: "Montserrat";
+}
+/*End*/
 
+/*General Modal*/
+#general-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  position: absolute;
+  z-index: 9999;
+  background: white;
+  box-shadow: 0.05rem 0.05rem 1rem #444;
+  border-radius: 0.2rem;
+  max-width: 20rem;
+  max-height: 15rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.4rem;
+  transform: translate(calc(50dvw - 10rem), calc(50dvh - 7.5rem));
+
+  font-family: "Montserrat";
+  font-size: 1rem;
+
+  /*DEBUG*/
   display: none;
 }
 /*End*/

@@ -60,6 +60,7 @@ export interface LayerData {
 export class Network {
   memory: Map<string, Mesh | InstancedMesh | GreasedLineMesh>;
   scene: Scene;
+  state: any;
   
   private baseNeuron: Mesh;
   
@@ -85,18 +86,50 @@ export class Network {
     this.baseNeuron.setEnabled(false);
     
     
-    this.scene.registerBeforeRender(() => {
-      [...this.memory.values()].forEach(mesh => {
-        //if (mesh.annMeta.visible === undefined) return;
-        
-        
-        if (mesh.name[0] == "0") {
-          
-        }
+    // Add to Network constructor
+this.lodState = {
+    targetFps: 45,
+    currentLevel: 2, // 0 = base only, 1 = +detail, 2 = +high
+    frameCounter: 0,
+    fpsHistory: new Float32Array(30), // 0.5s sliding window
+    historyIdx: 0
+};
 
-
-      });
+this.scene.registerBeforeRender(() => {
+    const fps = this.scene._engine.getFps();
+    const state = this.lodState;
+    
+    // Update sliding window every frame
+    state.fpsHistory[state.historyIdx] = fps;
+    state.historyIdx = (state.historyIdx + 1) % 30;
+    
+    // Only re-evaluate every 10 frames (~160ms) to avoid oscillation
+    state.frameCounter++;
+    if (state.frameCounter < 10) return;
+    state.frameCounter = 0;
+    
+    const avgFps = state.fpsHistory.reduce((a, b) => a + b, 0) / 30;
+    
+    // Hysteresis: drop detail if avg < 35, add back if avg > 55
+    if (avgFps < 35 && state.currentLevel > 0) {
+        state.currentLevel--;
+        console.log(`LOD drop -> ${state.currentLevel}, avgFps: ${avgFps.toFixed(1)}`);
+    } else if (avgFps > 55 && state.currentLevel < 2) {
+        state.currentLevel++;
+        console.log(`LOD rise -> ${state.currentLevel}, avgFps: ${avgFps.toFixed(1)}`);
+    }
+    
+    // Apply to all synapse batches in one pass
+    const enableDetail = state.currentLevel >= 1;
+    const enableHigh = state.currentLevel >= 2;
+    
+    this.memory.forEach((mesh, key) => {
+        if (key.includes("_D")) mesh.setEnabled(enableDetail);
+        if (key.includes("_H")) mesh.setEnabled(enableHigh);
     });
+});
+
+
   }
   
   //0 = Layer, 1 = Neuron, 2 = Synapse, 4 = SynapseBatch
@@ -159,55 +192,6 @@ export class Network {
     },  this.scene) as GreasedLineMesh;
     
     this.memory.set(`2_${data.id}`, mesh);
-  }
-  
-  newSynapseBatch(batch: SynapseBatchData) {
-    const from1 = [batch.fts[0]![0], batch.fts[0]![1], batch.fts[0]![2]];
-    const from2 = [batch.fts[1]![0], batch.fts[1]![1], batch.fts[1]![2]];
-    const from3 = [batch.fts[batch.ftshape[2]!]![0], batch.fts[batch.ftshape[2]!]![1], batch.fts[batch.ftshape[2]!]![2]]; //batch.ftshape[2] is the z-shape of the 'from' layer
-    
-    const to = [batch.fts[0]![3], batch.fts[0]![4], batch.fts[0]![5]];
-    
-    const vRef = [from1[0]! - to[0]!, from1[1]! - to[1]!, from1[2]! - to[2]!];
-    const vZ = [from2[0]! - to[0]!, from2[1]! - to[1]!, from2[2]! - to[2]!];
-    const vY = [from3[0]! - to[0]!, from3[1]! - to[1]!, from3[2]! - to[2]!];
-    
-    const vRef_mag = Math.sqrt(vRef[0]! * vRef[0]! + vRef[1]! * vRef[1]! + vRef[2]! * vRef[2]!);
-    const vZ_mag = Math.sqrt(vZ[0]! * vZ[0]! + vZ[1]! * vZ[1]! + vZ[2]! * vZ[2]!);
-    const vY_mag = Math.sqrt(vY[0]! * vY[0]! + vY[1]! * vY[1]! + vY[2]! * vY[2]!);
-    
-    //normalised so larger vectors dont affect density
-    vRef[0]! /= vRef_mag;
-    vRef[1]! /= vRef_mag;
-    vRef[2]! /= vRef_mag;
-    
-    vZ[0]! /= vZ_mag;
-    vZ[1]! /= vZ_mag;
-    vZ[2]! /= vZ_mag;
-    
-    vY[0]! /= vY_mag;
-    vY[1]! /= vY_mag;
-    vY[2]! /= vY_mag;
-    
-    const dot_z = vRef[0]! * vZ[0]! + vRef[1]! * vZ[1]! + vRef[2]! * vZ[2]!;
-    const dot_y = vRef[0]! * vY[0]! + vRef[1]! * vY[1]! + vRef[2]! * vY[2]!;
-    
-    console.log(`id: ${batch.id}\nZ_dot_angle: ${dot_z}, ${Math.acos(dot_z) * DEG180BYPI} \nY_dot_angle: ${dot_y}, ${Math.acos(dot_y) * DEG180BYPI}`);
-    
-    const mesh = CreateGreasedLine(`4_${batch.id}`, {
-      points: batch.fts
-    }, {
-      width: 0.02
-    }, this.scene);
-    
-    //@ts-ignore
-    mesh.annInfo ??= { density: {} }
-    //@ts-ignore
-    mesh.annInfo.density.z_dot = dot_z;
-    //@ts-ignore
-    mesh.annInfo.density.y_dot = dot_y;
-
-    this.memory.set(`4_${batch.id}`, mesh);
   }
 
   newDenseSynapseBatch(layerA: LayerData, layerB: LayerData) {
@@ -328,6 +312,8 @@ export class Network {
       //@ts-ignore
       detailMesh.annMeta.visible = false;
 
+      detailMesh.setEnabled(false);
+
       this.memory.set(`4_${detailMesh.name}_D`, detailMesh);
     }
 
@@ -342,6 +328,8 @@ export class Network {
       highDetailMesh.annMeta = metadata;
       //@ts-ignore
       highDetailMesh.annMeta.visible = false;
+
+      highDetailMesh.setEnabled(false);
 
       this.memory.set(`4_${highDetailMesh.name}_D`, highDetailMesh);
     }
