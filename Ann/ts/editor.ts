@@ -29,28 +29,28 @@ const layer0: LayerData = {
   id: 1,
   pos: new Float32Array([0, 0, 0]),
   shape: new Uint32Array([1, 28, 28]),
-  ids: new Float64Array(784)
+  ids: undefined
 };
 
 const layer1: LayerData = {
   id: 2,
   pos: new Float32Array([40, 0, 0]),
   shape: new Uint32Array([1, 8, 8]),
-  ids: new Float64Array(64)
+  ids: undefined
 };
 
 const layer2: LayerData = {
   id: 3,
   pos: new Float32Array([70, 0, 0]),
   shape: new Uint32Array([1, 4, 4]),
-  ids: new Float64Array(16)
+  ids: undefined
 };
 
 const layer3: LayerData = {
   id: 4,
   pos: new Float32Array([95, 0, 0]),
   shape: new Uint32Array([1, 10, 1]),
-  ids: new Float64Array(10)
+  ids: undefined
 };
 
 net.newLayer(layer0);

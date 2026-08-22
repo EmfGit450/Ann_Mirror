@@ -135,9 +135,9 @@ export class Network {
     const sy = batch.pos[1]! - ((batch.shape[1]! - 1) * NEURON_SPACING) / 2;
     const sz = batch.pos[2]! - ((batch.shape[2]! - 1) * NEURON_SPACING) / 2;
 
-    const idsUndefined = batch.ids ? true : false;
+    const idsUndefined = batch.ids === undefined ? true : false;
     
-    const thinInstanceMatrix = new Float32Array(idsUndefined ? batch.ids!.length * 16 : (batch.shape[0]! * batch.shape[1]! * batch.shape[2]!) * 16);
+    const thinInstanceMatrix = new Float32Array(idsUndefined ? (batch.shape[0]! * batch.shape[1]! * batch.shape[2]!) * 16 : batch.ids!.length * 16);
     
     let offset = 0;
     
