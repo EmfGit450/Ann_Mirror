@@ -60,7 +60,6 @@ export interface LayerData {
 export class Network {
   memory: Map<string, Mesh | InstancedMesh | GreasedLineMesh>;
   scene: Scene;
-  state: any;
   
   private baseNeuron: Mesh;
   
@@ -84,52 +83,37 @@ export class Network {
     this.baseNeuron.material = neuronMaterial;
     
     this.baseNeuron.setEnabled(false);
-    
-    
-    // Add to Network constructor
-this.lodState = {
-    targetFps: 45,
-    currentLevel: 2, // 0 = base only, 1 = +detail, 2 = +high
-    frameCounter: 0,
-    fpsHistory: new Float32Array(30), // 0.5s sliding window
-    historyIdx: 0
-};
 
-this.scene.registerBeforeRender(() => {
-    const fps = this.scene._engine.getFps();
-    const state = this.lodState;
-    
-    // Update sliding window every frame
-    state.fpsHistory[state.historyIdx] = fps;
-    state.historyIdx = (state.historyIdx + 1) % 30;
-    
-    // Only re-evaluate every 10 frames (~160ms) to avoid oscillation
-    state.frameCounter++;
-    if (state.frameCounter < 10) return;
-    state.frameCounter = 0;
-    
-    const avgFps = state.fpsHistory.reduce((a, b) => a + b, 0) / 30;
-    
-    // Hysteresis: drop detail if avg < 35, add back if avg > 55
-    if (avgFps < 35 && state.currentLevel > 0) {
-        state.currentLevel--;
-        console.log(`LOD drop -> ${state.currentLevel}, avgFps: ${avgFps.toFixed(1)}`);
-    } else if (avgFps > 55 && state.currentLevel < 2) {
-        state.currentLevel++;
-        console.log(`LOD rise -> ${state.currentLevel}, avgFps: ${avgFps.toFixed(1)}`);
-    }
-    
-    // Apply to all synapse batches in one pass
-    const enableDetail = state.currentLevel >= 1;
-    const enableHigh = state.currentLevel >= 2;
-    
-    this.memory.forEach((mesh, key) => {
-        if (key.includes("_D")) mesh.setEnabled(enableDetail);
-        if (key.includes("_H")) mesh.setEnabled(enableHigh);
+    this.scene.registerBeforeRender(() => {
+      const camPos = this.scene.activeCamera!.position;
+  
+      this.memory.forEach((mesh, key) => {
+        if (!mesh.annMeta?.firsts) return;
+        
+        const sc = mesh.annMeta.firsts.subarray(0, 3);
+        const tc = mesh.annMeta.firsts.subarray(3);
+        
+        const snx = Math.round(Math.max(sc[0], Math.min(camPos.x, sc[0] + (mesh.annMeta.sourceShape[0] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
+        const sny = Math.round(Math.max(sc[1], Math.min(camPos.y, sc[1] + (mesh.annMeta.sourceShape[1] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
+        const snz = Math.round(Math.max(sc[2], Math.min(camPos.z, sc[2] + (mesh.annMeta.sourceShape[2] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
+        
+        const sqreDist = (snx - camPos.x) ** 2 + (sny - camPos.y) ** 2 + (snz - camPos.z) ** 2
+        
+        
+        //Yes i have not implemented it for the target layer
+        
+        const tnx = Math.round(Math.max(sc[0], Math.min(camPos.x, sc[0] + (mesh.annMeta.targetShape[0] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
+        const tny = Math.round(Math.max(sc[1], Math.min(camPos.y, sc[1] + (mesh.annMeta.targetShape[1] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
+        const tnz = Math.round(Math.max(sc[2], Math.min(camPos.z, sc[2] + (mesh.annMeta.targetShape[2] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
+        
+
+        if (key.endsWith("_H")) {
+          mesh.setEnabled(sqreDist < 196); // 14^2
+        } else if (key.endsWith("_D")) {
+          mesh.setEnabled(sqreDist < 625); // 25^2
+        }
+      });
     });
-});
-
-
   }
   
   //0 = Layer, 1 = Neuron, 2 = Synapse, 4 = SynapseBatch
@@ -278,10 +262,10 @@ this.scene.registerBeforeRender(() => {
     console.log(`dot: ${dot_xz}, ${dot_xy}\nangle(deg): ${Math.acos(dot_xz) * DEG180BYPI}, ${Math.acos(dot_xy) * DEG180BYPI}`)
     
     const metadata = {
-      sourceCenter: layerA.pos,
-      targetCenter: layerB.pos,
-      density: undefined,
-      visible: undefined
+      firsts: new Float32Array([lAneurons[12]!, lAneurons[13]!, lAneurons[14]!, lBneurons[12]!, lBneurons[13]!, lBneurons[14]!]),
+      sourceShape: layerA.shape,
+      targetShape: layerB.shape,
+      density: undefined
     }
 
     const baseMesh = CreateGreasedLine(`4_${randInt53()}_B}`, {
@@ -309,8 +293,6 @@ this.scene.registerBeforeRender(() => {
       
       //@ts-ignore
       detailMesh.annMeta = metadata;
-      //@ts-ignore
-      detailMesh.annMeta.visible = false;
 
       detailMesh.setEnabled(false);
 
@@ -326,8 +308,6 @@ this.scene.registerBeforeRender(() => {
       
       //@ts-ignore
       highDetailMesh.annMeta = metadata;
-      //@ts-ignore
-      highDetailMesh.annMeta.visible = false;
 
       highDetailMesh.setEnabled(false);
 

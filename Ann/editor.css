@@ -59,13 +59,15 @@ button svg * {
   transition: stroke 0.3s ease;
 }
 
-button.active {
+button.click {
+  transition: 0.5s;
   background: radial-gradient(ellipse, #222, #070707);
 	box-shadow: 0.05rem 0.05rem 1rem #DCDCDC55;
 	transform: scale(1.05);
 }
 
-button.active svg * {
+button.click svg * {
+  transition: 0.5s;
   stroke: #FFF;
 }
 /*End*/
@@ -77,9 +79,12 @@ button.active svg * {
   background: #3336;
   color: #f0e5e5;
   border-radius: 1rem;
-  padding: 0.2rem;
+  margin-top: 0.6rem;
+  margin-left: 30rem;
+  padding: 0.5rem;
   text-shadow: 0 0 1rem #443838;
   z-index: 9999;
+  pointer-events: none;
   font-family: "Montserrat";
 }
 /*End*/
