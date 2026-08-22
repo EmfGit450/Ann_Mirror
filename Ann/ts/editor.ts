@@ -29,14 +29,14 @@ const layer0: LayerData = {
   id: 1,
   pos: new Float32Array([0, 0, 0]),
   shape: new Uint32Array([1, 28, 28]),
-  ids: new Float64Array(1024)
+  ids: new Float64Array(784)
 };
 
 const layer1: LayerData = {
   id: 2,
   pos: new Float32Array([40, 0, 0]),
-  shape: new Uint32Array([1, 4, 4]),
-  ids: new Float64Array(16)
+  shape: new Uint32Array([1, 8, 8]),
+  ids: new Float64Array(64)
 };
 
 const layer2: LayerData = {

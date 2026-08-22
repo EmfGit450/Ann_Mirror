@@ -207,10 +207,6 @@ export class Network {
     let skipMod = dot_xz > 0.99802 ? 2 : 1;    // ~3.5°
     skipMod = dot_xz > 0.99926  ? 3 : skipMod; // ~2.2°
     skipMod = dot_xz > 0.99965 ? 4 : skipMod;  // ~1.5°
-
-    
-    const centerV = [layerB.pos[0]! - layerA.pos[0]!, layerB.pos[1]! - layerA.pos[1]!, layerB.pos[2]! - layerA.pos[2]!]
-    const centerV_mag = Math.sqrt(centerV[0]! * centerV[0]! + centerV[1]! * centerV[1]! + centerV[2]! * centerV[2]!)
     
     let synapseCounter = 0;
 
@@ -218,12 +214,6 @@ export class Network {
       const currStart = start * 16;
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
-        
-        const source1_mag = Math.sqrt(lAneurons[currStart + 12]! * lAneurons[currStart + 12]! + lAneurons[currStart + 13]! * lAneurons[currStart + 13]! + lAneurons[currStart + 14]! * lAneurons[currStart + 14]!);
-        const source2_mag = Math.sqrt(lAneurons[currStart - 4]! * lAneurons[currStart - 4]! + lAneurons[currStart - 3]! * lAneurons[currStart - 3]! + lAneurons[currStart - 2]! * lAneurons[currStart - 2]!);
-
-        const dot1xz = (centerV[0]! * lAneurons[currStart + 12]! + centerV[1]! * lAneurons[currStart + 13]! + centerV[2]! * lAneurons[currStart + 14]!) * (1 / (centerV_mag * source1_mag));
-        const dot2xz = (centerV[0]! * lAneurons[currStart - 4]! + centerV[1]! * lAneurons[currStart - 3]! + centerV[2]! * lAneurons[currStart - 2]!) * (1 / (centerV_mag * source2_mag));
         
         const mod = synapseCounter % skipMod;
 
