@@ -183,6 +183,7 @@ export class Network {
     let base_fts: Float32Array[] = [];
     let detail_fts: Float32Array[] = [];
     let high_detail_fts: Float32Array[] = [];
+    let max_detail_fts: Float32Array[] = [];
  
     //lxnC = layer x neuron count
     const lAnC = layerA.shape[0]! * layerA.shape[1]! * layerA.shape[2]!
@@ -248,7 +249,7 @@ export class Network {
           ]));
         }
         else {
-          high_detail_fts.push(new Float32Array([
+          max_detail_fts.push(new Float32Array([
             lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
             lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
             lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
@@ -314,7 +315,22 @@ export class Network {
       this.memory.set(`4_${highDetailMesh.name}_D`, highDetailMesh);
     }
 
-    console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}`)
+    if (max_detail_fts.length > 0) {
+      const maxDetailMesh = CreateGreasedLine(`4_${randInt53()}_H`, {
+        points: max_detail_fts
+      }, {
+        width: 0.02
+      }, this.scene);
+      
+      //@ts-ignore
+      maxDetailMesh.annMeta = metadata;
+
+      maxDetailMesh.setEnabled(false);
+
+      this.memory.set(`4_${maxDetailMesh.name}_X`, maxDetailMesh);
+    }
+
+    console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`)
   }
   
 }
