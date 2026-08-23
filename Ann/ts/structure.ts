@@ -203,14 +203,16 @@ export class Network {
 
     const dot_xz = (vRef[0]! * vXZ[0]! + vRef[1]! * vXZ[1]! + vRef[2]! * vXZ[2]!) * (1 / (vRef_mag * vXZ_mag));
     const dot_xy = (vRef[0]! * vXY[0]! + vRef[1]! * vXY[1]! + vRef[2]! * vXY[2]!) * (1 / (vRef_mag * vXY_mag));
+    
+    const maxDensity = Math.max(dot_xz, dot_xy);
 
-    let skipMod = dot_xz > 0.99802 ? 2 : 1;    // ~3.5°
-    skipMod = dot_xz > 0.99926  ? 3 : skipMod; // ~2.2°
-    skipMod = dot_xz > 0.99965 ? 4 : skipMod;  // ~1.5°
+    let skipMod = maxDensity > 0.99802 ? 2 : 1;    // ~3.5°
+    skipMod = maxDensity > 0.999105  ? 3 : skipMod; // ~2.4°
+    skipMod = maxDensity > 0.99965 ? 4 : skipMod;  // ~1.5°
     
     let synapseCounter = 0;
 
-    for (let start = 1; start < lAnC; start += 2) {
+    for (let start = 1; start < lAnC; start++) {
       const currStart = start * 16;
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
@@ -259,7 +261,9 @@ export class Network {
       density: undefined
     }
 
-    const baseMesh = CreateGreasedLine(`4_${randInt53()}_B}`, {
+    const meshId = randInt53();
+
+    const baseMesh = CreateGreasedLine(`4_${meshId}_B}`, {
       points: base_fts
     }, {
       width: 0.02
@@ -276,7 +280,7 @@ export class Network {
     this.memory.set(`4_${baseMesh.name}_B`, baseMesh);
     
     if (detail_fts.length > 0) {
-      const detailMesh = CreateGreasedLine(`4_${randInt53()}_D`, {
+      const detailMesh = CreateGreasedLine(`4_${meshId}_D`, {
         points: detail_fts
       }, {
         width: 0.02
@@ -291,7 +295,7 @@ export class Network {
     }
 
     if (high_detail_fts.length > 0) {
-      const highDetailMesh = CreateGreasedLine(`4_${randInt53()}_H`, {
+      const highDetailMesh = CreateGreasedLine(`4_${meshId}_H`, {
         points: high_detail_fts
       }, {
         width: 0.02
@@ -302,11 +306,11 @@ export class Network {
 
       highDetailMesh.setEnabled(false);
 
-      this.memory.set(`4_${highDetailMesh.name}_D`, highDetailMesh);
+      this.memory.set(`4_${highDetailMesh.name}_X`, highDetailMesh);
     }
 
     if (max_detail_fts.length > 0) {
-      const maxDetailMesh = CreateGreasedLine(`4_${randInt53()}_H`, {
+      const maxDetailMesh = CreateGreasedLine(`4_${meshId}_X`, {
         points: max_detail_fts
       }, {
         width: 0.02
