@@ -5,142 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ann</title>
 
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	  <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
-
-    <style> 
-		@keyframes fade-in {
-		  0% { opacity: 0; transform: translateY(-30%); }
-		  25% { opacity: 0; }
-		  50% { opacity: 0.75; }
-		  80% { opacity: 0.9; }
-		  100% { opacity: 1; }
-		}
-		
-		@keyframes fade-in-up {
-		  0% { opacity: 0; transform: translateY(30%); }
-		  25% { opacity: 0; }
-		  50% { opacity: 0.75; }
-		  80% { opacity: 0.9; }
-		  100% { opacity: 1; transform: translateY(0); }
-		}
-		
-		@keyframes fade-in-left {
-		  0% { opacity: 0; transform: translateX(-10%); }
-		  25% { opacity: 0; }
-		  50% { opacity: 0.1; }
-		  80% { opacity: 0.9; }
-		  100% { opacity: 1; transform: translateX(0); }
-		}
-
-        @keyframes blink-text {
-          0% { text-shadow: 0 0 1rem #ffffff59; }
-         50% { text-shadow: 0 0 1rem #ffffff; }
-         100% { text-shadow: 0 0 1rem #ffffff59; }
-        }
-		  
-		* {
-		  -webkit-tap-highlight-color: transparent;
-		  outline: none;
-		  box-sizing: border-box;
-		}
-		  
-		html, body {
-		  margin: 0;
-          padding: 0;
-          height: 100%;
-          width: 100%;
-		}
-	    body {
-		  background: black;
-		  padding: 4rem;
-		  font-family: "Montserrat", Monospace;
-		  color: white;
-	    }
-	    
-	    header {
-	      text-shadow: 0 0 1rem #ffffff59;
-	      font-size: 4.2rem;
-	      animation: 
-            fade-in 1.2s linear,
-            blink-text 1.3s ease-in-out 1.2s;
-	    }
-	    p {
-	      text-shadow: 0 0 1rem #ffffff59;
-	      font-size: 2.4rem;
-	      animation: 
-            fade-in-left 1s ease-out,
-            blink-text 1.3s ease-in-out 1s;
-	    }
-	    
-	    nav {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          row-gap: 2rem;
-          justify-items: center;
-          align-items: center;
-        }
-		.main-links {
-		  margin-top: 2rem;
-		}
-	    
-	    nav a {
-		  user-select: none;
-	  	  text-decoration: none;
-		  
-  		  animation: fade-in 1.3s ease-out;
-
-		  transition: 0.3s;
-	  	  box-shadow: 0 0 1rem #111111;
-		  background: linear-gradient(51deg, #090909, #151515);
-	  	  color: white;
-		  width: 100%;
-		  max-width: 24rem;
-		  padding: 1.1rem;
-		  border-radius: 1rem;
-		  font-size: 2.5rem;
-	    }
-	    nav a:nth-child(3), nav a:nth-child(4) {
-	      animation: fade-in-up 1.3s ease-out;
-	    }
-	    nav a:hover, a:active {
-  		  transition: 0.3s ease-in-out;
-		  background: linear-gradient(51deg, #BBBBBB, #EFEFEF);
-	  	  box-shadow: 0 0 1rem #D1D1D1;
-		  color: black;
-		  transform: scale(1.04);
-		}
-
-	  	@media (max-width: 940px) {
-          nav a {
-		    font-size: 2rem;
-		    max-width: 19rem;
-	      }
-		  p {
-		    font-size: 2rem;
-		  }
-        }
-		@media (max-width: 760px) {
-		  nav {
-			grid-template-columns: repeat(1, 1fr);
-			justify-items: start;
-			align-items: start;
-		  }
-		  body {
-			padding: 2rem;
-		  }
-		}
-    </style>
+      
+  	<link rel="stylesheet" href="./index.css" />
   </head>
   <body>
     <header>Ann</header>
-    <p>A tool to create, train, infer, and inspect multi-layer perceptrons visually.</p>
+    <p class="description"></p>
     <nav class="main-links">
-      <a target="_blank" href="editor.html">Editor</a>
+      <a target="_blank" href="Ann/editor.html">Editor</a>
       <a target="_blank" href="https://gitlab.com/EmfGit450/ann">Code</a>
-	  <a target="_blank" href="docs.html">Documentation</a>
+	    <a target="_blank" href="docs.html">Documentation</a>
       <a target="_blank" href="dev.html">Development</a>
     </nav>
   </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/TextPlugin.min.js"></script>
+
+  <script src="./index.js"></script>
 </html>

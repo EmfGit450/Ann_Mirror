@@ -1,0 +1,98 @@
+* {
+	-webkit-tap-highlight-color: transparent;
+	outline: none;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+body {
+  background: black;
+	padding: 4rem;
+  font-family: "Montserrat", Monospace;
+  color: #FFF;
+}
+
+header {
+  text-shadow: 0 0 1rem #ffffff59;
+	font-size: 4.2rem;  
+}
+
+.description {
+  text-shadow: 0 0 1rem #ffffff59;
+  font-size: 2.4rem;
+}
+.description::after {
+  content: "|";
+  animation: blink 1s 7;
+  opacity: 0;
+}
+
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.main-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 2rem;
+  justify-items: center;
+  align-items: center;
+  margin-top: 2rem;
+}
+	    
+nav a {
+  user-select: none;
+	text-decoration: none;
+
+	transition: 0.3s;
+	box-shadow: 0 0 1rem #111111;
+	background: linear-gradient(51deg, #090909, #151515);
+	color: #FFF;
+	width: 100%;
+	max-width: 24rem;
+	padding: 1.1rem;
+	border-radius: 1rem;
+  font-size: 2.5rem;
+
+  opacity: 0;
+}
+nav a:hover, a:active {
+  transition: 0.3s ease-in-out;
+	background: linear-gradient(51deg, #BBBBBB, #EFEFEF);
+	box-shadow: 0 0 1rem #D1D1D1;
+	color: black;
+	transform: scale(1.04);
+}
+
+@media (max-width: 940px) {
+  nav a {
+		font-size: 2rem;
+		max-width: 19rem;
+	}
+	
+  p {
+    font-size: 2rem;
+	}
+}
+
+@media (max-width: 760px) {
+  nav {
+		grid-template-columns: repeat(1, 1fr);
+		justify-items: start;
+		align-items: start;
+	}
+  
+	body {
+	  padding: 2rem;
+	}
+}

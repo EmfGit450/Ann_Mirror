@@ -2,8 +2,10 @@ pages:
   stage: deploy
   script:
   - mkdir -p public
-  - cp -r Ann/. public/
+  - cp -r Ann public/
   - cp index.html public/
+  - cp index.css public/
+  - cp index.js public/
   artifacts:
     paths:
       - public
