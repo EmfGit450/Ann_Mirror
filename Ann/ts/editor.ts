@@ -35,7 +35,7 @@ const layer0: LayerData = {
 const layer1: LayerData = {
   id: 2,
   pos: new Float32Array([40, 0, 0]),
-  shape: new Uint32Array([1, 8, 8]),
+  shape: new Uint32Array([1, 5, 5]),
   ids: undefined
 };
 
