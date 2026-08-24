@@ -88,30 +88,7 @@ export class Network {
       const camPos = this.scene.activeCamera!.position;
   
       this.memory.forEach((mesh, key) => {
-        if (!mesh.annMeta?.firsts) return;
         
-        const sc = mesh.annMeta.firsts.subarray(0, 3);
-        const tc = mesh.annMeta.firsts.subarray(3);
-        
-        const snx = Math.round(Math.max(sc[0], Math.min(camPos.x, sc[0] + (mesh.annMeta.sourceShape[0] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
-        const sny = Math.round(Math.max(sc[1], Math.min(camPos.y, sc[1] + (mesh.annMeta.sourceShape[1] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
-        const snz = Math.round(Math.max(sc[2], Math.min(camPos.z, sc[2] + (mesh.annMeta.sourceShape[2] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
-        
-        const sqreDist = (snx - camPos.x) ** 2 + (sny - camPos.y) ** 2 + (snz - camPos.z) ** 2
-        
-        
-        //Yes i have not implemented it for the target layer
-        
-        const tnx = Math.round(Math.max(sc[0], Math.min(camPos.x, sc[0] + (mesh.annMeta.targetShape[0] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
-        const tny = Math.round(Math.max(sc[1], Math.min(camPos.y, sc[1] + (mesh.annMeta.targetShape[1] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
-        const tnz = Math.round(Math.max(sc[2], Math.min(camPos.z, sc[2] + (mesh.annMeta.targetShape[2] - 1) * NEURON_SPACING)) / NEURON_SPACING) * NEURON_SPACING;
-        
-
-        if (key.endsWith("_H")) {
-          mesh.setEnabled(sqreDist < 196); // 14^2
-        } else if (key.endsWith("_D")) {
-          mesh.setEnabled(sqreDist < 625); // 25^2
-        }
       });
     });
   }
@@ -164,6 +141,11 @@ export class Network {
     
     masterNeuron.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16, true);
     
+    //@ts-ignore
+    masterNeuron.annMeta = {
+      shape: batch.shape
+    }
+        
     this.memory.set(`0_${batch.id}`, masterNeuron);
   }
   
@@ -325,6 +307,30 @@ export class Network {
     }
 
     console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`)
+  }
+
+
+  rebuildMeshes(dense: boolean | undefined) {
+    this.memory.forEach((mesh, key) => {
+      mesh.dispose();
+
+      if (key[0] == "0") {
+        const sx = (mesh as Mesh)!._thinInstanceDataStorage.matrixData![0];
+        const sy = (mesh as Mesh)!._thinInstanceDataStorage.matrixData![1];
+        const sz = (mesh as Mesh)!._thinInstanceDataStorage.matrixData![2];
+
+        this.newLayer({
+          id: parseInt(key.split("_")[1] as string),
+          pos: new Float32Array([
+            sx,
+            sy,
+            sz
+          ]),
+          shape: (mesh as any).annMeta.shape,
+          ids: undefined
+        })
+      }
+    });
   }
   
 }

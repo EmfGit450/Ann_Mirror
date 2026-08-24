@@ -82,25 +82,27 @@ button.click svg * {
   position: absolute;
   width: 100dvw;
   height: 100dvh;
-  background: #111111;
+  background: #0f0f0f;
   z-index: 3;
   
-  padding: 1rem;
+  padding: 2rem;
   font-family: "Montserrat";
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: #FFF;
+  text-align: center;
+  line-height: 1.5rem;
 }
 
 .small-screen-error span {
-  margin-top: 4rem;
+  margin-top: 3.5rem;
 }
 .small-screen-error svg {
   transform: scale(4.5);
 }
 /*End*/
 
-/*FPS COUNTER*/
+/*Debugger*/
 #debugger {
   font-size: 1.3rem;
   background: #3336;
@@ -108,7 +110,7 @@ button.click svg * {
   border-radius: 1rem;
   padding: 0.8rem;
   text-shadow: 0 0 1rem #443838;
-  z-index: 2;
+  z-index: 4;
   pointer-events: none;
   font-family: "Montserrat";
 }
@@ -137,6 +139,12 @@ button.click svg * {
 
   /*DEBUG*/
   display: none;
+}
+/*End*/
+
+/*Settings Menu*/
+.settings-menu {
+  background: red;
 }
 /*End*/
 

@@ -66,7 +66,7 @@ net.newDenseSynapseBatch(layer2, layer3);
 const camera = new Camera({scene: scene, canvas: canvas});
 
 engine.runRenderLoop(() => {
-  scene.render();
+  scene.render(); 
 });
 
 //Debugger Start
@@ -77,6 +77,8 @@ setInterval(() => {
 
 //@ts-ignore
 window.debug = () => net.scene;
+//@ts-ignore
+window.net = () => net;
 //Debugger End
 
 window.addEventListener("resize", () => {
