@@ -315,7 +315,7 @@ export class Network {
     
     const meshId = id ? id : randInt53();
 
-    const mesh = CreateGreasedLine(`4_${meshId}`, {
+    const mesh = CreateGreasedLine(`4_${meshId}_S`, {
       points: fts
     }, {
       width: 0.02
@@ -335,9 +335,11 @@ export class Network {
   }
   
   rebuildMeshes(options: { 
-    synapseBatchesDense: boolean | undefined,
-    synapseBatchSparsityLevel: number | undefined
+    dense: boolean | undefined,
+    sparsity: number | undefined
   }) {
+    this.scene.meshes = [];
+
     this.memory.forEach((mesh, key) => {
       if (key[0] == "0") {
         mesh.dispose();
@@ -360,21 +362,21 @@ export class Network {
         return;
       }
 
-      if (!options.synapseBatchesDense) {
+      if (!options.dense) {
         if (key.endsWith("B") ||
             key.endsWith("D") ||
             key.endsWith("H") ||
             key.endsWith("X")) this.memory.delete(key);
       }
 
-      if (options.synapseBatchesDense) {
+      if (options.dense) {
         if (key.endsWith("S")) this.memory.delete(key);
       }
 
       if (key[0] == "4") {
         const id = parseInt(key.split("_")[1] as string);
 
-        if (options.synapseBatchesDense) {
+        if (options.dense) {
           this.newDenseSynapseBatch(
             (mesh as any).annMeta.sourceLayer,
             (mesh as any).annMeta.targetLayer,
@@ -382,10 +384,17 @@ export class Network {
           );
         }
         else {
+          const sLShape = mesh.annMeta.sourceLayer.shape;
+          const tLShape = mesh.annMeta.targetLayer.shape;
+
+          const total = sLShape[0] * sLShape[1] * sLShape[2] * tLShape[0] * tLShape[1] * tLShape[2];
+
+          const sparsityPercent = options.sparsity ? options.sparsity * total : 1;
+
           this.newSparseSynapseBatch(
             (mesh as any).annMeta.sourceLayer,
             (mesh as any).annMeta.targetLayer,
-            options.synapseBatchSparsityLevel ? options.synapseBatchSparsityLevel : 1, //dummy. sparsity measure not set up
+            sparsityPercent, //dummy. sparsity measure not set up
             id
           )
         }
