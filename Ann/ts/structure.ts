@@ -10,7 +10,6 @@ import "@babylonjs/core/Meshes/thinInstanceMesh";
 
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 //IMP:
@@ -31,16 +30,6 @@ export function randInt53(): number {
   const view = new DataView(buf.buffer, buf.byteOffset);
   // Read as little-endian, handling the 7-byte limitation
   return view.getUint32(0, true) + view.getUint16(4, true) * 0x100000000 + buf[6]! * 0x10000000000;
-}
-
-export interface NeuronData {
-  id: number; 
-  pos: Float32Array;
-}
-
-export interface SynapseData {
-  id: number;
-  ft: Float32Array; //size 6 [fx, fy, fz, ex, ey, ez]
 }
 
 export interface SynapseBatchData { //one weight matrix
@@ -85,11 +74,7 @@ export class Network {
     this.baseNeuron.setEnabled(false);
 
     this.scene.registerBeforeRender(() => {
-      const camPos = this.scene.activeCamera!.position;
-  
-      this.memory.forEach((mesh, key) => {
-        
-      });
+      //LOD Mesh Enable/Disable Based On Coverage.
     });
   }
   

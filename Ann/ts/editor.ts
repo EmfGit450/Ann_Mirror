@@ -8,7 +8,7 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
-import { Network, LayerData, SynapseBatchData } from "./structure";
+import { Network, LayerData } from "./structure";
 
 import "@babylonjs/core/Meshes/instancedMesh";
 
