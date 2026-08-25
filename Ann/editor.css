@@ -112,6 +112,7 @@ button.click svg * {
   text-shadow: 0 0 1rem #443838;
   z-index: 4;
   pointer-events: none;
+  user-select: none;
   font-family: "Montserrat";
 }
 /*End*/
