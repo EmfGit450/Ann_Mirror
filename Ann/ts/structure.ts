@@ -93,14 +93,7 @@ export class Network {
     });
   }
   
-  //0 = Layer, 1 = Neuron, 2 = Synapse, 4 = SynapseBatch
-  newNeuron(data: NeuronData) {
-    const mesh = this.baseNeuron.createInstance(`1_${data.id}`);
-    mesh.position = new Vector3(data.pos[0], data.pos[1], data.pos[2]);
-    
-    this.memory.set(`1_${data.id}`, mesh);
-  }
-  
+  //0 = Layer, 4 = SynapseBatch  
   newLayer(batch: LayerData) {
     const masterNeuron = CreateSphere(`0_${batch.id}`, {
       diameter: 2,
@@ -150,17 +143,6 @@ export class Network {
 
     return masterNeuron;
   }
-  
-  newSynapse(data: SynapseData) {
-    const mesh = CreateGreasedLine(`2_${data.id}`, {
-      points: data.ft
-    }, {
-      color: new Color3(1, 1, 1),
-      width: 0.03
-    },  this.scene) as GreasedLineMesh;
-    
-    this.memory.set(`2_${data.id}`, mesh);
-  }
 
   newDenseSynapseBatch(layerA: LayerData, layerB: LayerData, id: number | undefined) {
     //NO ID CONFIG FOR NOW, ONLY PERFORMANCE TESTING
@@ -193,15 +175,13 @@ export class Network {
     let skipMod = maxDensity > 0.99802 ? 2 : 1;    // ~3.5°
     skipMod = maxDensity > 0.999105  ? 3 : skipMod; // ~2.4°
     skipMod = maxDensity > 0.99965 ? 4 : skipMod;  // ~1.5°
-    
-    let synapseCounter = 0;
 
     for (let start = 1; start < lAnC; start++) {
       const currStart = start * 16;
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
         
-        const mod = synapseCounter % skipMod;
+        const mod = (end + start) % skipMod;
 
         if (mod == 0) {
           base_fts.push(new Float32Array([
@@ -231,8 +211,6 @@ export class Network {
             lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
           ]));
         }
-
-        synapseCounter++;
       }
     }
     
@@ -310,7 +288,7 @@ export class Network {
     console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`)
   }
   
-  newSparseSynapseBatch(layerA: LayerData, layerB: LayerData, sparsity: number, id: number | undefined) {
+  newSparseSynapseBatch(layerA: LayerData, layerB: LayerData, skipper: number, id: number | undefined) {
     let fts: Float32Array[] = [];
  
     //lxnC = layer x neuron count
@@ -332,28 +310,21 @@ export class Network {
     const dot_xz = (vRef[0]! * vXZ[0]! + vRef[1]! * vXZ[1]! + vRef[2]! * vXZ[2]!) * (1 / (vRef_mag * vXZ_mag));
     const dot_xy = (vRef[0]! * vXY[0]! + vRef[1]! * vXY[1]! + vRef[2]! * vXY[2]!) * (1 / (vRef_mag * vXY_mag));
     
-    let skipMod = sparsity == 1 ? 2 : 1
-    if (Math.max(dot_xz, dot_xy) > 0.998629535) { 
-      skipMod = sparsity == 2 ? 4 : sparsity;
-      skipMod = sparsity == 3 ? 6 : sparsity;
-    }
-
-    let synapseCounter = 0;
+    let skipMod = skipper ? skipper : 1;
 
     for (let start = 1; start < lAnC; start++) {
       const currStart = start * 16;
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
 
-        if (synapseCounter % skipMod == 0) {
+        if ((end + start) % skipMod == 0) {
           fts.push(new Float32Array([
             lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
             lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
             lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
           ]));
         }
-
-        synapseCounter++;
+        
       }
     }
     
