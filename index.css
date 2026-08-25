@@ -28,7 +28,7 @@ header {
 }
 .description::after {
   content: "|";
-  animation: blink 1s 7;
+  animation: blink 1s 9;
   opacity: 0;
 }
 

@@ -1,6 +1,0 @@
-9679968//first 64 bits - recognition header
-0//second 64 bits - version number, uint
-
-//the first 100 integers (signed integer, -9 - 9 quintillion ints)
-//are reserved for instructions(if an
-//
