@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
     y: 30
   }, {
     opacity: 1,
+    pointerEvents: "auto",
     y: 0,
     stagger: 0.2,
     duration: 0.5,

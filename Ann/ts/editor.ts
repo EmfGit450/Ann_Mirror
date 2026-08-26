@@ -42,7 +42,7 @@ const layer1: LayerData = {
 const layer2: LayerData = {
   id: 3,
   pos: new Float32Array([70, 0, 0]),
-  shape: new Uint32Array([1, 4, 4]),
+  shape: new Uint32Array([1, 10, 10]),
   ids: undefined
 };
 
@@ -58,7 +58,7 @@ net.newLayer(layer1);
 net.newLayer(layer2);
 net.newLayer(layer3);
 
-net.newSparseSynapseBatch(layer0, layer1, 30, undefined);
+net.newDenseSynapseBatch(layer0, layer1, undefined);
 net.newDenseSynapseBatch(layer1, layer2, undefined);
 net.newDenseSynapseBatch(layer2, layer3, undefined);
 //Tests End
@@ -75,8 +75,6 @@ setInterval(() => {
   Debugger.innerHTML = `fps - ${Math.round(engine.getFps())}<br>cam - rad: ${(camera.bnCamera.radius).toPrecision(4)}<br>&emsp;&emsp;&emsp;pos: { x: ${(camera.bnCamera.position.x).toPrecision(3)}, y: ${(camera.bnCamera.position.y).toPrecision(3)}, z:  ${(camera.bnCamera.position.z).toPrecision(3)} }<br>&emsp;&emsp;&emsp;target: { x: ${(camera.bnCamera.target.x).toPrecision(3)}, y: ${(camera.bnCamera.target.y).toPrecision(3)}, z: ${(camera.bnCamera.target.z).toPrecision(3)} }`;
 }, 150);
 
-//@ts-ignore
-window.debug = () => net.scene;
 //@ts-ignore
 window.net = () => net;
 //Debugger End

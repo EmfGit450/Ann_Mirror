@@ -52,6 +52,7 @@ header {
 	    
 nav a {
   user-select: none;
+  pointer-events: none;
 	text-decoration: none;
 
 	transition: 0.3s;
@@ -86,7 +87,7 @@ nav a:hover, a:active {
 }
 
 @media (max-width: 760px) {
-  nav {
+  .main-links {
 		grid-template-columns: repeat(1, 1fr);
 		justify-items: start;
 		align-items: start;

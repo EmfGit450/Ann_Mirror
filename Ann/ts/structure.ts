@@ -74,7 +74,7 @@ export class Network {
     this.baseNeuron.setEnabled(false);
 
     this.scene.registerBeforeRender(() => {
-      //LOD Mesh Enable/Disable Based On Coverage.
+      const camPos = this.scene.activeCamera?.position;
     });
   }
   
@@ -273,72 +273,12 @@ export class Network {
     console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`)
   }
   
-  newSparseSynapseBatch(layerA: LayerData, layerB: LayerData, skipper: number, id: number | undefined) {
-    let fts: Float32Array[] = [];
- 
-    //lxnC = layer x neuron count
-    const lAnC = layerA.shape[0]! * layerA.shape[1]! * layerA.shape[2]!
-    const lBnC = layerB.shape[0]! * layerB.shape[1]! * layerB.shape[2]!
-
-    const lAneurons = (this.memory.get(`0_${layerA.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
-    const lBneurons = (this.memory.get(`0_${layerB.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
-    
-    const lAZshape = layerA.shape[2]! * 16;
-    const vRef = [lBneurons[12]! - lAneurons[12]!, lBneurons[13]! - lAneurons[13]!, lBneurons[14]! - lAneurons[14]!];
-    const vXZ = [lBneurons[12]! - lAneurons[28]!, lBneurons[13]! - lAneurons[29]!, lBneurons[14]! - lAneurons[30]!];
-    const vXY = [lBneurons[12]! - lAneurons[lAZshape + 12]!, lBneurons[13]! - lAneurons[lAZshape + 13]!, lBneurons[14]! - lAneurons[lAZshape + 14]!];
-
-    const vRef_mag = Math.sqrt(vRef[0]! * vRef[0]! + vRef[1]! * vRef[1]! + vRef[2]! * vRef[2]!);
-    const vXZ_mag = Math.sqrt(vXZ[0]! * vXZ[0]! + vXZ[1]! * vXZ[1]! + vXZ[2]! * vXZ[2]!);
-    const vXY_mag = Math.sqrt(vXY[0]! * vXY[0]! + vXY[1]! * vXY[1]! + vXY[2]! * vXY[2]!);
-
-    const dot_xz = (vRef[0]! * vXZ[0]! + vRef[1]! * vXZ[1]! + vRef[2]! * vXZ[2]!) * (1 / (vRef_mag * vXZ_mag));
-    const dot_xy = (vRef[0]! * vXY[0]! + vRef[1]! * vXY[1]! + vRef[2]! * vXY[2]!) * (1 / (vRef_mag * vXY_mag));
-    
-    let skipMod = skipper ? skipper : 1;
-
-    for (let start = 1; start < lAnC; start++) {
-      const currStart = start * 16;
-      for (let end = 0; end < lBnC; end++) {
-        const currEndOff = end * 16;
-
-        if ((end + start) % skipMod == 0) {
-          fts.push(new Float32Array([
-            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
-            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
-          ]));
-        }
-        
-      }
+  rebuildMeshes() {
+    let sceneMeshLength = this.scene.meshes.length;
+    for (let i = 1; i < sceneMeshLength; i++) {
+      this.scene.meshes[i]?.dispose();
+      sceneMeshLength--;
     }
-    
-    const meshId = id ? id : randInt53();
-
-    const mesh = CreateGreasedLine(`4_${meshId}_S`, {
-      points: fts
-    }, {
-      width: 0.02
-    }, this.scene);
-
-    //@ts-ignore
-    mesh.annMeta = {
-      sourceLayer: layerA,
-      targetLayer: layerB,
-      density: {
-        xz: Math.acos(dot_xz) * DEG180BYPI,
-        xy: Math.acos(dot_xy) * DEG180BYPI
-      }
-    }
-
-    this.memory.set(`4_${meshId}_S`, mesh);
-  }
-  
-  rebuildMeshes(options: { 
-    dense: boolean | undefined,
-    sparsity: number | undefined
-  }) {
-    this.scene.meshes = [];
 
     this.memory.forEach((mesh, key) => {
       if (key[0] == "0") {
@@ -362,44 +302,14 @@ export class Network {
         return;
       }
 
-      if (!options.dense) {
-        if (key.endsWith("B") ||
-            key.endsWith("D") ||
-            key.endsWith("H") ||
-            key.endsWith("X")) this.memory.delete(key);
-      }
-
-      if (options.dense) {
-        if (key.endsWith("S")) this.memory.delete(key);
-      }
-
       if (key[0] == "4") {
-        const id = parseInt(key.split("_")[1] as string);
-
-        if (options.dense) {
-          this.newDenseSynapseBatch(
-            (mesh as any).annMeta.sourceLayer,
-            (mesh as any).annMeta.targetLayer,
-            id
-          );
-        }
-        else {
-          const sLShape = mesh.annMeta.sourceLayer.shape;
-          const tLShape = mesh.annMeta.targetLayer.shape;
-
-          const total = sLShape[0] * sLShape[1] * sLShape[2] * tLShape[0] * tLShape[1] * tLShape[2];
-
-          const sparsityPercent = options.sparsity ? options.sparsity * total : 1;
-
-          this.newSparseSynapseBatch(
-            (mesh as any).annMeta.sourceLayer,
-            (mesh as any).annMeta.targetLayer,
-            sparsityPercent, //dummy. sparsity measure not set up
-            id
-          )
-        }
-
         mesh.dispose();
+
+        this.newDenseSynapseBatch(
+          (mesh as any).annMeta.sourceLayer,
+          (mesh as any).annMeta.targetLayer,
+          parseInt(key.split("_")[1] as string)
+        );
       }
     });
   }
