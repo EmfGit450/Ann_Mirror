@@ -120,7 +120,7 @@ export class Network {
     return masterNeuron;
   }
 
-  newDenseSynapseBatch(layerA_id: LayerData, layerB_id: LayerData, id: number | undefined) {
+  newDenseSynapseBatch(layerA_id: number, layerB_id: number, id: number | undefined) {
     let base_fts: Float32Array[] = [];
     let detail_fts: Float32Array[] = [];
     let high_detail_fts: Float32Array[] = [];
