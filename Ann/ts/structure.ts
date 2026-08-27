@@ -41,8 +41,8 @@ export interface SynapseBatchData { //one weight matrix
 
 export interface LayerData {
   id: number;
-  pos: Float32Array;
-  shape: Uint32Array; //Tensor visual thing
+  pos: number[];
+  shape: number[]; //Tensor visual thing
   ids: Float64Array | undefined; //child neuron ids
 }
 
@@ -120,21 +120,26 @@ export class Network {
     return masterNeuron;
   }
 
-  newDenseSynapseBatch(layerA: LayerData, layerB: LayerData, id: number | undefined) {
-    //NO ID CONFIG FOR NOW, ONLY PERFORMANCE TESTING
+  newDenseSynapseBatch(layerA_id: LayerData, layerB_id: LayerData, id: number | undefined) {
     let base_fts: Float32Array[] = [];
     let detail_fts: Float32Array[] = [];
     let high_detail_fts: Float32Array[] = [];
     let max_detail_fts: Float32Array[] = [];
+
+    const lA = this.memory.get(`0_${layerA_id}`)! as Mesh;
+    const lB = this.memory.get(`0_${layerB_id}`)! as Mesh;
  
     //lxnC = layer x neuron count
-    const lAnC = layerA.shape[0]! * layerA.shape[1]! * layerA.shape[2]!
-    const lBnC = layerB.shape[0]! * layerB.shape[1]! * layerB.shape[2]!
+    //@ts-ignore
+    const lAnC = lA.annMeta.shape[0]! * lA.annMeta.shape[1]! * lA.annMeta.shape[2]!
+    //@ts-ignore
+    const lBnC = lB.annMeta.shape[0]! * lB.annMeta.shape[1]! * lB.annMeta.shape[2]!
 
-    const lAneurons = (this.memory.get(`0_${layerA.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
-    const lBneurons = (this.memory.get(`0_${layerB.id}`)! as Mesh)._thinInstanceDataStorage.matrixData!;
+    const lAneurons = lA._thinInstanceDataStorage.matrixData!;
+    const lBneurons = lB._thinInstanceDataStorage.matrixData!;
     
-    const lAZshape = layerA.shape[2]! * 16;
+    //@ts-ignore
+    const lAZshape = lA.annMeta.shape[2]! * 16;
     const vRef = [lBneurons[12]! - lAneurons[12]!, lBneurons[13]! - lAneurons[13]!, lBneurons[14]! - lAneurons[14]!];
     const vXZ = [lBneurons[12]! - lAneurons[28]!, lBneurons[13]! - lAneurons[29]!, lBneurons[14]! - lAneurons[30]!];
     const vXY = [lBneurons[12]! - lAneurons[lAZshape + 12]!, lBneurons[13]! - lAneurons[lAZshape + 13]!, lBneurons[14]! - lAneurons[lAZshape + 14]!];
@@ -193,8 +198,8 @@ export class Network {
     console.log(`dot: ${dot_xz}, ${dot_xy}\nangle(deg): ${Math.acos(dot_xz) * DEG180BYPI}, ${Math.acos(dot_xy) * DEG180BYPI}`)
     
     const metadata = {
-      sourceLayer: layerA,
-      targetLayer: layerB,
+      sourceLayer: `0_${layerA_id}`,
+      targetLayer: `0_${layerB_id}`,
       density: undefined
     }
 
@@ -260,13 +265,12 @@ export class Network {
 
       this.memory.set(`4_${meshId}_X`, maxDetailMesh);
     }
-
+    
+    //DEBUG
     console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`)
   }
   
   rebuildMeshes() {
-    console.log("Before rebuild\nnet.memory:\n", this.memory, "net.scene.meshes:\n", this.scene.meshes);
-
     for (let i = 0; i < this.scene.meshes.length; i++) {
       this.scene.meshes[i]?.dispose();
     }
@@ -281,11 +285,11 @@ export class Network {
         
         this.newLayer({
           id: parseInt(key.split("_")[1] as string),
-          pos: new Float32Array([
+          pos: [
             sx! + ( ((mesh as any).annMeta.shape[0] - 1) * NEURON_SPACING) / 2,
             sy! + ( ((mesh as any).annMeta.shape[1] - 1) * NEURON_SPACING) / 2,
             sz! + ( ((mesh as any).annMeta.shape[2] - 1) * NEURON_SPACING) / 2
-          ]),
+          ],
           shape: (mesh as any).annMeta.shape,
           ids: undefined
         });
@@ -309,8 +313,6 @@ export class Network {
         );
       }
     });
-
-    console.log("After rebuild\nnet.memory:\n", this.memory, "net.scene.meshes:\n", this.scene.meshes);
   }
   
 }

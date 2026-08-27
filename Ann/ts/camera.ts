@@ -38,11 +38,4 @@ export class Camera {
     this.bnCamera.wheelPrecision = 10;
     this.bnCamera.panningSensibility = 200;
   }
-  
-  /*toggleDim() {
-    this.bnCamera.lowerBetaLimit = 1.5707963267;
-    this.bnCamera.upperBetaLimit = 1.5707963267;
-    this.bnCamera.lowerAlphaLimit = -1.5707963267;
-    this.bnCamera.upperAlphaLimit = -1.5707963267;
-  }*/
 }
