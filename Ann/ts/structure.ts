@@ -120,7 +120,7 @@ export class Network {
     return masterNeuron;
   }
 
-  newDenseSynapseBatch(layerA_id: number, layerB_id: number, id: number | undefined) {
+  newDenseSynapseBatch(layerA_id: number, layerB_id: number, id: number | undefined, skipModOverride: number | undefined) {
     let base_fts: Float32Array[] = [];
     let detail_fts: Float32Array[] = [];
     let high_detail_fts: Float32Array[] = [];
@@ -152,10 +152,18 @@ export class Network {
     const dot_xy = (vRef[0]! * vXY[0]! + vRef[1]! * vXY[1]! + vRef[2]! * vXY[2]!) * (1 / (vRef_mag * vXY_mag));
     
     const maxDensity = Math.max(dot_xz, dot_xy);
+    //@ts-ignore
+    const minShape = Math.min(lA.annMeta.shape[1], lB.annMeta.shape[1], lA.annMeta.shape[2], lB.annMeta.shape[2]);
 
-    let skipMod = maxDensity > 0.99802 ? 2 : 1;    // ~3.5°
-    skipMod = maxDensity > 0.999105  ? 3 : skipMod; // ~2.4°
-    skipMod = maxDensity > 0.99965 ? 4 : skipMod;  // ~1.5°
+    const densityScore = maxDensity * minShape;
+
+    let skipMod;
+    if (skipModOverride != null) skipMod = skipModOverride;
+    else {
+      skipMod = densityScore > 5 ? 2 : 1;
+      skipMod = densityScore > 10 ? 3 : skipMod;
+      skipMod = densityScore > 15 ? 4 : skipMod;
+    }
 
     for (let start = 1; start < lAnC; start++) {
       const currStart = start * 16;
@@ -171,14 +179,14 @@ export class Network {
             lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
           ]));
         }
-        else if (mod == 1) { //
+        else if (mod == 1) {
           detail_fts.push(new Float32Array([
             lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
             lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
             lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
           ]));
         }
-        else if (mod == 2) { //
+        else if (mod == 2) {
           high_detail_fts.push(new Float32Array([
             lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
             lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
@@ -194,8 +202,6 @@ export class Network {
         }
       }
     }
-    
-    console.log(`dot: ${dot_xz}, ${dot_xy}\nangle(deg): ${Math.acos(dot_xz) * DEG180BYPI}, ${Math.acos(dot_xy) * DEG180BYPI}`)
     
     const metadata = {
       sourceLayer: `0_${layerA_id}`,
@@ -214,10 +220,7 @@ export class Network {
     //@ts-ignore
     baseMesh.annMeta = metadata;
     //@ts-ignore
-    baseMesh.annMeta.density = {
-      xz: Math.acos(dot_xz) * DEG180BYPI,
-      xy: Math.acos(dot_xy) * DEG180BYPI
-    }
+    baseMesh.annMeta.density = densityScore;
 
     this.memory.set(`4_${meshId}_B`, baseMesh);
     
@@ -248,7 +251,7 @@ export class Network {
 
       highDetailMesh.setEnabled(false);
 
-      this.memory.set(`4_${meshId}_X`, highDetailMesh);
+      this.memory.set(`4_${meshId}_H`, highDetailMesh);
     }
 
     if (max_detail_fts.length > 0) {
@@ -267,7 +270,12 @@ export class Network {
     }
     
     //DEBUG
+    console.log("--------------------------");
+    console.log(`SynapseBatch ${meshId}`);
+    console.log(`dot: ${dot_xz}, ${dot_xy}\nangle(deg): ${Math.acos(dot_xz) * DEG180BYPI}, ${Math.acos(dot_xy) * DEG180BYPI}`)
+    console.log(`maxDensity: ${maxDensity}\nminShape: ${minShape}\ndensityScore: ${densityScore}`);
     console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`)
+    console.log("--------------------------");
   }
   
   rebuildMeshes() {
@@ -309,7 +317,8 @@ export class Network {
         this.newDenseSynapseBatch(
           (mesh as any).annMeta.sourceLayer,
           (mesh as any).annMeta.targetLayer,
-          parseInt(key.split("_")[1] as string)
+          parseInt(key.split("_")[1] as string),
+          undefined
         );
       }
     });

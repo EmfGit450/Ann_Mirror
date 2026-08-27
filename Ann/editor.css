@@ -113,7 +113,7 @@ button.click svg * {
   z-index: 4;
   pointer-events: none;
   user-select: none;
-  font-family: "Montserrat";
+  font-family: "Arimo", "Montserrat";
 }
 /*End*/
 

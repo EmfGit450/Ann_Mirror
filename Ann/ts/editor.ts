@@ -28,27 +28,27 @@ const net = new Network(scene);
 const layer0: LayerData = {
   id: 1,
   pos: [0, 0, 0],
-  shape: [1, 28, 28],
+  shape: [1, 14, 14],
   ids: undefined
 };
 
 const layer1: LayerData = {
   id: 2,
-  pos: [40, 0, 0],
-  shape: [1, 10, 10],
+  pos: [20, 0, 0],
+  shape: [1, 7, 7],
   ids: undefined
 };
 
 const layer2: LayerData = {
   id: 3,
-  pos: [70, 0, 0],
-  shape: [1, 6, 6],
+  pos: [40, 0, 0],
+  shape: [1, 4, 4],
   ids: undefined
 };
 
 const layer3: LayerData = {
   id: 4,
-  pos: [95, 0, 0],
+  pos: [60, 0, 0],
   shape: [1, 10, 1],
   ids: undefined
 };
@@ -58,9 +58,9 @@ net.newLayer(layer1);
 net.newLayer(layer2);
 net.newLayer(layer3);
 
-net.newDenseSynapseBatch(1, 2, 11);
-net.newDenseSynapseBatch(2, 3, 12);
-net.newDenseSynapseBatch(3, 4, 13);
+net.newDenseSynapseBatch(1, 2, 11, undefined);
+net.newDenseSynapseBatch(2, 3, 12, undefined);
+net.newDenseSynapseBatch(3, 4, 13, undefined);
 //Tests End
 
 const camera = new Camera({scene: scene, canvas: canvas});

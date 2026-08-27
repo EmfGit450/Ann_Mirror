@@ -76,7 +76,7 @@ nav a:hover, a:active {
 }
 
 @media (max-width: 940px) {
-  nav a {
+  .main-links a {
 		font-size: 2rem;
 		max-width: 19rem;
 	}
