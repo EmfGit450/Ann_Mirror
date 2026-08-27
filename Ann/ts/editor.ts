@@ -35,14 +35,14 @@ const layer0: LayerData = {
 const layer1: LayerData = {
   id: 2,
   pos: new Float32Array([40, 0, 0]),
-  shape: new Uint32Array([1, 5, 5]),
+  shape: new Uint32Array([1, 10, 10]),
   ids: undefined
 };
 
 const layer2: LayerData = {
   id: 3,
   pos: new Float32Array([70, 0, 0]),
-  shape: new Uint32Array([1, 4, 4]),
+  shape: new Uint32Array([1, 6, 6]),
   ids: undefined
 };
 
@@ -58,9 +58,9 @@ net.newLayer(layer1);
 net.newLayer(layer2);
 net.newLayer(layer3);
 
-net.newDenseSynapseBatch(layer0, layer1, undefined);
-net.newDenseSynapseBatch(layer1, layer2, undefined);
-net.newDenseSynapseBatch(layer2, layer3, undefined);
+net.newDenseSynapseBatch(layer0, layer1, 11);
+net.newDenseSynapseBatch(layer1, layer2, 12);
+net.newDenseSynapseBatch(layer2, layer3, 13);
 //Tests End
 
 const camera = new Camera({scene: scene, canvas: canvas});

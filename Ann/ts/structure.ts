@@ -50,29 +50,20 @@ export class Network {
   memory: Map<string, Mesh | InstancedMesh | GreasedLineMesh>;
   scene: Scene;
   
-  private baseNeuron: Mesh;
+  private NeuronMaterial: StandardMaterial;
   
   constructor(renderScene: Scene) {
     this.scene = renderScene;
     this.memory = new Map();
     
-    this.baseNeuron = CreateSphere("sourceNeuron", {
-      diameter: 2,
-      segments: 14
-    }, renderScene);
-    
-    const neuronMaterial = new StandardMaterial("hologramBlue", renderScene);
-    neuronMaterial.diffuseColor = new Color3(0.2, 0.6, 1.0);
-    neuronMaterial.emissiveColor = new Color3(0.05, 0.15, 0.25);
+    this.NeuronMaterial = new StandardMaterial("hologramBlue", renderScene);
+    this.NeuronMaterial.diffuseColor = new Color3(0.2, 0.6, 1.0);
+    this.NeuronMaterial.emissiveColor = new Color3(0.05, 0.15, 0.25);
 
-    neuronMaterial.specularColor = new Color3(0,0,0);
-    neuronMaterial.specularPower = 1;
-    neuronMaterial.disableLighting = false;
-   
-    this.baseNeuron.material = neuronMaterial;
+    this.NeuronMaterial.specularColor = new Color3(0,0,0);
+    this.NeuronMaterial.specularPower = 1;
+    this.NeuronMaterial.disableLighting = false;
     
-    this.baseNeuron.setEnabled(false);
-
     this.scene.registerBeforeRender(() => {
       const camPos = this.scene.activeCamera?.position;
     });
@@ -84,7 +75,7 @@ export class Network {
       diameter: 2,
       segments: 14
     }, this.scene);
-    masterNeuron.material = this.baseNeuron.material;
+    masterNeuron.material = this.NeuronMaterial;
 
     const sx = batch.pos[0]! - ((batch.shape[0]! - 1) * NEURON_SPACING) / 2;
     const sy = batch.pos[1]! - ((batch.shape[1]! - 1) * NEURON_SPACING) / 2;
@@ -274,12 +265,12 @@ export class Network {
   }
   
   rebuildMeshes() {
-    let sceneMeshLength = this.scene.meshes.length;
-    for (let i = 1; i < sceneMeshLength; i++) {
-      this.scene.meshes[i]?.dispose();
-      sceneMeshLength--;
-    }
+    console.log("Before rebuild\nnet.memory:\n", this.memory, "net.scene.meshes:\n", this.scene.meshes);
 
+    for (let i = 0; i < this.scene.meshes.length; i++) {
+      this.scene.meshes[i]?.dispose();
+    }
+    
     this.memory.forEach((mesh, key) => {
       if (key[0] == "0") {
         mesh.dispose();
@@ -301,7 +292,13 @@ export class Network {
         
         return;
       }
-
+      
+      if (key.endsWith("D") ||
+          key.endsWith("H") ||
+          key.endsWith("X")) {
+        mesh.dispose();    
+      }
+      
       if (key[0] == "4") {
         mesh.dispose();
 
@@ -312,6 +309,8 @@ export class Network {
         );
       }
     });
+
+    console.log("After rebuild\nnet.memory:\n", this.memory, "net.scene.meshes:\n", this.scene.meshes);
   }
   
 }
