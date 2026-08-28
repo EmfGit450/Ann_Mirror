@@ -164,54 +164,57 @@ export class Network {
       skipMod = densityScore > 10 ? 3 : skipMod;
       skipMod = densityScore > 15 ? 4 : skipMod;
     }
-
-    for (let start = 1; start < lAnC; start++) {
+    
+    //PROBLEM:
+    //CANNOT WORK WITH ODD NUMBER OF lAnC. ALSO
+    //FIRST lBnC neurons SKIPPED
+    for (let start = 0; start < lAnC; start += 2) {
       const currStart = start * 16;
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
         
-        const mod = (end + start) % skipMod;
+        const mod = Math.floor(Math.random() * lAnC * lBnC) % skipMod;
 
         if (mod == 0) {
           base_fts.push(new Float32Array([
             lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
             lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
+            lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //source2
           ]));
         }
         else if (mod == 1) {
           detail_fts.push(new Float32Array([
             lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
             lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
+            lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //source2
           ]));
         }
         else if (mod == 2) {
           high_detail_fts.push(new Float32Array([
             lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
             lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
+            lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //source2
           ]));
         }
         else {
           max_detail_fts.push(new Float32Array([
             lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
             lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart - 4]!, lAneurons[currStart - 3]!, lAneurons[currStart - 2]! //source2
+            lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //source2
           ]));
         }
       }
     }
     
     const metadata = {
-      sourceLayer: `0_${layerA_id}`,
-      targetLayer: `0_${layerB_id}`,
+      sourceLayerId: layerA_id,
+      targetLayerId: layerB_id,
       density: undefined
     }
 
     const meshId = id ? id : randInt53();
 
-    const baseMesh = CreateGreasedLine(`4_${meshId}_B}`, {
+    const baseMesh = CreateGreasedLine(`4_${meshId}_B`, {
       points: base_fts
     }, {
       width: 0.02
@@ -234,7 +237,7 @@ export class Network {
       //@ts-ignore
       detailMesh.annMeta = metadata;
 
-      detailMesh.setEnabled(false);
+      //detailMesh.setEnabled(false);
 
       this.memory.set(`4_${meshId}_D`, detailMesh);
     }
@@ -311,12 +314,12 @@ export class Network {
         mesh.dispose();    
       }
       
-      if (key[0] == "4") {
+      if (key.endsWith("B")) {
         mesh.dispose();
 
         this.newDenseSynapseBatch(
-          (mesh as any).annMeta.sourceLayer,
-          (mesh as any).annMeta.targetLayer,
+          (mesh as any).annMeta.sourceLayerId,
+          (mesh as any).annMeta.targetLayerId,
           parseInt(key.split("_")[1] as string),
           undefined
         );
