@@ -35,7 +35,7 @@ const layer0: LayerData = {
 const layer1: LayerData = {
   id: 2,
   pos: [20, 0, 0],
-  shape: [1, 6, 6],
+  shape: [1, 5, 5],
   ids: undefined
 };
 
