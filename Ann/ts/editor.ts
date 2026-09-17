@@ -1,3 +1,5 @@
+import { gsap } from "gsap";
+
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 
@@ -35,7 +37,7 @@ const layer0: LayerData = {
 const layer1: LayerData = {
   id: 2,
   pos: [20, 0, 0],
-  shape: [1, 5, 5],
+  shape: [1, 4, 4],
   ids: undefined
 };
 
@@ -71,9 +73,81 @@ engine.runRenderLoop(() => {
 
 //Debugger Start
 const Debugger = document.getElementById("debugger")!;
-setInterval(() => {
-  Debugger.innerHTML = `fps - ${Math.round(engine.getFps())}<br>cam - rad: ${(camera.bnCamera.radius).toPrecision(4)}<br>&emsp;&emsp;&emsp;pos: { x: ${(camera.bnCamera.position.x).toPrecision(3)}, y: ${(camera.bnCamera.position.y).toPrecision(3)}, z:  ${(camera.bnCamera.position.z).toPrecision(3)} }<br>&emsp;&emsp;&emsp;target: { x: ${(camera.bnCamera.target.x).toPrecision(3)}, y: ${(camera.bnCamera.target.y).toPrecision(3)}, z: ${(camera.bnCamera.target.z).toPrecision(3)} }`;
-}, 150);
+
+function updateDebugger() {
+  Debugger.innerHTML = `
+    <div class="debugger-top">
+      <span>fps > ${Math.round(engine.getFps())}</span>
+      
+      <button id="debugger-close">×</button>
+    </div>
+    
+    <div class="debugger-body">
+      cam > rad: ${camera.bnCamera.radius.toPrecision(4)}<br>
+      &emsp;&emsp;&emsp;pos: {
+      x: ${camera.bnCamera.position.x.toPrecision(3)},
+      y: ${camera.bnCamera.position.y.toPrecision(3)},
+      z: ${camera.bnCamera.position.z.toPrecision(3)}
+      }<br>
+      
+      &emsp;&emsp;&emsp;target: {
+      x: ${camera.bnCamera.target.x.toPrecision(3)},
+      y: ${camera.bnCamera.target.y.toPrecision(3)},
+      z: ${camera.bnCamera.target.z.toPrecision(3)}
+      }
+    </div>
+  `;
+}
+
+Debugger.addEventListener("click", (event) => {
+  const target = event.target as HTMLElement;
+
+  if (target.closest("#debugger-close")) {
+    hideDebugger();
+  }
+});
+
+let debugUpdateIntervalId: number | undefined = undefined;
+
+function showDebugger() {
+  updateDebugger();
+
+  if (debugUpdateIntervalId !== undefined) {
+    clearInterval(debugUpdateIntervalId);
+  }
+
+  debugUpdateIntervalId = setInterval(updateDebugger, 150);
+  
+  gsap.fromTo("#debugger", {
+    opacity: 0,
+    scale: 0
+  }, {
+    opacity: 1,
+    scale: 1,
+    duration: 0.7,
+    ease: "power4.inOut"
+  });
+}
+
+function hideDebugger() {
+  if (debugUpdateIntervalId !== undefined) {
+    clearInterval(debugUpdateIntervalId);
+    debugUpdateIntervalId = undefined;
+  }
+  
+  gsap.fromTo("#debugger", {
+    opacity: 1,
+    scale: 1
+  }, {
+    opacity: 0,
+    scale: 0,
+    duration: 0.7,
+    ease: "power4.inOut"
+  });
+}
+
+setTimeout(showDebugger, 1000);
+//setTimeout(hideDebugger, 8000);
 
 //@ts-ignore
 window.net = () => net;

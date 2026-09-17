@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 		  
 * {
-  --webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
 	outline: none;
 }
@@ -104,16 +104,48 @@ button.click svg * {
 
 /*Debugger*/
 #debugger {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
   font-size: 1.3rem;
+  opacity: 0;
   background: #3336;
   color: #f0e5e5;
   border-radius: 1rem;
   padding: 0.8rem;
   text-shadow: 0 0 1rem #443838;
   z-index: 4;
-  pointer-events: none;
   user-select: none;
-  font-family: "Arimo", "Montserrat";
+  font-family: "Arimo", "Montserrat", sans-serif;
+
+  /* Keep this if only the close button should be clickable */
+  pointer-events: none;
+}
+
+.debugger-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.debugger-body {
+  line-height: 1.4;
+}
+
+#debugger-close {
+  pointer-events: auto;
+  border: 0;
+  transition: 0.3s;
+  background: #e32d2d;
+  width: 1.2rem;
+  height: 1.2rem;
+  color: #000;
+  font-size: 1.3rem;
+  padding: 0;
+  cursor: pointer;
 }
 /*End*/
 
