@@ -207,6 +207,7 @@ button.click svg * {
 .top-editor {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
   margin: 1rem;
   z-index: 1;
 }
