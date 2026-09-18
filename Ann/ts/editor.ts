@@ -100,11 +100,16 @@ function updateDebugger() {
     </div>
     
     <div class="debugger-body">
-      <div class="GPU">
-        <div class="label">GPU</div>
+      <div class="Vendor">
+        <div class="label">Vendor</div>
         <div class="value">${glInfo.vendor}</div>
+      </div>
+      
+      <div class="Renderer">
+        <div class="label">Renderer</div>
         <div class="value">${glInfo.renderer}</div>
       </div>
+      
       <div class="API">
         <div class="label">API</div>
         <div class="value">${glInfo.version}</div>

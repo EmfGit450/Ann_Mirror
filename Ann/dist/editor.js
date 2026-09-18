@@ -13812,11 +13812,16 @@ max.fts.length: ${l.length}`),console.log("--------------------------")}rebuildM
     </div>
     
     <div class="debugger-body">
-      <div class="GPU">
-        <div class="label">GPU</div>
+      <div class="Vendor">
+        <div class="label">Vendor</div>
         <div class="value">${yp.vendor}</div>
+      </div>
+      
+      <div class="Renderer">
+        <div class="label">Renderer</div>
         <div class="value">${yp.renderer}</div>
       </div>
+      
       <div class="API">
         <div class="label">API</div>
         <div class="value">${yp.version}</div>

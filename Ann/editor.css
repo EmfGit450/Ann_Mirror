@@ -152,7 +152,7 @@ button.click svg * {
   border-radius: 0.5rem;
 }
 
-.performance, .GPU, .API {
+.performance, .Vendor, .Renderer, .API {
   display: flex;
   gap: 0.3rem;
 }
