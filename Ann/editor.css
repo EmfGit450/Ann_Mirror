@@ -108,16 +108,16 @@ button.click svg * {
   flex-direction: column;
   align-items: stretch;
 
-  font-size: 1.3rem;
+  font-size: 1rem;
   opacity: 0;
-  background: #3336;
+  background: #00000066;
   color: #f0e5e5;
   border-radius: 1rem;
   padding: 0.8rem;
   text-shadow: 0 0 1rem #443838;
   z-index: 4;
   user-select: none;
-  font-family: "Arimo", "Montserrat", sans-serif;
+  font-family: "IBM Plex Mono", Monospace;
 
   /* Keep this if only the close button should be clickable */
   pointer-events: none;
@@ -127,12 +127,34 @@ button.click svg * {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
   width: 100%;
   margin-bottom: 0.5rem;
 }
 
 .debugger-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   line-height: 1.4;
+}
+
+.debugger-top div.label, .debugger-body div.label {
+  background: #141414;
+  padding: 0.3rem;
+  border-radius: 0.5rem;
+  margin-right: 0.2rem;
+}
+
+.debugger-top div.value, .debugger-body div.value {
+  background: #333;
+  padding: 0.3rem;
+  border-radius: 0.5rem;
+}
+
+.performance, .GPU, .API {
+  display: flex;
+  gap: 0.3rem;
 }
 
 #debugger-close {

@@ -71,33 +71,49 @@ engine.runRenderLoop(() => {
   scene.render(); 
 });
 
+let lastFrameTime = performance.now();
+let frameDelta: number | null = null;
+
+scene.onBeforeRenderObservable.add(() => {
+  const now = performance.now();
+  frameDelta = now - lastFrameTime;
+  lastFrameTime = now;
+});
+
 //Debugger Start
 const Debugger = document.getElementById("debugger")!;
 
+let glInfo = null;
+
 function updateDebugger() {
+  glInfo = engine.getGlInfo();
+  
   Debugger.innerHTML = `
     <div class="debugger-top">
-      <span>fps > ${Math.round(engine.getFps())}</span>
+      <div class="performance">
+        <div class="label">Performance</div>
+        <div style="display: inline-block;" class="value">${Math.round(engine.getFps())} fps</div>
+        <div class="value">∆ ${frameDelta.toFixed(2)}ms</div>
+      </div>
       
       <button id="debugger-close">×</button>
     </div>
     
     <div class="debugger-body">
-      cam > rad: ${camera.bnCamera.radius.toPrecision(4)}<br>
-      &emsp;&emsp;&emsp;pos: {
-      x: ${camera.bnCamera.position.x.toPrecision(3)},
-      y: ${camera.bnCamera.position.y.toPrecision(3)},
-      z: ${camera.bnCamera.position.z.toPrecision(3)}
-      }<br>
-      
-      &emsp;&emsp;&emsp;target: {
-      x: ${camera.bnCamera.target.x.toPrecision(3)},
-      y: ${camera.bnCamera.target.y.toPrecision(3)},
-      z: ${camera.bnCamera.target.z.toPrecision(3)}
-      }
+      <div class="GPU">
+        <div class="label">GPU</div>
+        <div class="value">${glInfo.vendor}</div>
+        <div class="value">${glInfo.renderer}</div>
+      </div>
+      <div class="API">
+        <div class="label">API</div>
+        <div class="value">${glInfo.version}</div>
+      </div>
     </div>
   `;
 }
+
+console.log(engine.getGlInfo());
 
 Debugger.addEventListener("click", (event) => {
   const target = event.target as HTMLElement;
