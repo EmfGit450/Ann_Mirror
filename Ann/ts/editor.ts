@@ -81,12 +81,52 @@ scene.onBeforeRenderObservable.add(() => {
 });
 
 //Debugger Start
+async function getWebGPUInfo() {
+  if (!navigator.gpu) {
+    return null;
+  }
+
+  const adapter = await navigator.gpu.requestAdapter();
+
+  if (!adapter) {
+    return null;
+  }
+
+  const info = adapter.info;
+
+  return {
+    vendor: info.vendor || "Unavailable",
+    renderer: info.device || info.description || "Unavailable",
+  };
+}
+
+async function getGraphicsInfo() {
+  if (engine.isWebGPU) {
+    const info = await getWebGPUInfo();
+
+    return {
+      api: "WebGPU",
+      vendor: info?.vendor ?? "Unavailable",
+      renderer: info?.renderer ?? "Unavailable"
+    };
+  }
+
+  const info = engine.getGlInfo();
+
+  return {
+    api: `WebGL ${engine.webGLVersion}`,
+    vendor: info.vendor,
+    renderer: info.renderer
+  };
+}
+
+
 const Debugger = document.getElementById("debugger")!;
 
-let glInfo = null;
+let hardwareInfo = null;
 
 function updateDebugger() {
-  glInfo = engine.getGlInfo();
+  hardwareInfo = getGraphicsInfo();
   
   Debugger.innerHTML = `
     <div class="debugger-top">
@@ -102,17 +142,17 @@ function updateDebugger() {
     <div class="debugger-body">
       <div class="Vendor">
         <div class="label">Vendor</div>
-        <div class="value">${glInfo.vendor}</div>
+        <div class="value">${hardwareInfo.vendor}</div>
       </div>
       
       <div class="Renderer">
         <div class="label">Renderer</div>
-        <div class="value">${glInfo.renderer}</div>
+        <div class="value">${hardwareInfo.renderer}</div>
       </div>
       
       <div class="API">
         <div class="label">API</div>
-        <div class="value">${glInfo.version}</div>
+        <div class="value">${hardwareInfo.api}</div>
       </div>
     </div>
   `;
