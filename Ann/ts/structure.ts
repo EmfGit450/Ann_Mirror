@@ -65,7 +65,7 @@ export class Network {
     this.NeuronMaterial.disableLighting = false;
     
     this.scene.registerBeforeRender(() => {
-      const camPos = this.scene.activeCamera?.position;
+      
     });
   }
   

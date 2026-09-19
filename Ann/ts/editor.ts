@@ -55,65 +55,36 @@ async function getWebGPUInfo() {
   };
 }
 
-async function getGraphicsInfo() {
-  if (engine.isWebGPU) {
+async function showGraphicsInfo() {
+  if (engine?.isWebGPU) {
     const info = await getWebGPUInfo();
 
-    return {
-      api: "WebGPU",
-      vendor: info?.vendor ?? "Unavailable",
-      renderer: info?.renderer ?? "Unavailable"
-    };
+    document.getElementById("debugger-vendor")!.textContent = info?.vendor ?? "Unavailable";
+    document.getElementById("debugger-renderer")!.textContent = info?.renderer ?? "Unavailable";
+    document.getElementById("debugger-api")!.textContent = "WebGPU";
+
+    return;
   }
 
-  const info = engine.getGlInfo();
+  const info = (engine as Engine).getGlInfo();
 
-  return {
-    api: `WebGL ${engine.webGLVersion}`,
-    vendor: info.vendor,
-    renderer: info.renderer
-  };
+  document.getElementById("debugger-vendor")!.textContent = info.vendor;
+  document.getElementById("debugger-renderer")!.textContent = info.renderer;
+  document.getElementById("debugger-api")!.textContent = `WebGL ${(engine as Engine).webGLVersion}`;
 }
 //Init End
 
 //Debugger Start
 const Debugger = document.getElementById("debugger")!;
+
+const PerformanceDebug = document.querySelector(".performance")!;
   
-let hardwareInfo = null;
 let debugUpdateIntervalId: number | undefined = undefined;
 let frameDelta: number | null = null;
 
-async function updateDebugger() {
-  hardwareInfo = await getGraphicsInfo();
-  
-  Debugger.innerHTML = `
-    <div class="debugger-top">
-      <div class="performance">
-        <div class="label">Performance</div>
-        <div style="display: inline-block;" class="value">${Math.round(engine.getFps())} fps</div>
-        <div class="value">∆ ${frameDelta.toFixed(2)}ms</div>
-      </div>
-      
-      <button id="debugger-close">×</button>
-    </div>
-    
-    <div class="debugger-body">
-      <div class="Vendor">
-        <div class="label">Vendor</div>
-        <div class="value">${hardwareInfo.vendor}</div>
-      </div>
-      
-      <div class="Renderer">
-        <div class="label">Renderer</div>
-        <div class="value">${hardwareInfo.renderer}</div>
-      </div>
-      
-      <div class="API">
-        <div class="label">API</div>
-        <div class="value">${hardwareInfo.api}</div>
-      </div>
-    </div>
-  `;
+function updateDebugger() {
+  PerformanceDebug.children[1]!.textContent = `${Math.round(engine?.getFps() as number)} fps`;
+  PerformanceDebug.children[2]!.textContent = `∆ ${frameDelta?.toFixed(2)}ms`;
 }
 
 function showDebugger() {
@@ -126,12 +97,10 @@ function showDebugger() {
   debugUpdateIntervalId = setInterval(updateDebugger, 150);
   
   gsap.fromTo("#debugger", {
-    opacity: 0,
     scale: 0
   }, {
-    opacity: 1,
     scale: 1,
-    duration: 0.7,
+    duration: 0.3,
     ease: "power4.inOut"
   });
 }
@@ -143,12 +112,10 @@ function hideDebugger() {
   }
   
   gsap.fromTo("#debugger", {
-    opacity: 1,
     scale: 1
   }, {
-    opacity: 0,
     scale: 0,
-    duration: 0.7,
+    duration: 0.3,
     ease: "power4.inOut"
   });
 }
@@ -160,8 +127,6 @@ async function Main() {
   const scene = new Scene(engine);
   
   scene.clearColor = new Color4(0.01, 0.01, 0.01, 1);
-  
-  if (!engine.isWebGPU) console.warn("This website requires WebGPU for functionality");
   
   new HemisphericLight("light", new Vector3(0, 80, 0), scene);
   
@@ -205,8 +170,8 @@ async function Main() {
   net.newDenseSynapseBatch(2, 3, 12, undefined);
   net.newDenseSynapseBatch(3, 4, 13, undefined);
   //Tests End
-
-  const camera = new Camera({scene: scene, canvas: canvas});
+  
+  new Camera({scene: scene, canvas: canvas});
 
   engine.runRenderLoop(() => {
     scene.render(); 
@@ -228,16 +193,17 @@ async function Main() {
       hideDebugger();
     }
   });
+
+  await showGraphicsInfo()
   
   setTimeout(showDebugger, 1000);
-  //setTimeout(hideDebugger, 8000);
 
   //@ts-ignore
   window.net = () => net;
   //Debugger End
 
   window.addEventListener("resize", () => {
-    engine.resize();
+    engine?.resize();
   });
 }
 Main();

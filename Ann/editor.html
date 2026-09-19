@@ -13,7 +13,7 @@
   </head>
   <body>
    <div id="general-modal">
-     Multilayer Perceptrons.
+     Multilayer Perceptrons. yes this is incomplete work
    </div>
      <div class="small-screen-error">
 	    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round" class="feather feather-smartphone">
@@ -23,7 +23,7 @@
 
 		<span>The screen size of this device is insufficient to display this content properly</span>
 	 </div>
-	 <div class="main-c">
+	 < class="main-c">
 		 <div class="top-editor">
 		     <button id="code-editor">
 		        <svg viewBox="0 0 24 24">
@@ -33,7 +33,34 @@
 		     </button>
 
          <div id="debugger">
-           <!-- Injected by editor.js -->
+           <div class="debugger-top">
+             <div class="performance">
+               <div class="label">Performance</div>
+               <!-- Values updated by editor.js -->
+               <div id="debugger-fps" class="value"></div>
+               <div id="debugger-deltaFrameTime" class="value"></div>
+             </div>
+      
+             <button id="debugger-close-btn">×</button>
+           </div>
+
+           <div class="debugger-body">
+             <!-- Values injected by editor.js -->
+             <div class="Vendor">
+               <div class="label">Vendor</div>
+               <div id="debugger-vendor" class="value"></div>
+             </div>
+      
+             <div class="Renderer">
+               <div class="label">Renderer</div>
+               <div id="debugger-renderer" class="value"></div>
+             </div>
+      
+             <div class="API">
+               <div class="label">API</div>
+               <div id="debugger-api" class="value"></div>
+             </div>
+           </div>
    			 </div>
 
 		     <button id="editor-settings"> <!-- path from feathericons.com -->
@@ -43,16 +70,11 @@
 		        </svg>
 		     </button>
 		 </div>
-		 
-         <div class="settings-menu">
-
-		 </div>
          
 		 <div class="babylonjs-canvas">
 		   <canvas id="mainCanvas"></canvas>
 		 </div>
 		   
-	   </div>
 	 </div>
 	 
    <script type="module" src="dist/editor.js"></script>

@@ -109,18 +109,15 @@ button.click svg * {
   align-items: stretch;
 
   font-size: 1rem;
-  opacity: 0;
   background: #00000066;
   color: #f0e5e5;
   border-radius: 1rem;
   padding: 0.8rem;
   text-shadow: 0 0 1rem #443838;
   z-index: 4;
-  user-select: none;
   font-family: "IBM Plex Mono", Monospace;
 
-  /* Keep this if only the close button should be clickable */
-  pointer-events: none;
+  scale: 0;
 }
 
 .debugger-top {
@@ -152,13 +149,17 @@ button.click svg * {
   border-radius: 0.5rem;
 }
 
+.performance {
+  user-select: none;
+}
 .performance, .Vendor, .Renderer, .API {
   display: flex;
   gap: 0.3rem;
 }
 
-#debugger-close {
+#debugger-close-btn {
   pointer-events: auto;
+  user-select: none;
   border: 0;
   transition: 0.3s;
   background: #e32d2d;
