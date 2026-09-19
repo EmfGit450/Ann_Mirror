@@ -189,7 +189,7 @@ async function Main() {
   Debugger.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
     
-    if (target.closest("#debugger-close")) {
+    if (target.closest("#debugger-close-btn")) {
       hideDebugger();
     }
   });
