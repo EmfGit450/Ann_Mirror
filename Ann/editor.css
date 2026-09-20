@@ -162,9 +162,8 @@ button.click svg * {
   user-select: none;
   border: 0;
   transition: 0.3s;
-  background: #e32d2d;
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.4rem;
+  height: 1.4rem;
   color: #000;
   font-size: 1.3rem;
   padding: 0;

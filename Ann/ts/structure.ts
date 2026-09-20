@@ -4,7 +4,6 @@ import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
 import { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineMesh";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
 
@@ -33,26 +32,38 @@ export function randInt53(): number {
 }
 
 export interface SynapseBatchData { //one weight matrix
-  id: number;
-  ids: Float64Array;
-  fts: Float32Array[]; //[fx, fy, fz, ex, ey, ez, ...]
-  ftshape: Float32Array; //[fx, fy, fz, tx, ty, tz]
+  id: number | undefined;
+  ids: Float64Array | undefined;
+  from: number;
+  to: number
 }
 
 export interface LayerData {
-  id: number;
+  id: number | undefined;
   pos: number[];
   shape: number[]; //Tensor visual thing
   ids: Float64Array | undefined; //child neuron ids
 }
 
+interface NetworkData {
+  layers: LayerData[];
+  synapseBatches: SynapseBatchData[];
+}
+
 export class Network {
-  memory: Map<string, Mesh | InstancedMesh | GreasedLineMesh>;
+  networkData: NetworkData | undefined;
+  
+  memory: Map<string, Mesh | GreasedLineMesh>;
   scene: Scene;
   
   private NeuronMaterial: StandardMaterial;
   
   constructor(renderScene: Scene) {
+    this.networkData = { 
+      layers: [], 
+      synapseBatches: [] 
+    }
+    
     this.scene = renderScene;
     this.memory = new Map();
     
@@ -71,7 +82,9 @@ export class Network {
   
   //0 = Layer, 4 = SynapseBatch  
   newLayer(batch: LayerData) {
-    const masterNeuron = CreateSphere(`0_${batch.id}`, {
+    const meshId = batch.id ?? randInt53();
+    
+    const masterNeuron = CreateSphere(`0_${meshId}`, {
       diameter: 2,
       segments: 14
     }, this.scene);
@@ -115,7 +128,14 @@ export class Network {
       shape: batch.shape
     }
         
-    this.memory.set(`0_${batch.id}`, masterNeuron);
+    this.memory.set(`0_${meshId}`, masterNeuron);
+
+    this.networkData!.layers.push({
+      id: meshId,
+      pos: batch.pos,
+      shape: batch.shape,
+      ids: idsUndefined ? undefined : batch.ids
+    })
 
     return masterNeuron;
   }

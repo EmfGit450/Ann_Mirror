@@ -206,4 +206,10 @@ async function Main() {
     engine?.resize();
   });
 }
-Main();
+
+try {
+  Main();
+}
+catch (err) {
+  console.log("Ann - Caught runtime error", err);
+}
