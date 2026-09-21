@@ -166,9 +166,21 @@ async function Main() {
   net.newLayer(layer2);
   net.newLayer(layer3);
 
-  net.newDenseSynapseBatch(1, 2, 11, undefined);
-  net.newDenseSynapseBatch(2, 3, 12, undefined);
-  net.newDenseSynapseBatch(3, 4, 13, undefined);
+  net.newDenseConnection({
+    type: 0,
+    inputLayer: layer0,
+    outputLayer: layer1
+  }, undefined);
+  net.newDenseConnection({
+    type: 0,
+    inputLayer: layer1,
+    outputLayer: layer2
+  }, undefined);
+  net.newDenseConnection({
+    type: 0,
+    inputLayer: layer2,
+    outputLayer: layer3
+  }, undefined);
   //Tests End
   
   new Camera({scene: scene, canvas: canvas});

@@ -11,11 +11,6 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
-//IMP:
-//Float64 is used for ids, since that gives 2^53 = 9,007,199,254,740,991(9 quintillion) possible integer ids
-//Float32 is too low, 2^24 = 16,777,216(just 16 million)
-
-//Using Float32 for pos since there needs to be a large network before i need Float64
 
 const NEURON_SPACING = 2.5;
 
@@ -31,41 +26,44 @@ export function randInt53(): number {
   return view.getUint32(0, true) + view.getUint16(4, true) * 0x100000000 + buf[6]! * 0x10000000000;
 }
 
-export interface SynapseBatchData { //one weight matrix
+export const enum ConnectionType {
+  Dense,
+  Residual
+}
+
+export interface ConnectionData {
   id: number | undefined;
   ids: Float64Array | undefined;
-  from: number;
-  to: number
+  
+  type: ConnectionType;
+  inputLayer: number;
+  outputLayer: number
 }
 
 export interface LayerData {
   id: number | undefined;
-  pos: number[];
-  shape: number[]; //Tensor visual thing
-  ids: Float64Array | undefined; //child neuron ids
-}
-
-interface NetworkData {
-  layers: LayerData[];
-  synapseBatches: SynapseBatchData[];
+  pos: number[] | undefined;
+  
+  shape: number[];
 }
 
 export class Network {
-  networkData: NetworkData | undefined;
+  networkData: Array<LayerData | ConnectionData>;
   
-  memory: Map<string, Mesh | GreasedLineMesh>;
+  memory: Map<
+    LayerData | ConnectionData,
+    Mesh | Array<GreasedLineMesh>
+  >;
+  
   scene: Scene;
   
   private NeuronMaterial: StandardMaterial;
   
   constructor(renderScene: Scene) {
-    this.networkData = { 
-      layers: [], 
-      synapseBatches: [] 
-    }
+    this.networkData = [];
+    this.memory = new Map();
     
     this.scene = renderScene;
-    this.memory = new Map();
     
     this.NeuronMaterial = new StandardMaterial("hologramBlue", renderScene);
     this.NeuronMaterial.diffuseColor = new Color3(0.2, 0.6, 1.0);
@@ -80,31 +78,29 @@ export class Network {
     });
   }
   
-  //0 = Layer, 4 = SynapseBatch  
-  newLayer(batch: LayerData) {
-    const meshId = batch.id ?? randInt53();
+  newLayer(layer: LayerData) {
+    const meshId = layer.id ?? randInt53();
+    if (meshId !== layer.id) layer.id = meshId;
     
-    const masterNeuron = CreateSphere(`0_${meshId}`, {
+    const layerMesh = CreateSphere(`0_${meshId}`, {
       diameter: 2,
       segments: 14
     }, this.scene);
-    masterNeuron.material = this.NeuronMaterial;
+    layerMesh.material = this.NeuronMaterial;
 
-    const sx = batch.pos[0]! - ((batch.shape[0]! - 1) * NEURON_SPACING) / 2;
-    const sy = batch.pos[1]! - ((batch.shape[1]! - 1) * NEURON_SPACING) / 2;
-    const sz = batch.pos[2]! - ((batch.shape[2]! - 1) * NEURON_SPACING) / 2;
-
-    const idsUndefined = batch.ids === undefined ? true : false;
+    const sx = layer.pos[0]! - ((layer.shape[0]! - 1) * NEURON_SPACING) / 2;
+    const sy = layer.pos[1]! - ((layer.shape[1]! - 1) * NEURON_SPACING) / 2;
+    const sz = layer.pos[2]! - ((layer.shape[2]! - 1) * NEURON_SPACING) / 2;
     
-    const thinInstanceMatrix = new Float32Array(idsUndefined ? (batch.shape[0]! * batch.shape[1]! * batch.shape[2]!) * 16 : batch.ids!.length * 16);
+    const thinInstanceMatrix = new Float32Array(layer.shape[0]! * layer.shape[1]! * layer.shape[2]! * 16);
     
     let offset = 0;
     
-    for (let i = 0; i < batch.shape[0]!; i++) {
+    for (let i = 0; i < layer.shape[0]!; i++) {
       const x = sx + i * NEURON_SPACING;
-      for (let j = 0; j < batch.shape[1]!; j++) {
+      for (let j = 0; j < layer.shape[1]!; j++) {
         const y = sy + j * NEURON_SPACING;
-        for (let k = 0; k < batch.shape[2]!; k++) {
+        for (let k = 0; k < layer.shape[2]!; k++) {
           const z = sz + k * NEURON_SPACING;
           
           //babylonjs uses column major notation
@@ -121,33 +117,24 @@ export class Network {
       }
     }
     
-    masterNeuron.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16, true);
-    
-    //@ts-ignore
-    masterNeuron.annMeta = {
-      shape: batch.shape
+    layerMesh.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16, true);
+
+    layerMesh.annMeta = {
+      layer
     }
-        
-    this.memory.set(`0_${meshId}`, masterNeuron);
+    this.memory.set(layer, layerMesh);
 
-    this.networkData!.layers.push({
-      id: meshId,
-      pos: batch.pos,
-      shape: batch.shape,
-      ids: idsUndefined ? undefined : batch.ids
-    })
-
-    return masterNeuron;
+    return layerMesh;
   }
 
-  newDenseSynapseBatch(layerA_id: number, layerB_id: number, id: number | undefined, skipModOverride: number | undefined) {
+  newDenseConnection(connection: ConnectionData, skipModOverride: number | undefined) {
     let base_fts: Float32Array[] = [];
     let detail_fts: Float32Array[] = [];
     let high_detail_fts: Float32Array[] = [];
     let max_detail_fts: Float32Array[] = [];
 
-    const lA = this.memory.get(`0_${layerA_id}`)! as Mesh;
-    const lB = this.memory.get(`0_${layerB_id}`)! as Mesh;
+    const lA = this.memory.get(connection.inputLayer)! as Mesh;
+    const lB = this.memory.get(connection.outputLayer)! as Mesh;
  
     //lxnC = layer x neuron count
     //@ts-ignore
