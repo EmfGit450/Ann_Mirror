@@ -15,6 +15,19 @@ import { Network, LayerData } from "./structure";
 
 import "@babylonjs/core/Meshes/instancedMesh";
 
+
+
+
+
+  import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+
+import { SceneLoader } from "@babylonjs/core";
+import "@babylonjs/loaders/glTF";
+
+
+
+
 //Init Start
 let engine: WebGPUEngine | Engine | null = null;
 
@@ -166,21 +179,37 @@ async function Main() {
   net.newLayer(layer2);
   net.newLayer(layer3);
 
-  net.newDenseConnection({
-    type: 0,
-    inputLayer: layer0,
-    outputLayer: layer1
-  }, undefined);
-  net.newDenseConnection({
-    type: 0,
-    inputLayer: layer1,
-    outputLayer: layer2
-  }, undefined);
-  net.newDenseConnection({
-    type: 0,
-    inputLayer: layer2,
-    outputLayer: layer3
-  }, undefined);
+  // net.newDenseConnection({
+  //   type: 0,
+  //   inputLayer: layer0,
+  //   outputLayer: layer1
+  // }, undefined);
+  // net.newDenseConnection({
+  //   type: 0,
+  //   inputLayer: layer1,
+  //   outputLayer: layer2
+  // }, undefined);
+  // net.newDenseConnection({
+  //   type: 0,
+  //   inputLayer: layer2,
+  //   outputLayer: layer3
+  // }, undefined);
+
+
+
+
+  const boxt = CreateBox("name1", {
+    width: 3,
+    height: 36,
+    depth: 36
+  }, scene);
+
+  const mat = new StandardMaterial("mat", scene);
+  mat.diffuseColor = new Color4(0.4, 0.4, 1, 1);
+  mat.emissiveColor = new Color4(0.5, 0.5, 0.5, 1);
+  mat.alpha = 0.5;
+
+  boxt.material = mat;
   //Tests End
   
   new Camera({scene: scene, canvas: canvas});
