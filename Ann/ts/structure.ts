@@ -52,7 +52,7 @@ export class Network {
   
   memory: Map<
     LayerData | ConnectionData,
-    Mesh | Array<GreasedLineMesh>
+    Mesh | GreasedLineMesh[]
   >;
   
   scene: Scene;
@@ -119,9 +119,7 @@ export class Network {
     
     layerMesh.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16, true);
 
-    layerMesh.annMeta = {
-      layer
-    }
+    layerMesh.annMeta = layer;
     this.memory.set(layer, layerMesh);
 
     return layerMesh;
@@ -146,80 +144,90 @@ export class Network {
     const lBneurons = lB._thinInstanceDataStorage.matrixData!;
     
     //@ts-ignore
-    const lAZshape = lA.annMeta.shape[2]! * 16;
-    const vRef = [lBneurons[12]! - lAneurons[12]!, lBneurons[13]! - lAneurons[13]!, lBneurons[14]! - lAneurons[14]!];
-    const vXZ = [lBneurons[12]! - lAneurons[28]!, lBneurons[13]! - lAneurons[29]!, lBneurons[14]! - lAneurons[30]!];
-    const vXY = [lBneurons[12]! - lAneurons[lAZshape + 12]!, lBneurons[13]! - lAneurons[lAZshape + 13]!, lBneurons[14]! - lAneurons[lAZshape + 14]!];
+    // const lAZshape = lA.annMeta.shape[2]! * 16;
+    // const vRef = [lBneurons[12]! - lAneurons[12]!, lBneurons[13]! - lAneurons[13]!, lBneurons[14]! - lAneurons[14]!];
+    // const vXZ = [lBneurons[12]! - lAneurons[28]!, lBneurons[13]! - lAneurons[29]!, lBneurons[14]! - lAneurons[30]!];
+    // const vXY = [lBneurons[12]! - lAneurons[lAZshape + 12]!, lBneurons[13]! - lAneurons[lAZshape + 13]!, lBneurons[14]! - lAneurons[lAZshape + 14]!];
 
-    const vRef_mag = Math.sqrt(vRef[0]! * vRef[0]! + vRef[1]! * vRef[1]! + vRef[2]! * vRef[2]!);
-    const vXZ_mag = Math.sqrt(vXZ[0]! * vXZ[0]! + vXZ[1]! * vXZ[1]! + vXZ[2]! * vXZ[2]!);
-    const vXY_mag = Math.sqrt(vXY[0]! * vXY[0]! + vXY[1]! * vXY[1]! + vXY[2]! * vXY[2]!);
+    // const vRef_mag = Math.sqrt(vRef[0]! * vRef[0]! + vRef[1]! * vRef[1]! + vRef[2]! * vRef[2]!);
+    // const vXZ_mag = Math.sqrt(vXZ[0]! * vXZ[0]! + vXZ[1]! * vXZ[1]! + vXZ[2]! * vXZ[2]!);
+    // const vXY_mag = Math.sqrt(vXY[0]! * vXY[0]! + vXY[1]! * vXY[1]! + vXY[2]! * vXY[2]!);
 
-    const dot_xz = (vRef[0]! * vXZ[0]! + vRef[1]! * vXZ[1]! + vRef[2]! * vXZ[2]!) / (vRef_mag * vXZ_mag);
-    const dot_xy = (vRef[0]! * vXY[0]! + vRef[1]! * vXY[1]! + vRef[2]! * vXY[2]!) / (vRef_mag * vXY_mag);
+    // const dot_xz = (vRef[0]! * vXZ[0]! + vRef[1]! * vXZ[1]! + vRef[2]! * vXZ[2]!) / (vRef_mag * vXZ_mag);
+    // const dot_xy = (vRef[0]! * vXY[0]! + vRef[1]! * vXY[1]! + vRef[2]! * vXY[2]!) / (vRef_mag * vXY_mag);
     
-    const maxDensity = Math.max(dot_xz, dot_xy);
-    //@ts-ignore
-    const minShape = Math.min(lA.annMeta.shape[1], lB.annMeta.shape[1], lA.annMeta.shape[2], lB.annMeta.shape[2]);
+    // const maxDensity = Math.max(dot_xz, dot_xy);
+    // const minShape = Math.min(lA.annMeta.shape[1], lB.annMeta.shape[1], lA.annMeta.shape[2], lB.annMeta.shape[2]);
+    // const maxShape = Math.max(lA.annMeta.shape[1], lB.annMeta.shape[1], lA.annMeta.shape[2], lB.annMeta.shape[2]);
 
-    const densityScore = maxDensity * minShape;
+    // const densityScore = maxDensity * (maxShape / minShape);
 
-    let skipMod;
-    if (skipModOverride != null) skipMod = skipModOverride;
-    else {
-      skipMod = densityScore > 5 ? 2 : 1;
-      skipMod = densityScore > 10 ? 3 : skipMod;
-      skipMod = densityScore > 15 ? 4 : skipMod;
-    }
+    const layersCenter = [lB.annMeta.pos[0] - lA.annMeta.pos[0], lB.annMeta.pos[1] - lA.annMeta.pos[1], lB.annMeta.pos[2] - lA.annMeta.pos[2]];
+    const layersCenterMag = Math.sqrt(layersCenter[0] * layersCenter[0] + layersCenter[1] * layersCenter[1] + layersCenter[2] * layersCenter[2]);
+    
     
     //PROBLEM:
     //CANNOT WORK WITH ODD NUMBER OF lAnC. ALSO
-    //FIRST lBnC neurons SKIPPED
+    //LAST lBnC neurons SKIPPED with ODD shape_x * shape_y * shape_z
     for (let start = 0; start < lAnC; start += 2) {
       const currStart = start * 16;
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
         
-        const mod = Math.floor(Math.random() * lAnC * lBnC) % skipMod;
+        const input1 = [lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!];
+        const input2 = [lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]!];
+        const output = [lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!];
 
-        if (mod == 0) {
-          base_fts.push(new Float32Array([
-            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
-            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //source2
-          ]));
-        }
-        else if (mod == 1) {
-          detail_fts.push(new Float32Array([
-            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
-            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //source2
-          ]));
-        }
-        else if (mod == 2) {
-          high_detail_fts.push(new Float32Array([
-            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
-            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //source2
-          ]));
-        }
-        else {
-          max_detail_fts.push(new Float32Array([
-            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //source1
-            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //target
-            lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //source2
-          ]));
-        }
+        const i1oV = [output[0] - input1[0], output[1] - input1[1], output[2] - input1[2]];
+        const i2oV = [output[0] - input2[0], output[1] - input2[1], output[2] - input2[2]];
+        
+        const i1oVMag = Math.sqrt(i1oV[0] * i1oV[0] + i1oV[1] * i1oV[1] + i1oV[2] * i1oV[2]);
+        const i2oVMag = Math.sqrt(i2oV[0] * i2oV[0] + i2oV[1] * i2oV[1] + i2oV[2] * i2oV[2]);
+
+        const i1oVdot = (i1oV[0] * layersCenter[0] + i1oV[1] * layersCenter[1] + i1oV[2] * layersCenter[2]) / (i1oVMag * layersCenterMag);
+        const i2oVdot = (i2oV[0] * layersCenter[0] + i2oV[1] * layersCenter[1] + i2oV[2] * layersCenter[2]) / (i2oVMag * layersCenterMag);
+        
+        base_fts.push(new Float32Array([
+          lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
+          lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //output
+          lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //input2
+        ]));
+
+        console.log(i1oVdot * DEG180BYPI, i2oVdot * DEG180BYPI);
+        
+        
+        // else if (mod == 1) {
+        //   detail_fts.push(new Float32Array([
+        //     lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
+        //     lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //output
+        //     lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //input2
+        //   ]));
+        // }
+        // else if (mod == 2) {
+        //   high_detail_fts.push(new Float32Array([
+        //     lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
+        //     lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //output
+        //     lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //input2
+        //   ]));
+        // }
+        // else if (mod == 3) {
+        //   max_detail_fts.push(new Float32Array([
+        //     lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
+        //     lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //output
+        //     lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //input2
+        //   ]));
+        // }
       }
     }
     
     const metadata = {
-      sourceLayerId: layerA_id,
-      targetLayerId: layerB_id,
-      density: undefined
+      inputLayer: connection.inputLayer,
+      outputLayer: connection.outputLayer
     }
 
-    const meshId = id ? id : randInt53();
+    const meshId = connection.id ?? randInt53();
+
+    let meshes: GreasedLineMesh[] = [];
 
     const baseMesh = CreateGreasedLine(`4_${meshId}_B`, {
       points: base_fts
@@ -230,9 +238,8 @@ export class Network {
     //@ts-ignore
     baseMesh.annMeta = metadata;
     //@ts-ignore
-    baseMesh.annMeta.density = densityScore;
-
-    this.memory.set(`4_${meshId}_B`, baseMesh);
+    
+    meshes.push(baseMesh);
     
     if (detail_fts.length > 0) {
       const detailMesh = CreateGreasedLine(`4_${meshId}_D`, {
@@ -246,7 +253,7 @@ export class Network {
 
       //detailMesh.setEnabled(false);
 
-      this.memory.set(`4_${meshId}_D`, detailMesh);
+      meshes.push(detailMesh);
     }
 
     if (high_detail_fts.length > 0) {
@@ -261,7 +268,7 @@ export class Network {
 
       highDetailMesh.setEnabled(false);
 
-      this.memory.set(`4_${meshId}_H`, highDetailMesh);
+      meshes.push(highDetailMesh);
     }
 
     if (max_detail_fts.length > 0) {
@@ -276,62 +283,16 @@ export class Network {
 
       maxDetailMesh.setEnabled(false);
 
-      this.memory.set(`4_${meshId}_X`, maxDetailMesh);
+      meshes.push(maxDetailMesh);
     }
     
     //DEBUG
     console.log("--------------------------");
     console.log(`SynapseBatch ${meshId}`);
-    console.log(`dot: ${dot_xz}, ${dot_xy}\nangle(deg): ${Math.acos(dot_xz) * DEG180BYPI}, ${Math.acos(dot_xy) * DEG180BYPI}`)
-    console.log(`maxDensity: ${maxDensity}\nminShape: ${minShape}\ndensityScore: ${densityScore}`);
     console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`)
     console.log("--------------------------");
-  }
-  
-  rebuildMeshes() {
-    for (let i = 0; i < this.scene.meshes.length; i++) {
-      this.scene.meshes[i]?.dispose();
-    }
-    
-    this.memory.forEach((mesh, key) => {
-      if (key[0] == "0") {
-        mesh.dispose();
-        
-        const sx = (mesh as Mesh)!._thinInstanceDataStorage.matrixData![12];
-        const sy = (mesh as Mesh)!._thinInstanceDataStorage.matrixData![13];
-        const sz = (mesh as Mesh)!._thinInstanceDataStorage.matrixData![14];
-        
-        this.newLayer({
-          id: parseInt(key.split("_")[1] as string),
-          pos: [
-            sx! + ( ((mesh as any).annMeta.shape[0] - 1) * NEURON_SPACING) / 2,
-            sy! + ( ((mesh as any).annMeta.shape[1] - 1) * NEURON_SPACING) / 2,
-            sz! + ( ((mesh as any).annMeta.shape[2] - 1) * NEURON_SPACING) / 2
-          ],
-          shape: (mesh as any).annMeta.shape,
-          ids: undefined
-        });
-        
-        return;
-      }
-      
-      if (key.endsWith("D") ||
-          key.endsWith("H") ||
-          key.endsWith("X")) {
-        mesh.dispose();    
-      }
-      
-      if (key.endsWith("B")) {
-        mesh.dispose();
 
-        this.newDenseSynapseBatch(
-          (mesh as any).annMeta.sourceLayerId,
-          (mesh as any).annMeta.targetLayerId,
-          parseInt(key.split("_")[1] as string),
-          undefined
-        );
-      }
-    });
+    this.memory.set(connection, meshes);
   }
   
 }

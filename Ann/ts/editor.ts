@@ -11,21 +11,7 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
-import { Network, LayerData } from "./structure";
-
-import "@babylonjs/core/Meshes/instancedMesh";
-
-
-
-
-
-  import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-
-import { SceneLoader } from "@babylonjs/core";
-import "@babylonjs/loaders/glTF";
-
-
+import { Network, LayerData } from "./structure";;
 
 
 //Init Start
@@ -149,14 +135,14 @@ async function Main() {
   const layer0: LayerData = {
     id: 1,
     pos: [0, 0, 0],
-    shape: [1, 14, 14],
+    shape: [1, 4, 4],
     ids: undefined
   };
 
   const layer1: LayerData = {
     id: 2,
     pos: [20, 0, 0],
-    shape: [1, 4, 4],
+    shape: [1, 2, 2],
     ids: undefined
   };
 
@@ -179,11 +165,11 @@ async function Main() {
   net.newLayer(layer2);
   net.newLayer(layer3);
 
-  // net.newDenseConnection({
-  //   type: 0,
-  //   inputLayer: layer0,
-  //   outputLayer: layer1
-  // }, undefined);
+  net.newDenseConnection({
+     type: 0,
+     inputLayer: layer0,
+     outputLayer: layer1
+  });
   // net.newDenseConnection({
   //   type: 0,
   //   inputLayer: layer1,
@@ -194,22 +180,7 @@ async function Main() {
   //   inputLayer: layer2,
   //   outputLayer: layer3
   // }, undefined);
-
-
-
-
-  const boxt = CreateBox("name1", {
-    width: 3,
-    height: 36,
-    depth: 36
-  }, scene);
-
-  const mat = new StandardMaterial("mat", scene);
-  mat.diffuseColor = new Color4(0.4, 0.4, 1, 1);
-  mat.emissiveColor = new Color4(0.5, 0.5, 0.5, 1);
-  mat.alpha = 0.5;
-
-  boxt.material = mat;
+  
   //Tests End
   
   new Camera({scene: scene, canvas: canvas});
