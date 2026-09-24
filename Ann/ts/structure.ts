@@ -36,8 +36,8 @@ export interface ConnectionData {
   ids: Float64Array | undefined;
   
   type: ConnectionType;
-  inputLayer: number;
-  outputLayer: number
+  input: LayerData;
+  output: LayerData;
 }
 
 export interface LayerData {
@@ -131,8 +131,8 @@ export class Network {
     let high_detail_fts: Float32Array[] = [];
     let max_detail_fts: Float32Array[] = [];
 
-    const lA = this.memory.get(connection.inputLayer)! as Mesh;
-    const lB = this.memory.get(connection.outputLayer)! as Mesh;
+    const lA = this.memory.get(connection.input)! as Mesh;
+    const lB = this.memory.get(connection.output)! as Mesh;
  
     //lxnC = layer x neuron count
     //@ts-ignore
@@ -164,7 +164,9 @@ export class Network {
 
     const layersCenter = [lB.annMeta.pos[0] - lA.annMeta.pos[0], lB.annMeta.pos[1] - lA.annMeta.pos[1], lB.annMeta.pos[2] - lA.annMeta.pos[2]];
     const layersCenterMag = Math.sqrt(layersCenter[0] * layersCenter[0] + layersCenter[1] * layersCenter[1] + layersCenter[2] * layersCenter[2]);
-    
+
+
+    const DEBUG_DOTPRODS = [];
     
     //PROBLEM:
     //CANNOT WORK WITH ODD NUMBER OF lAnC. ALSO
@@ -184,8 +186,12 @@ export class Network {
         const i1oVMag = Math.sqrt(i1oV[0] * i1oV[0] + i1oV[1] * i1oV[1] + i1oV[2] * i1oV[2]);
         const i2oVMag = Math.sqrt(i2oV[0] * i2oV[0] + i2oV[1] * i2oV[1] + i2oV[2] * i2oV[2]);
 
-        const i1oVdot = (i1oV[0] * layersCenter[0] + i1oV[1] * layersCenter[1] + i1oV[2] * layersCenter[2]) / (i1oVMag * layersCenterMag);
-        const i2oVdot = (i2oV[0] * layersCenter[0] + i2oV[1] * layersCenter[1] + i2oV[2] * layersCenter[2]) / (i2oVMag * layersCenterMag);
+        let i1oVdot = (i1oV[0] * layersCenter[0] + i1oV[1] * layersCenter[1] + i1oV[2] * layersCenter[2]) / (i1oVMag * layersCenterMag);
+        let i2oVdot = (i2oV[0] * layersCenter[0] + i2oV[1] * layersCenter[1] + i2oV[2] * layersCenter[2]) / (i2oVMag * layersCenterMag);
+
+        //density becomes less as the distance between layers increase
+        //i1oVdot /= layersCenterMag
+        //i2oVdot /= layersCenterMag
         
         base_fts.push(new Float32Array([
           lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
@@ -193,36 +199,25 @@ export class Network {
           lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //input2
         ]));
 
-        console.log(i1oVdot * DEG180BYPI, i2oVdot * DEG180BYPI);
-        
-        
-        // else if (mod == 1) {
-        //   detail_fts.push(new Float32Array([
-        //     lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
-        //     lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //output
-        //     lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //input2
-        //   ]));
-        // }
-        // else if (mod == 2) {
-        //   high_detail_fts.push(new Float32Array([
-        //     lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
-        //     lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //output
-        //     lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //input2
-        //   ]));
-        // }
-        // else if (mod == 3) {
-        //   max_detail_fts.push(new Float32Array([
-        //     lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
-        //     lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //output
-        //     lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]! //input2
-        //   ]));
-        // }
+        DEBUG_DOTPRODS.push(Math.acos(i1oVdot) * DEG180BYPI, Math.acos(i2oVdot) * DEG180BYPI);
       }
     }
+
+    let DOTPRODS_MEAN = 0;
+    for (let prod of DEBUG_DOTPRODS) { 
+      DOTPRODS_MEAN += prod;
+    }
+    DOTPRODS_MEAN /= DEBUG_DOTPRODS.length;
+
+    let DOTPRODS_VARIANCE = 0;
+    for (let prod of DEBUG_DOTPRODS) {
+      DOTPRODS_VARIANCE += (prod - DOTPRODS_MEAN) * (prod - DOTPRODS_MEAN);
+    }
+    DOTPRODS_VARIANCE /= DEBUG_DOTPRODS.length;
     
     const metadata = {
-      inputLayer: connection.inputLayer,
-      outputLayer: connection.outputLayer
+      input: connection.input,
+      output: connection.output
     }
 
     const meshId = connection.id ?? randInt53();
@@ -251,7 +246,7 @@ export class Network {
       //@ts-ignore
       detailMesh.annMeta = metadata;
 
-      //detailMesh.setEnabled(false);
+      detailMesh.setEnabled(false);
 
       meshes.push(detailMesh);
     }
@@ -289,7 +284,8 @@ export class Network {
     //DEBUG
     console.log("--------------------------");
     console.log(`SynapseBatch ${meshId}`);
-    console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`)
+    console.log(`dotproducts: ${DEBUG_DOTPRODS}\nmin: ${Math.min(...DEBUG_DOTPRODS)}\nmax: ${Math.max(...DEBUG_DOTPRODS)}\nmean: ${DOTPRODS_MEAN}\nangle stddev: ${Math.sqrt(DOTPRODS_VARIANCE)}`);
+    console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`);
     console.log("--------------------------");
 
     this.memory.set(connection, meshes);

@@ -135,7 +135,7 @@ async function Main() {
   const layer0: LayerData = {
     id: 1,
     pos: [0, 0, 0],
-    shape: [1, 4, 4],
+    shape: [1, 10, 10],
     ids: undefined
   };
 
@@ -167,18 +167,18 @@ async function Main() {
 
   net.newDenseConnection({
      type: 0,
-     inputLayer: layer0,
-     outputLayer: layer1
+     input: layer0,
+     output: layer1
   });
   // net.newDenseConnection({
   //   type: 0,
-  //   inputLayer: layer1,
-  //   outputLayer: layer2
+  //   input: layer1,
+  //   output: layer2
   // }, undefined);
   // net.newDenseConnection({
   //   type: 0,
-  //   inputLayer: layer2,
-  //   outputLayer: layer3
+  //   input: layer2,
+  //   output: layer3
   // }, undefined);
   
   //Tests End
