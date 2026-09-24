@@ -135,27 +135,27 @@ async function Main() {
   const layer0: LayerData = {
     id: 1,
     pos: [0, 0, 0],
-    shape: [1, 10, 10],
+    shape: [1, 16, 16],
     ids: undefined
   };
 
   const layer1: LayerData = {
     id: 2,
-    pos: [20, 0, 0],
-    shape: [1, 2, 2],
+    pos: [30, 0, 0],
+    shape: [1, 4, 4],
     ids: undefined
   };
 
   const layer2: LayerData = {
     id: 3,
-    pos: [40, 0, 0],
+    pos: [50, 0, 0],
     shape: [1, 4, 4],
     ids: undefined
   };
 
   const layer3: LayerData = {
     id: 4,
-    pos: [60, 0, 0],
+    pos: [70, 0, 0],
     shape: [1, 10, 1],
     ids: undefined
   };
@@ -170,17 +170,18 @@ async function Main() {
      input: layer0,
      output: layer1
   });
-  // net.newDenseConnection({
-  //   type: 0,
-  //   input: layer1,
-  //   output: layer2
-  // }, undefined);
-  // net.newDenseConnection({
-  //   type: 0,
-  //   input: layer2,
-  //   output: layer3
-  // }, undefined);
-  
+  net.newDenseConnection({
+    type: 0,
+    input: layer1,
+    output: layer2
+  }, undefined);
+  net.newDenseConnection({
+    type: 0,
+    input: layer2,
+    output: layer3
+  }, undefined);
+
+  console.log(net.parseTensorDimensions(), net);
   //Tests End
   
   new Camera({scene: scene, canvas: canvas});
