@@ -138,20 +138,20 @@ async function Main() {
   };
 
   const layer1: LayerData = {
-    pos: [30, 0, 0],
+    pos: [15, 0, 0],
     shape: [1, 4, 4],
     activation: ActivationType.Softplus
   };
 
   const layer2: LayerData = {
-    pos: [50, 0, 0],
+    pos: [30, 0, 0],
     shape: [1, 3, 3],
     activation: ActivationType.Softplus
   };
 
   const layer3: LayerData = {
-    pos: [70, 0, 0],
-    shape: [1, 10, 1],
+    pos: [45, 0, 0],
+    shape: [1, 5, 1],
     activation: ActivationType.Softplus
   };
 
