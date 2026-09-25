@@ -134,24 +134,24 @@ async function Main() {
   
   const layer0: LayerData = {
     pos: [0, 0, 0],
-    shape: [1, 8, 8]
+    shape: [1, 12, 12]
   };
 
   const layer1: LayerData = {
-    pos: [15, 0, 0],
-    shape: [1, 4, 4],
+    pos: [20, 0, 0],
+    shape: [1, 6, 6],
     activation: ActivationType.Softplus
   };
 
   const layer2: LayerData = {
     pos: [30, 0, 0],
-    shape: [1, 3, 3],
+    shape: [1, 4, 4],
     activation: ActivationType.Softplus
   };
 
   const layer3: LayerData = {
-    pos: [45, 0, 0],
-    shape: [1, 5, 1],
+    pos: [40, 0, 0],
+    shape: [1, 10, 1],
     activation: ActivationType.Softplus
   };
 
