@@ -11,7 +11,7 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
-import { Network, LayerData } from "./structure";;
+import { Network, ActivationType, ConnectionType, LayerData } from "./structure";;
 
 
 //Init Start
@@ -133,31 +133,26 @@ async function Main() {
   const net = new Network(scene);
   
   const layer0: LayerData = {
-    id: 1,
     pos: [0, 0, 0],
-    shape: [1, 16, 16],
-    ids: undefined
+    shape: [1, 8, 8]
   };
 
   const layer1: LayerData = {
-    id: 2,
     pos: [30, 0, 0],
     shape: [1, 4, 4],
-    ids: undefined
+    activation: ActivationType.Softplus
   };
 
   const layer2: LayerData = {
-    id: 3,
     pos: [50, 0, 0],
-    shape: [1, 4, 4],
-    ids: undefined
+    shape: [1, 3, 3],
+    activation: ActivationType.Softplus
   };
 
   const layer3: LayerData = {
-    id: 4,
     pos: [70, 0, 0],
     shape: [1, 10, 1],
-    ids: undefined
+    activation: ActivationType.Softplus
   };
 
   net.newLayer(layer0);
@@ -165,23 +160,23 @@ async function Main() {
   net.newLayer(layer2);
   net.newLayer(layer3);
 
-  net.newDenseConnection({
-     type: 0,
+  net.newConnection({
+     type: ConnectionType.Dense,
      input: layer0,
      output: layer1
   });
-  net.newDenseConnection({
-    type: 0,
+  net.newConnection({
+    type: ConnectionType.Dense,
     input: layer1,
     output: layer2
-  }, undefined);
-  net.newDenseConnection({
-    type: 0,
+  });
+  net.newConnection({
+    type: ConnectionType.Dense,
     input: layer2,
     output: layer3
-  }, undefined);
+  });
 
-  console.log(net.parseTensorDimensions(), net);
+  console.log(net.parseNetworkAsArray(), net);
   //Tests End
   
   new Camera({scene: scene, canvas: canvas});

@@ -15,7 +15,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 
 const NEURON_SPACING = 2.5;
 
-const DEG180BYPI = 57.2957795147;
+//const DEG180BYPI = 57.2957795147;
 
 export function randInt53(): number {
   const buf = new Uint8Array(7);
@@ -28,8 +28,22 @@ export function randInt53(): number {
 }
 
 export const enum ConnectionType {
-  Dense,
+  Dense = 12,
   Residual
+}
+
+export const enum ActivationType {
+  Linear = 1,
+  Sigmoid,
+  Tanh,
+  Mish,
+  Swish,
+  Softplus,
+  ReLU,
+  LeakyReLU, //alpha = 1
+  GELU,
+  ELU,
+  Softmax
 }
 
 export interface ConnectionData {
@@ -43,19 +57,23 @@ export interface ConnectionData {
 
 export interface LayerData {
   id: number | undefined;
-  pos: number[] | undefined;
-  
+  pos: number[];
+
+  activation: ActivationType | undefined;
   shape: number[];
 }
 
 export class Network {
   metadata: {
     layerCount: number
-    connectionCount: number;
+    connectionCount: {
+      dense: number;
+      residual: number;
+    };
   }
   
   layerMemory: Map<LayerData, Mesh>;
-  connectionMemory: Map<ConnectionData, GreasedLineMesh[]>;
+  connectionMemory: Map<ConnectionData, GreasedLineMesh[] | undefined>;
   
   scene: Scene;
   
@@ -64,7 +82,10 @@ export class Network {
   constructor(renderScene: Scene) {
     this.metadata = {
       layerCount: 0,
-      connectionCount: 0
+      connectionCount: {
+        dense: 0,
+        residual: 0
+      }
     }
     
     this.layerMemory = new Map();
@@ -85,36 +106,35 @@ export class Network {
     });
   }
   
-  
-  parseTensorDimensions() {
-    const dimensionArray = new Uint16Array(this.metadata.layerCount * 3);
+  //DOES NOT ACCOUNT FOR RESIDUALS
+  parseNetworkAsArray() {
+    const data = new Uint16Array(this.metadata.layerCount * 2);
 
+    let index = 4;
     let inputDecided = false;
-    let index = 6;
-    
+
+    //@ts-ignore
     this.connectionMemory.forEach((meshArr, dataKey) => {
       if (!inputDecided) {
-        dimensionArray[0] = dataKey.input.shape[0];
-        dimensionArray[1] = dataKey.input.shape[1];
-        dimensionArray[2] = dataKey.input.shape[2];
+        //0 means Input. data[1] is the size of the input vector
+        data[0] = 0;
+        data[1] = dataKey.input.shape[0]! * dataKey.input.shape[1]! * dataKey.input.shape[2]!;
         
-        dimensionArray[3] = dataKey.output.shape[0];
-        dimensionArray[4] = dataKey.output.shape[1];
-        dimensionArray[5] = dataKey.output.shape[2];
+        data[2] = dataKey.output.activation ?? 1;
+        data[3] = dataKey.output.shape[0]! * dataKey.output.shape[1]! * dataKey.output.shape[2]!;
 
         inputDecided = true;
       }
 
-      else {
-        dimensionArray[index] = dataKey.output.shape[0];
-        dimensionArray[index + 1] = dataKey.output.shape[1];
-        dimensionArray[index + 2] = dataKey.output.shape[2];
+      else if (dataKey.type == ConnectionType.Dense) {
+        data[index] = dataKey.output.activation ?? 1; //1 is Linear
+        data[index + 1] = dataKey.output.shape[0]! * dataKey.output.shape[1]! * dataKey.output.shape[2]!;
 
-        index += 3;
+        index += 2;
       }
     });
 
-    return dimensionArray;
+    return data;
   }
   
   
@@ -159,6 +179,7 @@ export class Network {
     
     layerMesh.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16, true);
 
+    //@ts-ignore
     layerMesh.annMeta = layer;
     this.layerMemory.set(layer, layerMesh);
     this.metadata.layerCount++;
@@ -166,7 +187,17 @@ export class Network {
     return layerMesh;
   }
 
-  newDenseConnection(connection: ConnectionData, skipModOverride: number | undefined) {
+  newConnection(connection: ConnectionData) {
+    if (connection.type == ConnectionType.Dense) {
+      this.newDenseConnection(connection);
+    }
+    else if (connection.type == ConnectionType.Residual) {
+      this.connectionMemory.set(connection, undefined);
+      this.metadata.connectionCount.residual++;
+    }
+  }
+
+  newDenseConnection(connection: ConnectionData) {
     let base_fts: Float32Array[] = [];
     let detail_fts: Float32Array[] = [];
     let high_detail_fts: Float32Array[] = [];
@@ -184,12 +215,6 @@ export class Network {
     const lAneurons = lA._thinInstanceDataStorage.matrixData!;
     const lBneurons = lB._thinInstanceDataStorage.matrixData!;
     
-    const layersCenter = [lB.annMeta.pos[0] - lA.annMeta.pos[0], lB.annMeta.pos[1] - lA.annMeta.pos[1], lB.annMeta.pos[2] - lA.annMeta.pos[2]];
-    const layersCenterMag = Math.sqrt(layersCenter[0] * layersCenter[0] + layersCenter[1] * layersCenter[1] + layersCenter[2] * layersCenter[2]);
-
-
-    const DEBUG_DOTPRODS = [];
-    
     //PROBLEM:
     //CANNOT WORK WITH ODD NUMBER OF lAnC. ALSO
     //LAST lBnC neurons SKIPPED with ODD shape_x * shape_y * shape_z
@@ -197,7 +222,8 @@ export class Network {
       const currStart = start * 16;
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
-        
+
+        /* COMMENTED OUT FOR TESTING OTHER FUNCTIONS
         const input1 = [lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!];
         const input2 = [lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]!];
         const output = [lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!];
@@ -205,7 +231,7 @@ export class Network {
         const dist_i1_lACenter = (input1[0] - lA.annMeta.pos[0]) ** 2 + (input1[1] - lA.annMeta.pos[1]) ** 2 + (input1[2] - lA.annMeta.pos[2]) ** 2;
         const dist_i1_lBCenter = (input1[0] - lB.annMeta.pos[0]) ** 2 + (input1[1] - lB.annMeta.pos[1]) ** 2 + (input1[2] - lB.annMeta.pos[2]) ** 2;
 
-        console.log(Math.sqrt(dist_i1_lACenter), Math.sqrt(dist_i1_lBCenter));
+        console.log(Math.sqrt(dist_i1_lACenter), Math.sqrt(dist_i1_lBCenter)); */
         
         base_fts.push(new Float32Array([
           lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
@@ -236,7 +262,7 @@ export class Network {
     //@ts-ignore
     baseMesh.annMeta = metadata;
     
-    meshes.push(baseMesh);
+    meshes.push(baseMesh as GreasedLineMesh);
     
     if (detail_fts.length > 0) {
       const detailMesh = CreateGreasedLine(`4_${meshId}_D`, {
@@ -248,7 +274,7 @@ export class Network {
 
       detailMesh.setEnabled(false);
 
-      meshes.push(detailMesh);
+      meshes.push(detailMesh as GreasedLineMesh);
     }
 
     if (high_detail_fts.length > 0) {
@@ -261,7 +287,7 @@ export class Network {
 
       highDetailMesh.setEnabled(false);
 
-      meshes.push(highDetailMesh);
+      meshes.push(highDetailMesh as GreasedLineMesh);
     }
 
     if (max_detail_fts.length > 0) {
@@ -274,7 +300,7 @@ export class Network {
 
       maxDetailMesh.setEnabled(false);
 
-      meshes.push(maxDetailMesh);
+      meshes.push(maxDetailMesh as GreasedLineMesh);
     }
     
     //DEBUG
@@ -284,7 +310,7 @@ export class Network {
     console.log("--------------------------");
 
     this.connectionMemory.set(connection, meshes);
-    this.metadata.connectionCount++;
+    this.metadata.connectionCount.dense++;
   }
   
 }
