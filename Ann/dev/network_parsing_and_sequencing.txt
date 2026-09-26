@@ -1,0 +1,58 @@
+[Deepseek Chat Log:]
+User: 
+"Output will be greater than input index - I force that."
+
+Response:
+"Right — that's the assert condition. output._sequence_index > input._sequence_index for every connection, dense or residual. Enforce it in newConnection and the format can't be built wrong.
+
+The one place this bites if you're not careful: it also implies layers are added in topological order.If a user adds layer 3 before layer 2 (even though layer 3 depends on layer 2), the indices are still monotonic — they're insertion order, not dependency order. So the check passes, but the graph is wrong. That's the case where "enforce monotonic indices" isn't sufficient to guarantee "enforce valid topology." Not something you can catch cheaply, and arguably not your problem if you've declared the architecture as strictly sequential. Worth one line in the doc: "layers must be added in execution order."
+
+That's the last architectural constraint worth naming. Everything after it is mechanical."
+
+User:
+"Then, we could try something called "network forward", which defines the forward direction of the network, and instead of sequence index being based on layer count, it is based on the direction order - closest to direction 0, 0, 0 first, then 2nd closest 2nd, and so on."
+
+Response:
+"That's a meaningfully different model, and it's worth being clear about what it buys and what it costs before committing.
+
+What it buys: the "sequence index" becomes a derived property of geometry rather than a stored property of insertion. Layers get their execution order from their position along the forward direction, not from when the user called newLayer. That means:
+
+· Insertion order stops mattering.
+· The architecture constraint becomes "layers must be positioned such that the forward direction produces a valid topological order" — which is checkable, unlike "user must add things in the right order."
+· You could conceivably allow a partial order and let the direction fill in the rest.
+
+What it costs: you now need a forward direction vector, and the projection of each layer's center onto that vector determines its rank. That introduces three new problems:
+
+1. Ties. Two layers at the same projection distance. Common with symmetric layouts, or if a layer sits "beside" the main axis. You need a tiebreaker — insertion order, layer id, or refuse and error. Pick one and document it.
+2. Non-monotonic geometry. A residual connection from layer 0 to layer 3 where layer 3 is not actually further along the forward direction than layer 0 — the projection won't reflect it. Users can lay out a network visually however they want; the projection assumes the visual layout is the topological order. That's a constraint on the editor, not just on the network model.
+3. The forward direction is itself a user input. Which axis? (1, 0, 0) for left-to-right, but then what if a user lays out layers top-to-bottom? You need to either fix the direction (+X always), derive it from the network (e.g. layerN - layer0), or expose it as a UI control. Each choice has consequences for how the editor feels.
+
+The comparison:
+
+· Insertion order (current): simple, explicit, requires discipline. Cheap to check (> assert). Format is stable regardless of geometry.
+· Forward direction order: geometry-derived, more forgiving of insertion order, but couples the format to the layout and requires solving ties and non-monotonicity.
+
+For an editor where the user constructs the network by placing layers, forward direction is arguably the more natural model — the user already has a visual notion of "this comes after that" and you'd be honoring it. For an editor where the user loads an existing network, insertion order is simpler and doesn't require the layout to be meaningful.
+
+Middle path: keep insertion-order as the storage format (IndexedDB, serialization) but sort by forward-direction projection once at load/parse time, and store the projection rank as _sequence_index. Then the format stays geometry-agnostic, the runtime gets the geometric ordering the user expects, and the "user must add things in order" constraint disappears. You'd still need tiebreakers and a rule for non-monotonic geometry — but those live in the sort function, not in the storage layer, and you can change them without migrating saved networks.
+
+Given you were just about to write the doc, this is exactly the kind of decision that's worth pinning before the doc is written, not after. If you go with forward-direction ordering, the doc has to specify: which direction, how ties are broken, and what happens when the layout doesn't admit a valid ordering. Those three answers become the format's real spec."
+
+User:
+"And it gives more control to the user, exactly what I want."
+
+Response:
+"Then that's the design. The user's spatial arrangement is the computation graph — which is a genuinely nice property for a visual editor, because it collapses "how it looks" and "how it runs" into one thing. The user can't lay out a network that looks wrong and runs right, or vice versa.
+
+Three things that become load-bearing once you commit to this:
+
+The forward direction needs a definition, and it needs to be unambiguous. Options: fixed +X, derived from layer_last - layer_first, or user-editable. The first is simplest and matches your current layout convention. The second is elegant when it works but ill-defined when the first and last layers aren't the geometric extremes. The third is most flexible but pushes the problem to the UI. My read: fix it to +X, document it, and if you ever want to move it, add it as a later feature rather than baking flexibility in from day one.
+
+Ties need a documented answer. Two layers with equal X-projection. Common case: input and output layers at the same X but different Y/Z (a "fan" layout). Ties broken by insertion order is the least surprising default — the user's own ordering is the tiebreaker, and it degrades gracefully to the old behavior when projection can't distinguish.
+
+Non-monotonic geometry needs a rule. A connection whose input projects after its output. Two options: reject it at build time (strict), or accept it and let the projection-based order disagree with the connection (permissive, but then residuals compute a negative offset). Reject is better — a clear error at construction beats a mysterious wrong-answer at runtime. Same assert you were going to write, just checking projection instead of index.
+
+The doc's "Architecture" section now has a real spec to describe, not just a constraint to mention: the forward direction is +X, layer execution order is the projection of layer position onto +X, ties break by insertion order, connections must go from lower to higher projection, and the sequence index is derived from this at parse time rather than stored at construction time. That's five sentences, and it replaces the whole "user must add layers in order" hand-wave with something concrete.
+
+Worth also noting: once this is in place, _sequence_index stops being "set by newLayer" and starts being "computed by parseNetworkAsArray" (or a pre-pass). That's a small but real change to where the source of truth lives — from insertion to geometry. Which is exactly the shift you wanted, just worth naming so it doesn't surprise you when you go to write the code."
+[/Deepseek Chat Log]
