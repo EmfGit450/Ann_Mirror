@@ -326,10 +326,7 @@ export class Network {
     }
     
     //DEBUG
-    console.log("--------------------------");
-    console.log(`SynapseBatch ${meshId}`);
-    console.log(`base.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}`);
-    console.log("--------------------------");
+    console.log(`--------------------------\nSynapseBatch ${meshId}\n\nbase.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}\n--------------------------`);
 
     this.connectionMemory.set(connection, meshes);
     this.metadata.connectionCount.dense++;
