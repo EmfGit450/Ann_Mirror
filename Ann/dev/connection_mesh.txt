@@ -3,3 +3,13 @@ If the angle between synapses is approximately equal zero,
 just skip some synapses, humans wont be abke to visually parse the difference either way.
 
 then, on top of that, use the lod system that is based on distance to center
+
+[9 Sep 2026 : 18:18]
+Context:
+four tiers, each one GreasedLineMesh. base, detail, high detail, max detail.
+first method was to calculate a single dot product between two adjacent lines(not made, direction computed)
+on xy and xz axis, to measure density, and then compute a value to sample lines(called skipMod. skipMod = 2 means every other polyline(2 lines) is skipped), no mesh tiering at this time. discarded because it did not account for the position of the line, and lost lines could never be shown.
+switched to mesh tiering, but did not find a satisfactory way to disable and enable meshes.
+(deep inside center means it will not be visible most of the time, add to a detail mesh).
+
+Currently planning for the above method of combining distance to center, lod system, and previous dot product, to skip unnecessary lines(if angle between synapses < 0.001, skip skipMod neurons : pseudo)
