@@ -18,14 +18,6 @@ export class Camera {
       Vector3.Zero(),
       props.scene
     );
-    const aspect = props.canvas.clientWidth / props.canvas.clientHeight;
-    const orthoHeight = 10;
-
-    this.bnCamera.orthoTop = orthoHeight / 2;
-    this.bnCamera.orthoBottom = -orthoHeight / 2;
-
-    this.bnCamera.orthoRight = (orthoHeight / 2) * aspect;
-    this.bnCamera.orthoLeft = -((orthoHeight / 2) * aspect);
 
     this.bnScene = props.scene;
     this.bnCanvas = props.canvas;

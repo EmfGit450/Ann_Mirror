@@ -47,20 +47,27 @@ export const enum ActivationType {
 }
 
 export interface ConnectionData {
+  //Render
   id: number | undefined;
   ids: Float64Array | undefined;
   
+  //Data
   type: ConnectionType;
   input: LayerData;
   output: LayerData;
 }
 
 export interface LayerData {
+  //Render
   id: number | undefined;
   pos: number[];
-
+  
+  //Data
   activation: ActivationType | undefined;
   shape: number[];
+  
+  //Internal
+  _sequence_index: number | undefined;
 }
 
 export class Network {
@@ -108,7 +115,9 @@ export class Network {
   
   //DOES NOT ACCOUNT FOR RESIDUALS
   parseNetworkAsArray() {
-    const data = new Uint16Array(this.metadata.layerCount * 2);
+    const data = new Uint16Array(
+      this.metadata.layerCount * 2 + this.metadata.connectionCount.residual * 2
+    );
 
     let index = 4;
     let inputDecided = false;
@@ -127,8 +136,15 @@ export class Network {
       }
 
       else if (dataKey.type == ConnectionType.Dense) {
-        data[index] = dataKey.output.activation ?? 1; //1 is Linear
+        data[index] = dataKey.output.activation ?? ActivationType.Linear;
         data[index + 1] = dataKey.output.shape[0]! * dataKey.output.shape[1]! * dataKey.output.shape[2]!;
+
+        index += 2;
+      }
+
+      else if (dataKey.type == ConnectionType.Residual) {
+        data[index] = ConnectionType.Residual;
+        data[index + 1] = dataKey.output._sequence_index! - dataKey.input._sequence_index!;
 
         index += 2;
       }
@@ -141,6 +157,9 @@ export class Network {
   newLayer(layer: LayerData) {
     const meshId = layer.id ?? randInt53();
     if (meshId !== layer.id) layer.id = meshId;
+    
+    //0-base indexing
+    layer._sequence_index = this.metadata.layerCount;
     
     const layerMesh = CreateSphere(`0_${meshId}`, {
       diameter: 2,
