@@ -1,0 +1,7 @@
+[9 Sep 2026 : 18:34]
+We could add a "viz style" setting, with two options.
+"Synaptic": the current style blue neuron balls, greased line synapses
+"Matrix": new style, cubes as activations, and no lines - a matrix transformation is visualised
+          instead.
+
+will prepare soon - got other stuff to do.
