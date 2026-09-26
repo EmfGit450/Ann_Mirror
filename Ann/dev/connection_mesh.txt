@@ -1,0 +1,5 @@
+[9 Sep 2026 : ~17:50]
+If the angle between synapses is approximately equal zero, 
+just skip some synapses, humans wont be abke to visually parse the difference either way.
+
+then, on top of that, use the lod system that is based on distance to center

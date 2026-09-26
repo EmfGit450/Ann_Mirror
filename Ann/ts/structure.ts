@@ -28,8 +28,9 @@ export function randInt53(): number {
 }
 
 export const enum ConnectionType {
-  Dense = 12,
-  Residual
+  Dense = 100,
+  ResidualTruncate,
+  ResidualTransform
 }
 
 export const enum ActivationType {
@@ -142,8 +143,9 @@ export class Network {
         index += 2;
       }
 
-      else if (dataKey.type == ConnectionType.Residual) {
-        data[index] = ConnectionType.Residual;
+      else if (dataKey.type == ConnectionType.ResidualTruncate ||
+               dataKey.type == ConnectionType.ResidualTransform) {
+        data[index] = dataKey.type;
         data[index + 1] = dataKey.output._sequence_index! - dataKey.input._sequence_index!;
 
         index += 2;
@@ -210,7 +212,8 @@ export class Network {
     if (connection.type == ConnectionType.Dense) {
       this.newDenseConnection(connection);
     }
-    else if (connection.type == ConnectionType.Residual) {
+    else if (connection.type == ConnectionType.ResidualTruncate ||
+             connection.type == ConnectionType.ResidualTransform) {
       this.connectionMemory.set(connection, undefined);
       this.metadata.connectionCount.residual++;
     }

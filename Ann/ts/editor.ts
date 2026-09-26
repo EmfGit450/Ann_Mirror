@@ -139,26 +139,26 @@ async function Main() {
   //@ts-ignore
   const layer0: LayerData = {
     pos: [0, 0, 0],
-    shape: [1, 28, 28]
+    shape: [1, 14, 14]
   };
   
   //@ts-ignore
   const layer1: LayerData = {
-    pos: [40, 0, 0],
-    shape: [1, 10, 10],
+    pos: [20, 0, 0],
+    shape: [1, 4, 4],
     activation: ActivationType.Softplus
   };
   
   //@ts-ignore
   const layer2: LayerData = {
-    pos: [60, 0, 0],
+    pos: [30, 0, 0],
     shape: [1, 5, 5],
     activation: ActivationType.Softplus
   };
   
   //@ts-ignore
   const layer3: LayerData = {
-    pos: [70, 0, 0],
+    pos: [40, 0, 0],
     shape: [1, 10, 1],
     activation: ActivationType.Softplus
   };
@@ -191,7 +191,7 @@ async function Main() {
 
   //@ts-ignore
    net.newConnection({
-    type: ConnectionType.Residual,
+    type: ConnectionType.ResidualTransform,
     input: layer0,
     output: layer3
   });

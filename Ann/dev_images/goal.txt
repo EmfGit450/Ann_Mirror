@@ -1,4 +1,0 @@
-The goal is to make the culling look beautiful. 
-we know that far away, both look the same.
-storing different levels of LOD meshes(one base mesh and extra detail meshes)
-could be the way to go
