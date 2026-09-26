@@ -114,7 +114,6 @@ export class Network {
     });
   }
   
-  //DOES NOT ACCOUNT FOR RESIDUALS
   parseNetworkAsArray() {
     const data = new Uint16Array(
       this.metadata.layerCount * 2 + this.metadata.connectionCount.residual * 2
@@ -326,7 +325,7 @@ export class Network {
     }
     
     //DEBUG
-    console.log(`--------------------------\nSynapseBatch ${meshId}\n\nbase.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}\n--------------------------`);
+    console.log(`--------------------------\nConnection ${meshId}\n\nbase.fts.length: ${base_fts.length}\ndetail.fts.length: ${detail_fts.length}\nhigh.fts.length: ${high_detail_fts.length}\nmax.fts.length: ${max_detail_fts.length}\n--------------------------`);
 
     this.connectionMemory.set(connection, meshes);
     this.metadata.connectionCount.dense++;
