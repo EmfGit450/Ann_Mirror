@@ -178,7 +178,7 @@ button.click svg * {
   align-items: center;
   
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   background: white;
   box-shadow: 0.05rem 0.05rem 1rem #444;
   border-radius: 0.2rem;
@@ -189,11 +189,33 @@ button.click svg * {
   padding: 0.4rem;
   transform: translate(calc(50dvw - 10rem), calc(50dvh - 7.5rem));
 
-  font-family: "Montserrat";
+  font-family: "IBM Plex Mono";
   font-size: 1rem;
 
   /*DEBUG*/
   display: none;
+}
+/*End*/
+
+/*Builder Panel*/
+.builder-panel {
+  background: #171717ae;
+  top: 0;
+  left: 0;
+  width: 9rem;
+  height: 100dvh;
+  position: absolute;
+  will-change: transform;
+  z-index: 2;
+  padding: 1rem;
+  opacity: 0;
+}
+
+.build-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 2rem;
 }
 /*End*/
 
@@ -232,6 +254,7 @@ button.click svg * {
   width: 100%;
   height: 100%;
   z-index: 0;
+  touch-action: none;
 }
 
 @media (max-width: 620px) {

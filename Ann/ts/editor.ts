@@ -6,12 +6,22 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { Camera } from "./camera";
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
+import { BuilderMenu } from "./ui";
+
+
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { CreateCapsule } from "@babylonjs/core/Meshes/Builders/capsuleBuilder";
+import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
+import { UtilityLayerRenderer } from "@babylonjs/core/Rendering/utilityLayerRenderer";
+import { RotationGizmo } from "@babylonjs/core/Gizmos/rotationGizmo";
+import "@babylonjs/core/Culling/ray";
 
 
 //Init Start
@@ -163,40 +173,135 @@ async function Main() {
     activation: ActivationType.Softplus
   };
 
-  net.newLayer(layer0);
-  net.newLayer(layer1);
-  net.newLayer(layer2);
-  net.newLayer(layer3);
+  // net.newLayer(layer0);
+  // net.newLayer(layer1);
+  // net.newLayer(layer2);
+  // net.newLayer(layer3);
   
-  //@ts-ignore
-  net.newConnection({
-     type: ConnectionType.Dense,
-     input: layer0,
-     output: layer1
-  });
+  // //@ts-ignore
+  // net.newConnection({
+  //    type: ConnectionType.Dense,
+  //    input: layer0,
+  //    output: layer1
+  // });
 
-  //@ts-ignore
-  net.newConnection({
-    type: ConnectionType.Dense,
-    input: layer1,
-    output: layer2
-  });
+  // //@ts-ignore
+  // net.newConnection({
+  //   type: ConnectionType.Dense,
+  //   input: layer1,
+  //   output: layer2
+  // });
 
-  //@ts-ignore
-  net.newConnection({
-    type: ConnectionType.Dense,
-    input: layer2,
-    output: layer3
-  });
+  // //@ts-ignore
+  // net.newConnection({
+  //   type: ConnectionType.Dense,
+  //   input: layer2,
+  //   output: layer3
+  // });
 
-  //@ts-ignore
-   net.newConnection({
-    type: ConnectionType.ResidualTransform,
-    input: layer0,
-    output: layer3
-  });
+  // //@ts-ignore
+  //  net.newConnection({
+  //   type: ConnectionType.ResidualTransform,
+  //   input: layer0,
+  //   output: layer3
+  // });
 
   console.log(net.parseNetworkAsArray(), net);
+
+  const utilLayer = new UtilityLayerRenderer(scene, false, false, false, true);
+utilLayer.utilityLayerScene.attachControl();
+
+// Utility scene's input manager just stole primary input.
+// Re-attach the main camera so it also receives pointer events.
+const mainCamera = scene.activeCamera;
+mainCamera?.detachControl();
+mainCamera?.attachControl(canvas, true);
+
+const rotationGizmo = new RotationGizmo(utilLayer);
+rotationGizmo.scaleRatio = 1.3;
+
+const forwardPivot = new TransformNode("forwardPivot", scene);
+if (!forwardPivot.rotationQuaternion) {
+  forwardPivot.rotationQuaternion = Quaternion.FromEulerAngles(
+    forwardPivot.rotation.x, forwardPivot.rotation.y, forwardPivot.rotation.z
+  );
+}
+
+const tube = CreateCapsule("forwardDirShaft", { height: 2, radius: 0.1 }, scene);
+tube.parent = forwardPivot;
+tube.position.y = 1;
+
+const cone = CreateCylinder("forwardDirArrow", {
+  height: 0.4, diameterTop: 0, diameterBottom: 0.4
+}, scene);
+cone.parent = forwardPivot;
+cone.position.y = 2.1;
+
+rotationGizmo.attachedMesh = forwardPivot;
+// Hide the Y-axis rotation ring (the yellow one in your screenshot)
+rotationGizmo.yGizmo.isEnabled = false;
+
+  for (const sub of [rotationGizmo.xGizmo, rotationGizmo.yGizmo, rotationGizmo.zGizmo]) {
+  // Option A: kill the shader material's output
+ // sub._rotationShaderMaterial.alpha = 0;
+
+  // Option B: keep visibility at 0 even after drag start
+  sub.dragBehavior.onDragStartObservable.add(() => {
+    sub._rotationDisplayPlane.visibility = 0;
+  });
+  sub.dragBehavior.onDragObservable.add(() => {
+    sub._rotationDisplayPlane.visibility = 0;
+  });
+
+    
+  sub.coloredMaterial.diffuseColor = new Color4(0.8, 0.7, 1.0, 1);
+  sub.hoverMaterial.diffuseColor = new Color4(0.4, 0.8, 1.0, 1);
+  }
+  
+let activeTween: gsap.core.Tween | null = null;
+const SNAP = Math.PI / 2;
+
+function snapForwardPivot() {
+  const node = forwardPivot;
+  const current = node.rotationQuaternion!.clone();
+
+  const euler = current.toEulerAngles();
+  const target = Quaternion.FromEulerAngles(
+    Math.round(euler.x / SNAP) * SNAP,
+    Math.round(euler.y / SNAP) * SNAP,
+    Math.round(euler.z / SNAP) * SNAP
+  );
+
+  const proxy = { t: 0 };
+  const start = current.clone();
+
+  activeTween = gsap.to(proxy, {
+    t: 1,
+    duration: 0.25,
+    ease: "power2.out",
+    onUpdate: () => {
+      Quaternion.SlerpToRef(start, target, proxy.t, node.rotationQuaternion!);
+    }
+  });
+}
+
+for (const sub of [rotationGizmo.xGizmo, rotationGizmo.yGizmo, rotationGizmo.zGizmo]) {
+  sub.dragBehavior.onDragStartObservable.add(() => {
+    activeTween?.kill();
+    activeTween = null;
+  });
+  sub.dragBehavior.onDragEndObservable.add(snapForwardPivot);
+}
+
+
+
+
+
+  new BuilderMenu({ 
+    root: ".builder-panel",
+    showButton: "#builder-button",
+    collapseButton: "#collapse-builder-panel"
+  });
   //Tests End
 
   engine.runRenderLoop(() => {
