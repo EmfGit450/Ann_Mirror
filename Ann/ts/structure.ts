@@ -4,6 +4,7 @@ import { CreateSphere } from "@babylonjs/core/Meshes/Builders/sphereBuilder";
 import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
 
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineMesh";
 import { GreasedLineMeshMaterialType } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
 import "@babylonjs/core/Meshes/thinInstanceMesh";
@@ -12,9 +13,11 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 
+
 const NEURON_SPACING = 2.5;
 
 //const DEG180BYPI = 57.2957795147;
+
 
 export function randInt53(): number {
   const buf = new Uint8Array(7);
@@ -81,8 +84,9 @@ export class Network {
 
   layerMemory: Map<LayerData, Mesh>;
   connectionMemory: Map<ConnectionData, GreasedLineMesh[] | undefined>;
-
+  
   scene: Scene;
+  networkRoot: TransformNode;
 
   private NeuronMaterial: StandardMaterial;
 
@@ -99,6 +103,7 @@ export class Network {
     this.connectionMemory = new Map();
 
     this.scene = renderScene;
+    this.networkRoot = new TransformNode("netRoot", renderScene);
 
     this.NeuronMaterial = new StandardMaterial("hologramBlue", renderScene);
     this.NeuronMaterial.diffuseColor = new Color3(0.2, 0.6, 1.0);
@@ -200,6 +205,7 @@ export class Network {
 
     layerMesh.thinInstanceSetBuffer("matrix", thinInstanceMatrix, 16, true);
 
+    layerMesh.parent = this.networkRoot;
     //@ts-ignore
     layerMesh.annMeta = layer;
     this.layerMemory.set(layer, layerMesh);
@@ -314,6 +320,8 @@ export class Network {
       this.scene
     );
 
+    baseMesh.parent = this.networkRoot;
+
     //@ts-ignore
     baseMesh.annMeta = metadata;
 
@@ -329,6 +337,8 @@ export class Network {
         this.scene
       );
 
+      detailMesh.parent = this.networkRoot;
+      
       //@ts-ignore
       detailMesh.annMeta = metadata;
 
@@ -347,6 +357,8 @@ export class Network {
         this.scene
       );
 
+      highDetailMesh.parent = this.networkRoot;
+      
       //@ts-ignore
       highDetailMesh.annMeta = metadata;
 
@@ -365,6 +377,8 @@ export class Network {
         this.scene
       );
 
+      maxDetailMesh.parent = this.networkRoot;
+      
       //@ts-ignore
       maxDetailMesh.annMeta = metadata;
 

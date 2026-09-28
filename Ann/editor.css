@@ -203,7 +203,7 @@ button.onclick svg * {
 
 /*Builder Panel*/
 .builder-panel {
-  background: #171717ae;
+  background: #171717da;
   top: 0;
   left: 0;
   width: 13rem;
@@ -242,26 +242,15 @@ button.onclick svg * {
   width: 1.8rem;
   height: 1.8rem;
   border-radius: 0.7rem;
+  color: #fff
 }
 
-#px-dir {
-  background: radial-gradient(ellipse, #f00, #600);
-}
-#py-dir {
-  background: radial-gradient(ellipse, #0f0, #060);
-}
-#pz-dir {
-  background: radial-gradient(ellipse, #00f, #006);
-}
-#nx-dir {
-  background: radial-gradient(ellipse, #600, #f00);
-}
-#ny-dir {
-  background: radial-gradient(ellipse, #060, #0f0);
-}
-#nz-dir {
-  background: radial-gradient(ellipse, #006, #00f);
-}
+#px-dir { background: radial-gradient(ellipse, #f00, #600); }
+#py-dir { background: radial-gradient(ellipse, #0f0, #060); }
+#pz-dir { background: radial-gradient(ellipse, #00f, #006); }
+#nx-dir { background: radial-gradient(ellipse, #600, #f00); }
+#ny-dir { background: radial-gradient(ellipse, #060, #0f0); }
+#nz-dir { background: radial-gradient(ellipse, #006, #00f); }
 
 /*End*/
 

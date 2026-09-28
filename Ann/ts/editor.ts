@@ -1,5 +1,6 @@
 import { gsap } from "gsap";
 
+
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Scene } from "@babylonjs/core/scene";
@@ -11,11 +12,16 @@ import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
+
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
+
 import { BuilderMenu } from "./ui";
 
-import { CreateCapsule } from "@babylonjs/core/Meshes/Builders/capsuleBuilder";
-import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
+
+import { AxesViewer } from "@babylonjs/core/Debug/axesViewer";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+
 
 //Init Start
 let engine: WebGPUEngine | Engine | null = null;
@@ -209,29 +215,60 @@ async function Main() {
 
   console.log(net.parseNetworkAsArray(), net);
 
-  const tube = CreateCapsule("forwardDirShaft", { height: 2, radius: 0.1 }, scene);
-  tube.position.y = 0.9;
-
-  const cone = CreateCylinder(
-    "forwardDirArrow",
-    {
-      height: 0.4,
-      diameterTop: 0,
-      diameterBottom: 0.4,
-    },
-    scene
-  );
-  cone.position.y = 2;
-
+  
   new BuilderMenu({
     root: ".builder-panel",
     showButton: "#builder-button",
     collapseButton: "#collapse-builder-panel",
   });
+
+
+  const axes = new AxesViewer(scene, 4);
+  const desiredScreenSize = 0.15;
+
+  const setAxisColor = (axis: TransformNode, color: Color4) => {
+    axis.getChildMeshes().forEach(mesh => {
+        if (mesh.material) {
+            const mat = mesh.material as StandardMaterial;
+            mat.emissiveColor = color;
+            mat.diffuseColor = color;
+            mat.specularColor = new Color4(0, 0, 0, 0);
+            mat.disableLighting = true;
+        }
+    });
+};
+
+setAxisColor(axes.xAxis, new Color4(1, 0.15, 0.15, 1)); // Red
+setAxisColor(axes.yAxis, new Color4(0.15, 1, 0.15, 1)); // Green
+setAxisColor(axes.zAxis, new Color4(0.2, 0.4, 1)), 1;   // Blue
+  
+  scene.onBeforeRenderObservable.add(() => {
+    const camera = scene.activeCamera;
+    if (!camera) return;
+
+    // Distance from camera to the axes origin (or wherever you placed it)
+    const distance = Vector3.Distance(camera.position, axes.xAxis.position);
+
+    // Make the visual size constant on screen
+    axes.scaleLines = desiredScreenSize * distance;
+  });
   //Tests End
 
+  let frameC = 0;
   engine.runRenderLoop(() => {
+    frameC++;
     scene.render();
+
+    if (frameC >= 120) {
+      frameC = 0;
+
+      gsap.to(net.networkRoot.rotation, {
+        y: net.networkRoot.rotation.y + Math.PI / 2,
+        duration: 0.5,
+        ease: "power3.inOut"
+      })
+      //net.networkRoot.rotation.y + Math.PI / 2;
+    }
   });
 
   let lastFrameTime = performance.now();
