@@ -1,43 +1,45 @@
 import { gsap } from "gsap";
 
-import { ForwardDirection } from "./states";
 
-export class BuilderMenu {
+import { EditorState, ForwardDirection } from "./states";
+
+
+export class UI {
+  quickHelpersUI: QuickHelpersUI;
+  settingsUI: SettingsUI;
+  builderUI: BuilderUI;
+
+  state: EditorState;
+}
+
+export class QuickHelpersUI {
   root: HTMLElement;
-  showButton: HTMLElement;
-  collapseButton: HTMLElement;
-
-  preferences: {
-    forwardDir: ForwardDirection;
-  };
-
-  constructor(config: { root: string; showButton: string; collapseButton: string }) {
-    this.root = document.querySelector(config.root)! as HTMLElement;
-    this.showButton = document.querySelector(config.showButton)! as HTMLElement;
-    this.collapseButton = document.querySelector(config.collapseButton)! as HTMLElement;
-
-    gsap.set(this.root, {
-      xPercent: -100,
-      opacity: 1,
-    });
-
-    this.collapseButton.addEventListener("click", this.collapse);
-    this.showButton.addEventListener("click", this.show);
+  helpers!: {
+    axesHelperButton: HTMLElement;
+  }
+  callbacks!: {
+    axesHelperCallback: () => void;
   }
 
-  collapse = () => {
-    gsap.to(this.root, {
-      xPercent: -100,
-      duration: 0.4,
-      ease: "power4.inOut",
-    });
-  };
+  constructor(config: {
+    rootSelector: string;
+  }, helperSelectors: {
+    axesHelperBtnSelector: string;
+  }, helperCallbacks: {
+    axesHelperCallback: () => void;
+  }) {
+    this.root = document.querySelector(config.rootSelector);
 
-  show = () => {
-    gsap.to(this.root, {
-      xPercent: 0,
-      duration: 0.4,
-      ease: "power4.inOut",
+    this.helpers.axesHelperButton = document.querySelector(helperSelectors.axesHelperBtnSelector);
+    
+    this.callbacks.axesHelperCallback = helperCallbacks.axesHelperCallback;
+    
+    this.helpers.axesHelperButton.addEventListener("click", () => {
+      this.callbacks.axesHelperCallback();
     });
-  };
+  }
+}
+
+export class SettingsUI {
+  
 }

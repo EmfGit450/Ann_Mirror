@@ -6,3 +6,20 @@ export const enum ForwardDirection {
   PosZ,
   NegZ,
 }
+
+interface EditorState {
+  settings: {
+    app: {
+      
+    },
+    builder: {
+      forwardDirection: ForwardDirection;
+    }
+  }
+  preferences: {
+    
+  }
+  quickHelpers: {
+    axesEnabled: boolean;
+  }
+}

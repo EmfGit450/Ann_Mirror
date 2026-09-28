@@ -15,8 +15,6 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
 
-import { BuilderMenu } from "./ui";
-
 
 import { AxesViewer } from "@babylonjs/core/Debug/axesViewer";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
@@ -215,13 +213,6 @@ async function Main() {
 
   console.log(net.parseNetworkAsArray(), net);
 
-  
-  new BuilderMenu({
-    root: ".builder-panel",
-    showButton: "#builder-button",
-    collapseButton: "#collapse-builder-panel",
-  });
-
 
   const axes = new AxesViewer(scene, 4);
   const desiredScreenSize = 0.15;
@@ -267,7 +258,6 @@ setAxisColor(axes.zAxis, new Color4(0.2, 0.4, 1)), 1;   // Blue
         duration: 0.5,
         ease: "power3.inOut"
       })
-      //net.networkRoot.rotation.y + Math.PI / 2;
     }
   });
 
