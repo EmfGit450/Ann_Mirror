@@ -5,11 +5,14 @@
     "gsap": "^3.15.0"
   },
   "devDependencies": {
-    "esbuild": "^0.28.1"
+    "esbuild": "^0.28.1",
+    "prettier": "^3.9.9"
   },
   "scripts": {
     "build": "node build.mjs",
     "watch": "node build.mjs --watch",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "formatCheck": "prettier --check ."
   }
 }

@@ -1,12 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-		  
 * {
   -webkit-tap-highlight-color: transparent;
-	box-sizing: border-box;
-	outline: none;
+  box-sizing: border-box;
+  outline: none;
 }
-		  
-html, body {
+
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -15,10 +14,10 @@ html, body {
 }
 
 body {
-	background: black;
-	display: flex;
-	flex-direction: column;
-	padding: 0rem;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  padding: 0rem;
 }
 
 /*Main Container*/
@@ -27,48 +26,48 @@ body {
   flex-direction: column;
   justify-content: space-between;
   gap: 0.5rem;
-  
+
   height: 100dvh;
-	background: #000;
-	box-shadow: 0.2rem 0.2rem 1rem #1F1F1F;
-	      
-	font-family: "Montserrat";
-	color: white;
+  background: #000;
+  box-shadow: 0.2rem 0.2rem 1rem #1f1f1f;
+
+  font-family: "IBM Plex Mono";
+  color: white;
 }
 /*End*/
-	    
+
 /* Primary Button Styling*/
 button {
   display: flex;
-	justify-content: center;
-	align-items: center;
-	border: 0;
-	border-radius: 1.5rem;
-		    
-	transition: 0.3s ease;
-	width: 3.6rem;
-	height: 3.3rem;
-	background: radial-gradient(ellipse, #F7F7F7, #DDDDDD);
-	box-shadow: 0.1rem 0.1rem 1rem #DCDCDC33;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  border-radius: 1.5rem;
+
+  transition: 0.3s ease;
+  width: 3.6rem;
+  height: 3.3rem;
+  background: radial-gradient(ellipse, #f7f7f7, #dddddd);
+  box-shadow: 0.1rem 0.1rem 1rem #dcdcdc33;
 }
 button svg {
-	width: 1.8rem;
-	height: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
 }
 button svg * {
   transition: stroke 0.3s ease;
 }
 
-button.click {
+button.onclick {
   transition: 0.5s;
   background: radial-gradient(ellipse, #222, #070707);
-	box-shadow: 0.05rem 0.05rem 1rem #DCDCDC55;
-	transform: scale(1.05);
+  box-shadow: 0.05rem 0.05rem 1rem #dcdcdc55;
+  transform: scale(1.05);
 }
 
-button.click svg * {
+button.onclick svg * {
   transition: 0.5s;
-  stroke: #FFF;
+  stroke: #fff;
 }
 /*End*/
 
@@ -84,12 +83,12 @@ button.click svg * {
   height: 100dvh;
   background: #0f0f0f;
   z-index: 3;
-  
+
   padding: 2rem;
-  font-family: "Montserrat";
+  font-family: "IBM Plex Mono";
   font-size: 0.9rem;
   font-weight: 500;
-  color: #FFF;
+  color: #fff;
   text-align: center;
   line-height: 1.5rem;
 }
@@ -136,14 +135,16 @@ button.click svg * {
   line-height: 1.4;
 }
 
-.debugger-top div.label, .debugger-body div.label {
+.debugger-top div.label,
+.debugger-body div.label {
   background: #141414;
   padding: 0.3rem;
   border-radius: 0.5rem;
   margin-right: 0.2rem;
 }
 
-.debugger-top div.value, .debugger-body div.value {
+.debugger-top div.value,
+.debugger-body div.value {
   background: #333;
   padding: 0.3rem;
   border-radius: 0.5rem;
@@ -152,7 +153,10 @@ button.click svg * {
 .performance {
   user-select: none;
 }
-.performance, .Vendor, .Renderer, .API {
+.performance,
+.Vendor,
+.Renderer,
+.API {
   display: flex;
   gap: 0.3rem;
 }
@@ -176,7 +180,7 @@ button.click svg * {
   display: flex;
   justify-content: center;
   align-items: center;
-  
+
   position: absolute;
   z-index: 3;
   background: white;
@@ -211,7 +215,7 @@ button.click svg * {
   opacity: 0;
 
   font-family: "IBM Plex Mono";
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #fff;
 }
 
@@ -222,19 +226,43 @@ button.click svg * {
   margin-top: 2rem;
 }
 
-.preferences div {
+.preferences > div {
   display: flex;
   align-items: center;
-  gap: 0.6rem
+  gap: 1rem;
 }
 
-.preferences div label {
-  background: #fff;
-  padding: 0.2rem;
-  border-radius: 0.4rem;
-  text-align: center;
-  color: #000;
+.forward-dir-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.2rem;
 }
+
+.forward-dir-options button {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 0.7rem;
+}
+
+#px-dir {
+  background: radial-gradient(ellipse, #f00, #600);
+}
+#py-dir {
+  background: radial-gradient(ellipse, #0f0, #060);
+}
+#pz-dir {
+  background: radial-gradient(ellipse, #00f, #006);
+}
+#nx-dir {
+  background: radial-gradient(ellipse, #600, #f00);
+}
+#ny-dir {
+  background: radial-gradient(ellipse, #060, #0f0);
+}
+#nz-dir {
+  background: radial-gradient(ellipse, #006, #00f);
+}
+
 /*End*/
 
 /*Settings Menu*/
@@ -252,16 +280,16 @@ button.click svg * {
   z-index: 1;
 }
 /*End*/
-		  
+
 /*Center Editor*/
 .babylonjs-canvas {
-	display: flex;
-	flex-grow: 1;
-	height: 100dvh;
-	width: 100dvw;
-	position: absolute;
-	overflow: hidden;
-	z-index: 0;
+  display: flex;
+  flex-grow: 1;
+  height: 100dvh;
+  width: 100dvw;
+  position: absolute;
+  overflow: hidden;
+  z-index: 0;
 }
 
 .babylonjs-canvas canvas {
