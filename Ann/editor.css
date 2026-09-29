@@ -206,11 +206,20 @@ button.onclick svg * {
 }
 /*End*/
 
+/*Panel Notch*/
+.panel-notch {
+  position: absolute;
+  top: 1;
+  width: 4.4renm;
+  height: 4.4rem;
+  padding: 0.5rem;
+  background: var(--panel-bg);
+}
+/*End*/
 /*Settings Menu*/
 .settings-menu-panel {
   background: var(--panel-bg);
   top: 0;
-  left: auto;
   right: 0;
   width: 13rem;
   height: 100dvh;
@@ -223,6 +232,13 @@ button.onclick svg * {
   font-family: "IBM Plex Mono";
   font-size: 0.7rem;
   color: #fff;
+}
+
+.settings-menu-notch {
+  left: -4.5rem;
+  padding-right: 0.4rem;
+  border-top-left-radius: 0.6rem;
+  border-bottom-left-radius: 0.6rem;
 }
 /*End*/
 
@@ -244,19 +260,27 @@ button.onclick svg * {
   color: #fff;
 }
 
+.builder-panel-notch {
+  right: -4.5rem;
+  padding-left: 0.4rem;
+  border-top-right-radius: 0.6rem;
+  border-bottom-right-radius: 0.6rem;
+}
+
 .build-actions-list {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  margin-top: 2rem;
 }
 
 .build-actions-list label {
+  background: #000a;
   padding: 0.2rem;
   margin-bottom: 1rem;
   border: 1px solid white;
   border-radius: 1rem;
   text-align: center;
+  text-shadow: 0 0 1rem #2e2e2e
 }
 
 .build-actions-list .settings > div {
@@ -276,43 +300,26 @@ button.onclick svg * {
   width: 1.8rem;
   height: 1.8rem;
   border-radius: 0.7rem;
+  font-size: 1.3rem;
   color: #fff;
 }
 
-#px-dir {
-  background: radial-gradient(ellipse, #f00, #600);
-}
-#py-dir {
-  background: radial-gradient(ellipse, #0f0, #060);
-}
-#pz-dir {
-  background: radial-gradient(ellipse, #00f, #006);
-}
-#nx-dir {
-  background: radial-gradient(ellipse, #600, #f00);
-}
-#ny-dir {
-  background: radial-gradient(ellipse, #060, #0f0);
-}
-#nz-dir {
-  background: radial-gradient(ellipse, #006, #00f);
-}
+#px-dir { background: radial-gradient(ellipse, #f00, #600); }
+#py-dir { background: radial-gradient(ellipse, #0f0, #060); }
+#pz-dir { background: radial-gradient(ellipse, #00f, #006); }
+#nx-dir { background: radial-gradient(ellipse, #600, #f00); }
+#ny-dir { background: radial-gradient(ellipse, #060, #0f0); }
+#nz-dir { background: radial-gradient(ellipse, #006, #00f); }
 
 /*End*/
 
 /*Top Editor*/
 .top-editor {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: 1rem;
   margin: 1rem;
   z-index: 1;
-}
-
-.top-editor-left {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .quick-helper-buttons button {

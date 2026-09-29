@@ -93,7 +93,7 @@ let frameDelta: number | null = null;
 
 function updateDebugger() {
   PerformanceDebug.children[1]!.textContent = `${Math.round(engine?.getFps() as number)} fps`;
-  PerformanceDebug.children[2]!.textContent = `∆ ${frameDelta?.toFixed(2)}ms`;
+  PerformanceDebug.children[2]!.textContent = `∆ ${frameDelta?.toFixed(2)} ms`;
 }
 
 function showDebugger() {
@@ -244,9 +244,37 @@ setAxisColor(axes.zAxis, new Color4(0.2, 0.4, 1)), 1;   // Blue
     // Make the visual size constant on screen
     axes.scaleLines = desiredScreenSize * distance;
   });
-
-
-  //new UI()
+  
+  
+  
+  new UI({
+    rootSelector: ".quick-helper-buttons",
+    helperSelectors: {
+      axesHelperSelector: "#axes-helper-toggle"
+    },
+    helperHooks: {
+      bjsAxesViewer: axes
+    }
+    }, {
+    rootSelector: ".settings-menu-panel",
+    togglerSelector: "#app-settings",
+    settingsSelectors: {
+      themeToggle: "#theme-toggle"
+    }
+  }, {
+    rootSelector: ".builder-panel",
+    togglerSelector: "#builder-panel-toggler",
+    actionButtonSelectors: {
+      addLayerSelector: "#add-layer"
+    },
+    settings: {
+      forwardDirButtonSelectors: {
+        px: "#px-dir", nx: "#nx-dir",
+        py: "#py-dir", ny: "#ny-dir",
+        pz: "#pz-dir", nz: "#nz-dir"
+      }
+    }
+  });
   //Tests End
 
   let frameC = 0;

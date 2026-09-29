@@ -45,58 +45,25 @@
     </div>
 
     <div class="settings-menu-panel">
-      
-    </div>
-
-    <div class="builder-panel">
-      <button id="collapse-builder-panel">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke="#000">
-          <path d="M 5 1 L 7 1 L 7 23 L 5 23 Z" stroke-width="1.9" />
-          <path
-            d="M 8 9 L 4.5 12 M 4.5 12 L 8 15 M 4.5 12 L 13 12"
-            stroke-width="1.8"
-            transform="translate(9, 0) scale(1.2)"
-            transform-origin="center"
-          />
-        </svg>
-      </button>
-
-      <div class="build-actions-list">
-        <label>Settings</label>
-        <div class="settings">
-          <div class="forward-dir">
-            <button id="forward-dir-icon">
-              <svg
-                viewBox="0 0 24 24"
-                stroke="black"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M 12 12 L 12 5 M 12 12 L 4.2 17.2 M 12 12 L 19.8 17.2 M 12 12 L 5.2 8.1 M 12 12 L 18.8 8.1 M 12 12 L 12 19"
-                  fill="none"
-                  transform-origin="center"
-                  transform="scale(1.2)"
-                />
-              </svg>
-            </button>
-            <div class="forward-dir-options">
-              <button id="px-dir">+x</button>
-              <button id="py-dir">+y</button>
-              <button id="pz-dir">+z</button>
-              <button id="nx-dir">-x</button>
-              <button id="ny-dir">-y</button>
-              <button id="nz-dir">-z</button>
-            </div>
-          </div>
-        </div>
+      <div class="settings-menu-notch panel-notch">
+        <button id="app-settings">
+          <!-- path from feathericons.com -->
+          <svg class="settings-icon-svg" viewBox="0 0 24 24">
+            <circle r="4" cx="12" cy="12" fill="none" stroke="black" stroke-width="2" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+              fill="none"
+              stroke-width="2"
+              stroke="black"
+            />
+          </svg>
+        </button>
       </div>
     </div>
 
-    <div class="main-c">
-      <div class="top-editor">
-        <button id="builder-button">
+    <div class="builder-panel">
+      <div class="builder-panel-notch panel-notch">
+        <button id="builder-panel-toggler">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -121,7 +88,43 @@
             />
           </svg>
         </button>
+      </div>
 
+      <div class="build-actions-list">
+        <label>Settings</label>
+        <div class="settings">
+          <div class="forward-dir">
+            <button id="forward-dir-icon">
+              <svg
+                viewBox="0 0 24 24"
+                stroke="black"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M 12 12 L 12 5 M 12 12 L 4.2 17.2 M 12 12 L 19.8 17.2 M 12 12 L 5.2 8.1 M 12 12 L 18.8 8.1 M 12 12 L 12 19"
+                  fill="none"
+                  transform-origin="center"
+                  transform="scale(1.2)"
+                />
+              </svg>
+            </button>
+            <div class="forward-dir-options">
+              <button id="px-dir">+</button>
+              <button id="py-dir">+</button>
+              <button id="pz-dir">+</button>
+              <button id="nx-dir">-</button>
+              <button id="ny-dir">-</button>
+              <button id="nz-dir">-</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-c">
+      <div class="top-editor">
         <div id="debugger">
           <div class="debugger-top">
             <div class="performance">
@@ -162,20 +165,9 @@
             </div>
           </div>
         </div>
-        <div class="top-editor-left">
-          <button id="editor-settings">
-            <!-- path from feathericons.com -->
-            <svg class="settings-icon-svg" viewBox="0 0 24 24">
-              <circle r="4" cx="12" cy="12" fill="none" stroke="black" stroke-width="2" />
-              <path
-                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-                fill="none"
-                stroke-width="2"
-                stroke="black"
-              />
-            </svg>
-          </button>
-          <div class="quick-helper-buttons">
+      </div>
+
+      <div class="quick-helper-buttons">
             <button id="axes-helper-toggle">
               <svg
                 viewBox="0 0 24 24"
@@ -190,8 +182,6 @@
                 </g>
               </svg>
             </button>
-          </div>
-        </div>
       </div>
 
       <div class="babylonjs-canvas">

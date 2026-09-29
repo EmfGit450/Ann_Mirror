@@ -5,3 +5,6 @@ We could add a "viz style" setting, with two options.
           instead.
 
 will prepare soon - got other stuff to do.
+
+[29 Sep 2026 : 17:31]
+the styles can be "Diagram" - like netron, "Graph", the current style, and "Matrix".

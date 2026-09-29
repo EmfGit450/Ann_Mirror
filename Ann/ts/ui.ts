@@ -4,6 +4,7 @@ import type { AxesViewer } from "@babylonjs/core/Debug/axesViewer";
 
 interface QuickHelpersConfig {
   rootSelector: string;
+  
   helperSelectors: {
     axesHelperSelector: string;
   };
@@ -14,13 +15,15 @@ interface QuickHelpersConfig {
 
 interface SettingsConfig {
   rootSelector: string;
-  settingsButtonSelectors: {
+  togglerSelector: string;
+  settingsSelectors: {
     themeToggle: string;
   }
 }
 
 interface BuilderConfig {
   rootSelector: string;
+  togglerSelector: string;
   actionButtonSelectors: {
     addLayerSelector: string;
   }
@@ -36,6 +39,7 @@ interface BuilderConfig {
 
 interface QuickHelpersUI {
   root: HTMLElement
+  
   helpers: {
     axesHelper: HTMLButtonElement;
   }
@@ -43,6 +47,8 @@ interface QuickHelpersUI {
 
 interface SettingsUI {
   root: HTMLElement;
+  toggler: HTMLButtonElement;
+  
   settings: {
     themeToggle: HTMLButtonElement;
   }
@@ -50,6 +56,8 @@ interface SettingsUI {
 
 interface BuilderUI {
   root: HTMLElement;
+  toggler: HTMLButtonElement;
+  
   actions: {
     addLayer: HTMLButtonElement;
   }
@@ -64,13 +72,15 @@ interface BuilderUI {
 
 interface EditorState {
   settings: {
-    app: {
-      darkMode: boolean;
-    },
-    builder: {
+    panelToggled: boolean; //whether the settings menu is shown or not
+    darkMode: boolean;
+  }
+  builder: {
+    panelToggled: boolean;
+    settings: {
       forwardDirection: ForwardDirection;
     }
-  },
+  }
   quickHelpers: {
     axesEnabled: boolean;
   }
@@ -94,12 +104,15 @@ export class UI {
   constructor(quickHelpersConfig: QuickHelpersConfig, 
               settingsConfig: SettingsConfig,
               builderConfig: BuilderConfig) {
+    //Init Start
     this.state = {
       settings: {
-        app: {
-          darkMode: true
-        },
-        builder: {
+        panelToggled: false,
+        darkMode: true
+      },
+      builder: {
+        panelToggled: false,
+        settings: {
           forwardDirection: ForwardDirection.PositiveX
         }
       },
@@ -111,6 +124,7 @@ export class UI {
 
     this.quickHelpersUI = {
       root: document.querySelector(quickHelpersConfig.rootSelector)!,
+      
       helpers: {
         axesHelper: document.querySelector(quickHelpersConfig.helperSelectors.axesHelperSelector)!
       }
@@ -118,13 +132,17 @@ export class UI {
 
     this.settingsUI = {
       root: document.querySelector(settingsConfig.rootSelector)!,
+      toggler: document.querySelector(settingsConfig.togglerSelector)!,
+      
       settings: {
-        themeToggle: document.querySelector(settingsConfig.settingsButtonSelectors.themeToggle)!
+        themeToggle: document.querySelector(settingsConfig.settingsSelectors.themeToggle)!
       }
     }
 
     this.builderUI = {
       root: document.querySelector(builderConfig.rootSelector)!,
+      toggler: document.querySelector(builderConfig.togglerSelector)!,
+      
       actions: {
         addLayer: document.querySelector(builderConfig.actionButtonSelectors.addLayerSelector)!
       },
@@ -136,8 +154,31 @@ export class UI {
         }
       }
     }
+    //Init End
 
-    
+    //Main UI Togglers Start
+    this.settingsUI.toggler.addEventListener("click", () => {
+      this.state.settings.panelToggled = !this.state.settings.panelToggled;
+      
+      gsap.to(this.settingsUI.root, {
+        xPercent: this.state.settings.panelToggled ? 0 : 100, //100 - to the right
+        duration: 0.3,
+        ease: "expo.inOut"
+      });
+    });
+
+    this.builderUI.toggler.addEventListener("click", () => {
+      this.state.builder.panelToggled = !this.state.builder.panelToggled;
+
+      gsap.to(this.builderUI.root, {
+        xPercent: this.state.builder.panelToggled ? 0 : -100, //to the left
+        duration: 0.3,
+        ease: "expo.inOut"
+      });
+    });
+    //Main UI Togglers End
+
+    //Quick Helpers Setup Start
     this.quickHelpersUI.helpers.axesHelper.addEventListener("click", () => {
       this.state.quickHelpers.axesEnabled = !this.state.quickHelpers.axesEnabled;
 
@@ -152,5 +193,6 @@ export class UI {
         quickHelpersConfig.helperHooks.bjsAxesViewer.zAxis.setEnabled(false);
       }
     });
+    //Quick Helpers Setup End
   }
 }
