@@ -19,6 +19,7 @@ body {
 }
 
 body {
+  position: relative;
   background: black;
   display: flex;
   flex-direction: column;
@@ -119,7 +120,7 @@ button.onclick svg * {
   border-radius: 1rem;
   padding: 0.8rem;
   text-shadow: 0 0 1rem #443838;
-  z-index: 4;
+  z-index: 3;
   font-family: "IBM Plex Mono", Monospace;
 
   scale: 0;
@@ -209,13 +210,14 @@ button.onclick svg * {
 /*Panel Notch*/
 .panel-notch {
   position: absolute;
-  top: 1;
+  top: 1rem;
   width: 4.4renm;
   height: 4.4rem;
   padding: 0.5rem;
   background: var(--panel-bg);
 }
 /*End*/
+
 /*Settings Menu*/
 .settings-menu-panel {
   background: var(--panel-bg);
@@ -232,6 +234,8 @@ button.onclick svg * {
   font-family: "IBM Plex Mono";
   font-size: 0.7rem;
   color: #fff;
+
+  translate: 100% 0;
 }
 
 .settings-menu-notch {
@@ -258,6 +262,8 @@ button.onclick svg * {
   font-family: "IBM Plex Mono";
   font-size: 1.4rem;
   color: #fff;
+
+  translate: -100% 0;
 }
 
 .builder-panel-notch {
@@ -313,6 +319,19 @@ button.onclick svg * {
 
 /*End*/
 
+/*Quick Helpers*/
+.quick-helper-buttons {
+  position: absolute;
+  z-index: 2;
+  top: 6rem;
+  right: 0.4rem;
+}
+
+.quick-helper-buttons button {
+  scale: 0.9;
+}
+/*End*/
+
 /*Top Editor*/
 .top-editor {
   display: flex;
@@ -320,10 +339,6 @@ button.onclick svg * {
   gap: 1rem;
   margin: 1rem;
   z-index: 1;
-}
-
-.quick-helper-buttons button {
-  scale: 0.8;
 }
 /*End*/
 

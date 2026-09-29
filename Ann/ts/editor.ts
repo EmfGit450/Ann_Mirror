@@ -228,21 +228,19 @@ async function Main() {
             mat.disableLighting = true;
         }
     });
-};
+  };
 
-setAxisColor(axes.xAxis, new Color4(1, 0.15, 0.15, 1)); // Red
-setAxisColor(axes.yAxis, new Color4(0.15, 1, 0.15, 1)); // Green
-setAxisColor(axes.zAxis, new Color4(0.2, 0.4, 1)), 1;   // Blue
+  setAxisColor(axes.xAxis, new Color4(1, 0.15, 0.15, 1)); // Red
+  setAxisColor(axes.yAxis, new Color4(0.15, 1, 0.15, 1)); // Green
+  setAxisColor(axes.zAxis, new Color4(0.2, 0.4, 1)), 1;   // Blue
   
   scene.onBeforeRenderObservable.add(() => {
     const camera = scene.activeCamera;
     if (!camera) return;
-
-    // Distance from camera to the axes origin (or wherever you placed it)
+    
     const distance = Vector3.Distance(camera.position, axes.xAxis.position);
-
-    // Make the visual size constant on screen
-    axes.scaleLines = desiredScreenSize * distance;
+    
+    axes.scaleLines = desiredScreenSize * (distance > 20 ? distance : 20);
   });
   
   
@@ -255,7 +253,7 @@ setAxisColor(axes.zAxis, new Color4(0.2, 0.4, 1)), 1;   // Blue
     helperHooks: {
       bjsAxesViewer: axes
     }
-    }, {
+  }, {
     rootSelector: ".settings-menu-panel",
     togglerSelector: "#app-settings",
     settingsSelectors: {

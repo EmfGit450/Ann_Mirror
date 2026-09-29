@@ -161,7 +161,7 @@ export class UI {
       this.state.settings.panelToggled = !this.state.settings.panelToggled;
       
       gsap.to(this.settingsUI.root, {
-        xPercent: this.state.settings.panelToggled ? 0 : 100, //100 - to the right
+        xPercent: this.state.settings.panelToggled ? 0 : -100, //100 - to the right
         duration: 0.3,
         ease: "expo.inOut"
       });
@@ -171,7 +171,7 @@ export class UI {
       this.state.builder.panelToggled = !this.state.builder.panelToggled;
 
       gsap.to(this.builderUI.root, {
-        xPercent: this.state.builder.panelToggled ? 0 : -100, //to the left
+        xPercent: this.state.builder.panelToggled ? 0 : 100, //to the left
         duration: 0.3,
         ease: "expo.inOut"
       });
