@@ -1,5 +1,5 @@
 :root {
-  --panel-bg: #171717da;
+  --panel-bg: #171717fa;
   --debugger-bg: #00000066;
 }
 
@@ -54,7 +54,7 @@ button {
   width: 3.6rem;
   height: 3.3rem;
   background: radial-gradient(ellipse, #f7f7f7, #dddddd);
-  box-shadow: 0.1rem 0.1rem 1rem #dcdcdc33;
+  box-shadow: 0 0 1rem #dcdcdc33;
 }
 button svg {
   width: 1.8rem;
@@ -67,7 +67,7 @@ button svg * {
 button.onclick {
   transition: 0.5s;
   background: radial-gradient(ellipse, #222, #070707);
-  box-shadow: 0.05rem 0.05rem 1rem #dcdcdc55;
+  box-shadow: 0 0 1rem #dcdcdc55;
   transform: scale(1.05);
 }
 
@@ -308,6 +308,7 @@ button.onclick svg * {
   border-radius: 0.7rem;
   font-size: 1.3rem;
   color: #fff;
+  box-shadow: 0 0 1rem #333
 }
 
 #px-dir { background: radial-gradient(ellipse, #f00, #600); }
