@@ -245,23 +245,30 @@ async function Main() {
   
   
   
-  new UI({
+  const quickHelpersConfig = {
     rootSelector: ".quick-helper-buttons",
+    
     helperSelectors: {
-      axesHelperSelector: "#axes-helper-toggle"
+    axesHelperSelector: "#axes-helper-toggle"
     },
     helperHooks: {
       bjsAxesViewer: axes
     }
-  }, {
+  };
+
+  const settingsConfig = {
     rootSelector: ".settings-menu-panel",
     togglerSelector: "#app-settings",
+    
     settingsSelectors: {
       themeToggle: "#theme-toggle"
     }
-  }, {
+  };
+
+  const builderConfig = {
     rootSelector: ".builder-panel",
     togglerSelector: "#builder-panel-toggler",
+    
     actionButtonSelectors: {
       addLayerSelector: "#add-layer"
     },
@@ -272,7 +279,9 @@ async function Main() {
         pz: "#pz-dir", nz: "#nz-dir"
       }
     }
-  });
+  };
+
+  new UI(quickHelpersConfig, settingsConfig, builderConfig);
   //Tests End
 
   let frameC = 0;
