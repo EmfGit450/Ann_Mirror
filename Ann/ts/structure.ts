@@ -252,30 +252,12 @@ export class Network {
       for (let end = 0; end < lBnC; end++) {
         const currEndOff = end * 16;
 
-        const input1 = [
-          lAneurons[currStart + 12]!,
-          lAneurons[currStart + 13]!,
-          lAneurons[currStart + 14]!,
-        ];
-        const input2 = [
-          lAneurons[currStart + 28]!,
-          lAneurons[currStart + 29]!,
-          lAneurons[currStart + 30]!,
-        ];
-        const output = [
-          lBneurons[currEndOff + 12]!,
-          lBneurons[currEndOff + 13]!,
-          lBneurons[currEndOff + 14]!,
-        ];
+        const input1 = [lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!];
+        const input2 = [lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]!];
+        const output = [lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!];
 
-        const dist_i1_lACenter =
-          (input1[0] - lA.annMeta.pos[0]) ** 2 +
-          (input1[1] - lA.annMeta.pos[1]) ** 2 +
-          (input1[2] - lA.annMeta.pos[2]) ** 2;
-        const dist_i1_lBCenter =
-          (input1[0] - lB.annMeta.pos[0]) ** 2 +
-          (input1[1] - lB.annMeta.pos[1]) ** 2 +
-          (input1[2] - lB.annMeta.pos[2]) ** 2;
+        const dist_i1_lACenter = (input1[0]! - connection.input.pos[0]!) ** 2 + (input1[1]! - connection.input.pos[1]!) ** 2 + (input1[2]! - connection.input.pos[2]!) ** 2;
+        const dist_i1_lBCenter = (input1[0]! - connection.input.pos[0]!) ** 2 + (input1[1]! - connection.input.pos[1]!) ** 2 + (input1[2]! - connection.input.pos[2]!) ** 2;
 
         const dist_diff = Math.sqrt(dist_i1_lACenter) - Math.sqrt(dist_i1_lBCenter);
 
@@ -283,15 +265,9 @@ export class Network {
 
         base_fts.push(
           new Float32Array([
-            lAneurons[currStart + 12]!,
-            lAneurons[currStart + 13]!,
-            lAneurons[currStart + 14]!, //input1
-            lBneurons[currEndOff + 12]!,
-            lBneurons[currEndOff + 13]!,
-            lBneurons[currEndOff + 14]!, //output
-            lAneurons[currStart + 28]!,
-            lAneurons[currStart + 29]!,
-            lAneurons[currStart + 30]!, //input2
+            lAneurons[currStart + 12]!, lAneurons[currStart + 13]!, lAneurons[currStart + 14]!, //input1
+            lBneurons[currEndOff + 12]!, lBneurons[currEndOff + 13]!, lBneurons[currEndOff + 14]!, //output
+            lAneurons[currStart + 28]!, lAneurons[currStart + 29]!, lAneurons[currStart + 30]!, //input2
           ])
         );
       }
@@ -303,6 +279,7 @@ export class Network {
     };
 
     const meshId = connection.id ?? randInt53();
+    if (meshId != connection.id) connection.id = meshId;
 
     let meshes: GreasedLineMesh[] = [];
 

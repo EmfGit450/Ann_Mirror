@@ -1,3 +1,8 @@
+:root {
+  --panel-bg: #171717da;
+  --debugger-bg: #00000066;
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
@@ -109,7 +114,7 @@ button.onclick svg * {
   gap: 0.5rem;
 
   font-size: 1rem;
-  background: #00000066;
+  background: var(--debugger-bg);
   color: #f0e5e5;
   border-radius: 1rem;
   padding: 0.8rem;
@@ -201,9 +206,29 @@ button.onclick svg * {
 }
 /*End*/
 
+/*Settings Menu*/
+.settings-menu-panel {
+  background: var(--panel-bg);
+  top: 0;
+  left: auto;
+  right: 0;
+  width: 13rem;
+  height: 100dvh;
+  position: absolute;
+  will-change: transform;
+  z-index: 2;
+  padding: 1rem;
+  opacity: 1;
+
+  font-family: "IBM Plex Mono";
+  font-size: 0.7rem;
+  color: #fff;
+}
+/*End*/
+
 /*Builder Panel*/
 .builder-panel {
-  background: #171717da;
+  background: var(--panel-bg);
   top: 0;
   left: 0;
   width: 13rem;
@@ -212,10 +237,10 @@ button.onclick svg * {
   will-change: transform;
   z-index: 2;
   padding: 1rem;
-  opacity: 0;
+  opacity: 1;
 
   font-family: "IBM Plex Mono";
-  font-size: 0.7rem;
+  font-size: 1.4rem;
   color: #fff;
 }
 
@@ -226,7 +251,15 @@ button.onclick svg * {
   margin-top: 2rem;
 }
 
-.preferences > div {
+.build-actions-list label {
+  padding: 0.2rem;
+  margin-bottom: 1rem;
+  border: 1px solid white;
+  border-radius: 1rem;
+  text-align: center;
+}
+
+.build-actions-list .settings > div {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -239,25 +272,32 @@ button.onclick svg * {
 }
 
 .forward-dir-options button {
+  min-width: 0;
   width: 1.8rem;
   height: 1.8rem;
   border-radius: 0.7rem;
-  color: #fff
+  color: #fff;
 }
 
-#px-dir { background: radial-gradient(ellipse, #f00, #600); }
-#py-dir { background: radial-gradient(ellipse, #0f0, #060); }
-#pz-dir { background: radial-gradient(ellipse, #00f, #006); }
-#nx-dir { background: radial-gradient(ellipse, #600, #f00); }
-#ny-dir { background: radial-gradient(ellipse, #060, #0f0); }
-#nz-dir { background: radial-gradient(ellipse, #006, #00f); }
-
-/*End*/
-
-/*Settings Menu*/
-.settings-menu {
-  background: red;
+#px-dir {
+  background: radial-gradient(ellipse, #f00, #600);
 }
+#py-dir {
+  background: radial-gradient(ellipse, #0f0, #060);
+}
+#pz-dir {
+  background: radial-gradient(ellipse, #00f, #006);
+}
+#nx-dir {
+  background: radial-gradient(ellipse, #600, #f00);
+}
+#ny-dir {
+  background: radial-gradient(ellipse, #060, #0f0);
+}
+#nz-dir {
+  background: radial-gradient(ellipse, #006, #00f);
+}
+
 /*End*/
 
 /*Top Editor*/

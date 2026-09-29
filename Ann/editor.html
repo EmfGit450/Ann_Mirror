@@ -44,15 +44,17 @@
       <span>The screen size of this device is insufficient to display this content properly</span>
     </div>
 
+    <div class="settings-menu-panel">
+      
+    </div>
+
     <div class="builder-panel">
       <button id="collapse-builder-panel">
-        <svg viewBox="0 0 24 24">
-          <path d="M 7 1 V 7 23" stroke-linecap="round" stroke-width="1.9" stroke="#000" />
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke="#000">
+          <path d="M 5 1 L 7 1 L 7 23 L 5 23 Z" stroke-width="1.9" />
           <path
             d="M 8 9 L 4.5 12 M 4.5 12 L 8 15 M 4.5 12 L 13 12"
-            stroke-linecap="round"
             stroke-width="1.8"
-            stroke="#000"
             transform="translate(9, 0) scale(1.2)"
             transform-origin="center"
           />
@@ -60,7 +62,8 @@
       </button>
 
       <div class="build-actions-list">
-        <div class="preferences">
+        <label>Settings</label>
+        <div class="settings">
           <div class="forward-dir">
             <button id="forward-dir-icon">
               <svg
@@ -174,10 +177,12 @@
           </button>
           <div class="quick-helper-buttons">
             <button id="axes-helper-toggle">
-              <svg viewBox="0 0 24 24"
+              <svg
+                viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke-linecap="round"
-                stroke-linejoin="round">
+                stroke-linejoin="round"
+              >
                 <g transform-origin="center" transform="scale(1.4)">
                   <path d="M 12 12 L 4.2 17.2" stroke="#e33232" />
                   <path d="M 12 12 L 12 5" stroke="#3de63d" />

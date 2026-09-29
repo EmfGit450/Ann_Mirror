@@ -7,13 +7,14 @@ import { Scene } from "@babylonjs/core/scene";
 
 import { Camera } from "./camera";
 
-import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Color4 } from "@babylonjs/core/Maths/math.color";
 
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
+import { UI } from "./ui";
 
 
 import { AxesViewer } from "@babylonjs/core/Debug/axesViewer";
@@ -243,6 +244,9 @@ setAxisColor(axes.zAxis, new Color4(0.2, 0.4, 1)), 1;   // Blue
     // Make the visual size constant on screen
     axes.scaleLines = desiredScreenSize * distance;
   });
+
+
+  //new UI()
   //Tests End
 
   let frameC = 0;
