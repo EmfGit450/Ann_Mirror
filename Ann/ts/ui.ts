@@ -167,6 +167,7 @@ export class UI {
       });
     });
 
+    
     this.builderUI.toggler.addEventListener("click", () => {
       this.state.builder.panelToggled = !this.state.builder.panelToggled;
 
@@ -176,6 +177,13 @@ export class UI {
         ease: "expo.inOut"
       });
     });
+    
+    this.builderUI.settings.forwardDirButtons.px.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.PositiveX; console.log(this.state.builder.settings); });
+    this.builderUI.settings.forwardDirButtons.py.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.PositiveY; console.log(this.state.builder.settings); });
+    this.builderUI.settings.forwardDirButtons.pz.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.PositiveZ; console.log(this.state.builder.settings); });
+    this.builderUI.settings.forwardDirButtons.nx.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.NegativeX; console.log(this.state.builder.settings); });
+    this.builderUI.settings.forwardDirButtons.ny.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.NegativeY; console.log(this.state.builder.settings); });
+    this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.NegativeZ; console.log(this.state.builder.settings); });
     //Main UI Togglers End
 
     //Quick Helpers Setup Start

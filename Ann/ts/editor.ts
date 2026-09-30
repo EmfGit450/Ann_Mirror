@@ -283,21 +283,9 @@ async function Main() {
 
   new UI(quickHelpersConfig, settingsConfig, builderConfig);
   //Tests End
-
-  let frameC = 0;
+  
   engine.runRenderLoop(() => {
-    frameC++;
     scene.render();
-
-    if (frameC >= 120) {
-      frameC = 0;
-
-      gsap.to(net.networkRoot.rotation, {
-        y: net.networkRoot.rotation.y + Math.PI / 2,
-        duration: 0.5,
-        ease: "power3.inOut"
-      })
-    }
   });
 
   let lastFrameTime = performance.now();
