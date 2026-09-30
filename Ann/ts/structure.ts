@@ -29,6 +29,7 @@ export function randInt53(): number {
   return view.getUint32(0, true) + view.getUint16(4, true) * 0x100000000 + buf[6]! * 0x10000000000;
 }
 
+
 export const enum ConnectionType {
   Dense = 100,
   ResidualTruncate,
@@ -48,6 +49,7 @@ export const enum ActivationType {
   ELU,
   Softmax,
 }
+
 
 export interface ConnectionData {
   //Render
@@ -72,6 +74,7 @@ export interface LayerData {
   //Internal
   _sequence_index: number | undefined;
 }
+
 
 export class Network {
   metadata: {

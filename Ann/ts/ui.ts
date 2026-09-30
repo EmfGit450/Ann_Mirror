@@ -182,6 +182,9 @@ export class UI {
       }
     }
 
+    gsap.set(this.settingsUI.root, { xPercent: 100, opacity: 1 });
+    gsap.set(this.builderUI.root, { xPercent: -100, opacity: 1 });
+
     this.builderUI.networkRoot.rotationQuaternion = Quaternion.Identity();
     //Init End
 
@@ -190,7 +193,12 @@ export class UI {
       this.state.settings.panelToggled = !this.state.settings.panelToggled;
       
       gsap.to(this.settingsUI.root, {
-        xPercent: this.state.settings.panelToggled ? 0 : -100, //100 - to the right
+        xPercent: this.state.settings.panelToggled ? 0 : 100,
+        duration: 0.3,
+        ease: "expo.inOut"
+      });
+      gsap.to(this.settingsUI.toggler.parentElement, {
+        x: this.state.settings.panelToggled ? "-13rem" : 0,
         duration: 0.3,
         ease: "expo.inOut"
       });
@@ -201,9 +209,14 @@ export class UI {
       this.state.builder.panelToggled = !this.state.builder.panelToggled;
 
       gsap.to(this.builderUI.root, {
-        xPercent: this.state.builder.panelToggled ? 0 : 100, //to the left
+        xPercent: this.state.builder.panelToggled ? 0 : -100,
         duration: 0.3,
-        ease: "expo.inOut"
+        ease: "circ.inOut"
+      });
+      gsap.to(this.builderUI.toggler.parentElement, {
+        x: this.state.builder.panelToggled ? "13rem" : 0,
+        duration: 0.3,
+        ease: "circ.inOut"
       });
     });
     

@@ -214,7 +214,7 @@ async function Main() {
 
   console.log(net.parseNetworkAsArray(), net);
 
-
+  
   const axes = new AxesViewer(scene, 4);
   const desiredScreenSize = 0.15;
 
@@ -243,6 +243,9 @@ async function Main() {
     axes.scaleLines = desiredScreenSize * (distance > 20 ? distance : 20);
   });
   
+  axes.xAxis.setEnabled(false);
+  axes.yAxis.setEnabled(false);
+  axes.zAxis.setEnabled(false);
   
   
   const quickHelpersConfig = {
@@ -283,7 +286,7 @@ async function Main() {
     }
   };
 
-  new UI(quickHelpersConfig, settingsConfig, builderConfig);
+  const ui = new UI(quickHelpersConfig, settingsConfig, builderConfig);
   //Tests End
   
   engine.runRenderLoop(() => {
@@ -313,11 +316,15 @@ async function Main() {
 
   //@ts-ignore
   window.net = () => net;
+  //@ts-ignore
+  window.ui = () => ui;
   //Debugger End
 
   window.addEventListener("resize", () => {
     engine?.resize();
   });
+
+  window.addEventListener("contextmenu", (e) => e.preventDefault());
 }
 
 try {
