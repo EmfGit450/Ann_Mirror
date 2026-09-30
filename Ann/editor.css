@@ -86,12 +86,12 @@ button:active {
   width: 100dvw;
   height: 100dvh;
   background: #0f0f0f;
-  z-index: 3;
+  z-index: 4;
 
   padding: 2rem;
   font-family: "IBM Plex Mono";
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 400;
   color: #fff;
   text-align: center;
   line-height: 1.1rem;
@@ -335,7 +335,7 @@ button:active {
   touch-action: none;
 }
 
-@media (max-width: 620px) {
+@media (max-width: 620px) or (max-height: 400px) {
   .small-screen-error {
     display: flex;
   }
