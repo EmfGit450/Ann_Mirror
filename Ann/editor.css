@@ -64,16 +64,10 @@ button svg * {
   transition: stroke 0.3s ease;
 }
 
-button.onclick {
+button:active {
   transition: 0.5s;
-  background: radial-gradient(ellipse, #222, #070707);
   box-shadow: 0 0 1rem #dcdcdc55;
-  transform: scale(1.05);
-}
-
-button.onclick svg * {
-  transition: 0.5s;
-  stroke: #fff;
+  transform: scale(1.4);
 }
 /*End*/
 
@@ -96,7 +90,7 @@ button.onclick svg * {
   font-weight: 500;
   color: #fff;
   text-align: center;
-  line-height: 1.5rem;
+  line-height: 1.1rem;
 }
 
 .small-screen-error span {
@@ -280,11 +274,11 @@ button.onclick svg * {
 }
 
 .build-actions-list label {
-  background: #000a;
+  background: #0008;
   padding: 0.2rem;
   margin-bottom: 1rem;
   border: 1px solid white;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   text-align: center;
   text-shadow: 0 0 1rem #2e2e2e
 }

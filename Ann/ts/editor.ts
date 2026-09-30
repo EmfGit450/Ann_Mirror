@@ -249,7 +249,7 @@ async function Main() {
     rootSelector: ".quick-helper-buttons",
     
     helperSelectors: {
-    axesHelperSelector: "#axes-helper-toggle"
+      axesHelperSelector: "#axes-helper-toggle"
     },
     helperHooks: {
       bjsAxesViewer: axes
@@ -268,6 +268,8 @@ async function Main() {
   const builderConfig = {
     rootSelector: ".builder-panel",
     togglerSelector: "#builder-panel-toggler",
+
+    networkRoot: net.networkRoot,
     
     actionButtonSelectors: {
       addLayerSelector: "#add-layer"

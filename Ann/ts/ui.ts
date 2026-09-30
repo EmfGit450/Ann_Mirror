@@ -1,6 +1,12 @@
 import { gsap } from "gsap";
 
+
 import type { AxesViewer } from "@babylonjs/core/Debug/axesViewer";
+
+
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
+
 
 interface QuickHelpersConfig {
   rootSelector: string;
@@ -16,6 +22,7 @@ interface QuickHelpersConfig {
 interface SettingsConfig {
   rootSelector: string;
   togglerSelector: string;
+  
   settingsSelectors: {
     themeToggle: string;
   }
@@ -24,6 +31,9 @@ interface SettingsConfig {
 interface BuilderConfig {
   rootSelector: string;
   togglerSelector: string;
+
+  networkRoot: TransformNode;
+  
   actionButtonSelectors: {
     addLayerSelector: string;
   }
@@ -57,6 +67,8 @@ interface SettingsUI {
 interface BuilderUI {
   root: HTMLElement;
   toggler: HTMLButtonElement;
+
+  networkRoot: TransformNode;
   
   actions: {
     addLayer: HTMLButtonElement;
@@ -70,7 +82,7 @@ interface BuilderUI {
   }
 }
 
-interface EditorState {
+interface UIState {
   settings: {
     panelToggled: boolean; //whether the settings menu is shown or not
     darkMode: boolean;
@@ -93,13 +105,26 @@ export const enum ForwardDirection {
   PositiveZ, NegativeZ,
 }
 
+const HALF_PI = Math.PI / 2;
+
+const DIRECTION_QUATS = [
+  Quaternion.Identity(),                                    // +X
+  Quaternion.RotationAxis(Vector3.Up(), Math.PI),           // -X
+  Quaternion.RotationAxis(Vector3.Forward(), HALF_PI),      // +Y
+  Quaternion.RotationAxis(Vector3.Forward(), -HALF_PI),     // -Y
+  Quaternion.RotationAxis(Vector3.Up(), -HALF_PI),          // +Z
+  Quaternion.RotationAxis(Vector3.Up(), HALF_PI),           // -Z
+];
+
 
 export class UI {
   quickHelpersUI: QuickHelpersUI;
   settingsUI: SettingsUI;
   builderUI: BuilderUI;
 
-  state: EditorState;
+  state: UIState;
+
+  forwardDirTweening: boolean = false;
 
   constructor(quickHelpersConfig: QuickHelpersConfig, 
               settingsConfig: SettingsConfig,
@@ -142,6 +167,8 @@ export class UI {
     this.builderUI = {
       root: document.querySelector(builderConfig.rootSelector)!,
       toggler: document.querySelector(builderConfig.togglerSelector)!,
+
+      networkRoot: builderConfig.networkRoot,
       
       actions: {
         addLayer: document.querySelector(builderConfig.actionButtonSelectors.addLayerSelector)!
@@ -154,6 +181,8 @@ export class UI {
         }
       }
     }
+
+    this.builderUI.networkRoot.rotationQuaternion = Quaternion.Identity();
     //Init End
 
     //Main UI Togglers Start
@@ -178,12 +207,12 @@ export class UI {
       });
     });
     
-    this.builderUI.settings.forwardDirButtons.px.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.PositiveX; console.log(this.state.builder.settings); });
-    this.builderUI.settings.forwardDirButtons.py.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.PositiveY; console.log(this.state.builder.settings); });
-    this.builderUI.settings.forwardDirButtons.pz.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.PositiveZ; console.log(this.state.builder.settings); });
-    this.builderUI.settings.forwardDirButtons.nx.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.NegativeX; console.log(this.state.builder.settings); });
-    this.builderUI.settings.forwardDirButtons.ny.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.NegativeY; console.log(this.state.builder.settings); });
-    this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.state.builder.settings.forwardDirection = ForwardDirection.NegativeZ; console.log(this.state.builder.settings); });
+    this.builderUI.settings.forwardDirButtons.px.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.PositiveX); });
+    this.builderUI.settings.forwardDirButtons.py.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.PositiveY); });
+    this.builderUI.settings.forwardDirButtons.pz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.PositiveZ); });
+    this.builderUI.settings.forwardDirButtons.nx.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeX); });
+    this.builderUI.settings.forwardDirButtons.ny.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeY); });
+    this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
     //Main UI Togglers End
 
     //Quick Helpers Setup Start
@@ -203,4 +232,30 @@ export class UI {
     });
     //Quick Helpers Setup End
   }
+
+  setForwardDirection(dir: ForwardDirection) {
+    if (this.state.builder.settings.forwardDirection != dir) {
+      const current = DIRECTION_QUATS[this.state.builder.settings.forwardDirection];
+      const target = DIRECTION_QUATS[dir];
+
+      const proxy = { t: 0 };
+
+      if (!this.forwardDirTweening) {    
+        gsap.to(proxy, {
+          t: 1,
+          duration: 0.6,
+          ease: "circ.inOut",
+          onUpdate: () => {
+            Quaternion.SlerpToRef(current, target, proxy.t, this.builderUI.networkRoot.rotationQuaternion);
+          },
+          
+          onStart: () => { this.forwardDirTweening = true; },
+          onComplete: () => { this.forwardDirTweening = false; }
+        });
+
+        this.state.builder.settings.forwardDirection = dir;
+      }
+    }
+  }
+  
 }
