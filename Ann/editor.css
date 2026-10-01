@@ -247,16 +247,15 @@ button:active {
   height: 100%;
 }
 
-.build-actions-list label {
+.build-actions-list label.heading {
   display: block;
-  background: #0008;
-  padding: 0.2rem;
-  padding-left: 0.4rem;
+  background: #09090988;
+  padding: 0.4rem;
+  padding-left: 0.5rem;
   margin-bottom: 1rem;
   width: 11rem;
-  border: 1px solid white;
   border-radius: 0.5rem;
-  text-shadow: 0 0 1rem #2e2e2e
+  box-shadow: 0 0 1rem #ffffff1c
 }
 
 .build-actions-list .settings > div {
@@ -303,8 +302,11 @@ button:active {
 .create-layer-config-menu label {
   display: inline-block;
   background: #232323da;
-  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.1rem;
+  padding-left: 0.3rem;
   width: 9rem;
+  margin-bottom: 0.7rem;
 }
 
 .create-layer-config-menu label.sub {
