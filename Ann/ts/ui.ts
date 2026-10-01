@@ -1,23 +1,10 @@
 import { gsap } from "gsap";
 
 
-import type { AxesViewer } from "@babylonjs/core/Debug/axesViewer";
-
-
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
 
-
-interface QuickHelpersConfig {
-  rootSelector: string;
-  
-  helperSelectors: {
-    axesHelperSelector: string;
-  };
-  helperHooks: {
-    bjsAxesViewer: AxesViewer;
-  }
-}
 
 interface SettingsConfig {
   rootSelector: string;
@@ -43,15 +30,6 @@ interface BuilderConfig {
       py: string, ny: string,
       pz: string, nz: string,
     }
-  }
-}
-
-
-interface QuickHelpersUI {
-  root: HTMLElement
-  
-  helpers: {
-    axesHelper: HTMLButtonElement;
   }
 }
 
@@ -93,9 +71,6 @@ interface UIState {
       forwardDirection: ForwardDirection;
     }
   }
-  quickHelpers: {
-    axesEnabled: boolean;
-  }
 }
 
 
@@ -116,7 +91,6 @@ const DIRECTION_YAW_PITCH = [
 
 
 export class UI {
-  quickHelpersUI: QuickHelpersUI;
   settingsUI: SettingsUI;
   builderUI: BuilderUI;
 
@@ -124,8 +98,7 @@ export class UI {
 
   forwardDirTweening: boolean = false;
 
-  constructor(quickHelpersConfig: QuickHelpersConfig, 
-              settingsConfig: SettingsConfig,
+  constructor(settingsConfig: SettingsConfig,
               builderConfig: BuilderConfig) {
     //Init Start
     this.state = {
@@ -138,20 +111,9 @@ export class UI {
         settings: {
           forwardDirection: ForwardDirection.PositiveX
         }
-      },
-      quickHelpers: {
-        axesEnabled: false
       }
     }
     
-
-    this.quickHelpersUI = {
-      root: document.querySelector(quickHelpersConfig.rootSelector)!,
-      
-      helpers: {
-        axesHelper: document.querySelector(quickHelpersConfig.helperSelectors.axesHelperSelector)!
-      }
-    }
 
     this.settingsUI = {
       root: document.querySelector(settingsConfig.rootSelector)!,
@@ -225,23 +187,6 @@ export class UI {
     this.builderUI.settings.forwardDirButtons.ny.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeY); });
     this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
     //Main UI Togglers End
-
-    //Quick Helpers Setup Start
-    this.quickHelpersUI.helpers.axesHelper.addEventListener("click", () => {
-      this.state.quickHelpers.axesEnabled = !this.state.quickHelpers.axesEnabled;
-
-      if (this.state.quickHelpers.axesEnabled) {
-        quickHelpersConfig.helperHooks.bjsAxesViewer.xAxis.setEnabled(true);
-        quickHelpersConfig.helperHooks.bjsAxesViewer.yAxis.setEnabled(true);
-        quickHelpersConfig.helperHooks.bjsAxesViewer.zAxis.setEnabled(true);
-      }
-      else {
-        quickHelpersConfig.helperHooks.bjsAxesViewer.xAxis.setEnabled(false);
-        quickHelpersConfig.helperHooks.bjsAxesViewer.yAxis.setEnabled(false);
-        quickHelpersConfig.helperHooks.bjsAxesViewer.zAxis.setEnabled(false);
-      }
-    });
-    //Quick Helpers Setup End
   }
 
   setForwardDirection(dir: ForwardDirection) {
@@ -262,10 +207,10 @@ export class UI {
     });
     
     if (target.yaw !== current.yaw) {
-      tl.to(proxy, { yaw: target.yaw, duration: 0.3, ease: "circ.inOut" });
+      tl.to(proxy, { yaw: target.yaw, duration: 0.6, ease: "circ.inOut" });
     }
     if (target.pitch !== current.pitch) {
-      tl.to(proxy, { pitch: target.pitch, duration: 0.3, ease: "circ.inOut" });
+      tl.to(proxy, { pitch: target.pitch, duration: 0.6, ease: "circ.inOut" });
     }
     
     this.state.builder.settings.forwardDirection = dir;

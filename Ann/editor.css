@@ -64,9 +64,6 @@ button svg {
   width: 1.8rem;
   height: 1.8rem;
 }
-button svg * {
-  transition: stroke 0.3s ease;
-}
 
 button:active {
   transition: 0.5s;
@@ -246,16 +243,16 @@ button:active {
 .build-actions-list {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 1rem;
 }
 
 .build-actions-list label {
   background: #0008;
   padding: 0.2rem;
-  margin-bottom: 1rem;
+  padding-left: 0.4rem;
+  width: 11rem;
   border: 1px solid white;
   border-radius: 0.5rem;
-  text-align: center;
   text-shadow: 0 0 1rem #2e2e2e
 }
 
@@ -278,7 +275,7 @@ button:active {
   border-radius: 0.7rem;
   font-size: 1.2rem;
   color: #fff;
-  box-shadow: 0 0 1rem #333
+  box-shadow: 0 0 1rem #333;
 }
 
 #px-dir { background: radial-gradient(ellipse, #f00, #600); }
@@ -288,19 +285,6 @@ button:active {
 #ny-dir { background: radial-gradient(ellipse, #060, #0f0); }
 #nz-dir { background: radial-gradient(ellipse, #006, #00f); }
 
-/*End*/
-
-/*Quick Helpers*/
-.quick-helper-buttons {
-  position: absolute;
-  z-index: 2;
-  top: 8rem;
-  right: 0.4rem;
-}
-
-.quick-helper-buttons button {
-  scale: 0.9;
-}
 /*End*/
 
 /*Top Editor*/

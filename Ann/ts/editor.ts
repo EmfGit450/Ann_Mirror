@@ -17,11 +17,6 @@ import { Network, ActivationType, ConnectionType, LayerData } from "./structure"
 import { UI } from "./ui";
 
 
-import { AxesViewer } from "@babylonjs/core/Debug/axesViewer";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-
-
 //Init Start
 let engine: WebGPUEngine | Engine | null = null;
 
@@ -213,54 +208,7 @@ async function Main() {
   });
 
   console.log(net.parseNetworkAsArray(), net);
-
   
-  const axes = new AxesViewer(scene, 4);
-  const desiredScreenSize = 0.15;
-
-  const setAxisColor = (axis: TransformNode, color: Color4) => {
-    axis.getChildMeshes().forEach(mesh => {
-        if (mesh.material) {
-            const mat = mesh.material as StandardMaterial;
-            //@ts-ignore
-            mat.emissiveColor = color;
-            //@ts-ignore
-            mat.diffuseColor = color;
-            //@ts-ignore
-            mat.specularColor = new Color4(0, 0, 0, 0);
-            mat.disableLighting = true;
-        }
-    });
-  };
-
-  setAxisColor(axes.xAxis, new Color4(1, 0.15, 0.15, 1)); // Red
-  setAxisColor(axes.yAxis, new Color4(0.15, 1, 0.15, 1)); // Green
-  setAxisColor(axes.zAxis, new Color4(0.2, 0.4, 1)), 1;   // Blue
-  
-  scene.onBeforeRenderObservable.add(() => {
-    const camera = scene.activeCamera;
-    if (!camera) return;
-    
-    const distance = Vector3.Distance(camera.position, axes.xAxis.position);
-    
-    axes.scaleLines = desiredScreenSize * (distance > 20 ? distance : 20);
-  });
-  
-  axes.xAxis.setEnabled(false);
-  axes.yAxis.setEnabled(false);
-  axes.zAxis.setEnabled(false);
-  
-  
-  const quickHelpersConfig = {
-    rootSelector: ".quick-helper-buttons",
-    
-    helperSelectors: {
-      axesHelperSelector: "#axes-helper-toggle"
-    },
-    helperHooks: {
-      bjsAxesViewer: axes
-    }
-  };
 
   const settingsConfig = {
     rootSelector: ".settings-menu-panel",
@@ -289,7 +237,7 @@ async function Main() {
     }
   };
 
-  const ui = new UI(quickHelpersConfig, settingsConfig, builderConfig);
+  const ui = new UI(settingsConfig, builderConfig);
   //Tests End
   
   engine.runRenderLoop(() => {

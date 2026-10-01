@@ -61,7 +61,7 @@
     <div class="builder-panel">
       <div class="build-actions-list">
         <label>Settings</label>
-        <div class="settings">
+        <div class="settings builder-panel-section">
           <div class="forward-dir">
             <button id="forward-dir-icon">
               <svg
@@ -80,15 +80,41 @@
               </svg>
             </button>
             <div class="forward-dir-options">
-              <button id="px-dir">+</button>
-              <button id="py-dir">+</button>
-              <button id="pz-dir">+</button>
-              <button id="nx-dir">-</button>
-              <button id="ny-dir">-</button>
-              <button id="nz-dir">-</button>
+              <button id="px-dir">
+                <svg viewBox="0 0 24 24">
+                  <path d="M 3 12 L 21 12 M 12 3 L 12 21" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
+                </svg>
+              </button>
+              <button id="py-dir">
+                <svg viewBox="0 0 24 24">
+                  <path d="M 3 12 L 21 12 M 12 3 L 12 21" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
+                </svg>
+              </button>
+              <button id="pz-dir">
+                <svg viewBox="0 0 24 24">
+                  <path d="M 3 12 L 21 12 M 12 3 L 12 21" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
+                </svg>
+              </button>
+              <button id="nx-dir">
+                <svg viewBox="0 0 24 24">
+                  <path d="M 4 12 L 20 12" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
+                </svg>
+              </button>
+              <button id="ny-dir">
+                <svg viewBox="0 0 24 24">
+                  <path d="M 4 12 L 20 12" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
+                </svg>
+              </button>
+              <button id="nz-dir">
+                <svg viewBox="0 0 24 24">
+                  <path d="M 4 12 L 20 12" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
+
+        <label>Create</label>
       </div>
     </div>
     <div class="builder-panel-notch panel-notch">
@@ -115,18 +141,6 @@
             transform-origin="center"
             transform="scale(1.4, 1.5)"
           />
-        </svg>
-      </button>
-    </div>
-
-    <div class="quick-helper-buttons">
-      <button id="axes-helper-toggle">
-        <svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <g transform-origin="center" transform="scale(1.4)">
-            <path d="M 12 12 L 4.2 17.2" stroke="#e33232" />
-            <path d="M 12 12 L 12 5" stroke="#3de63d" />
-            <path d="M 12 12 L 19.8 17.2" stroke="#2828e0" />
-          </g>
         </svg>
       </button>
     </div>
