@@ -69,7 +69,7 @@ export interface LayerData {
 
   //Data
   activation: ActivationType | undefined;
-  shape: number[];
+  shape: number[]; //[forward, vertical, horizontal]
 
   //Internal
   _sequence_index: number | undefined;
@@ -120,7 +120,7 @@ export class Network {
   }
 
   parseNetworkAsArray() {
-    const data = new Uint16Array(
+    const network = new Uint16Array(
       this.metadata.layerCount * 2 + this.metadata.connectionCount.residual * 2
     );
 
@@ -131,31 +131,33 @@ export class Network {
     this.connectionMemory.forEach((meshArr, dataKey) => {
       if (!inputDecided) {
         //0 means Input. data[1] is the size of the input vector
-        data[0] = 0;
-        data[1] = dataKey.input.shape[0]! * dataKey.input.shape[1]! * dataKey.input.shape[2]!;
+        network[0] = 0;
+        network[1] = dataKey.input.shape[0]! * dataKey.input.shape[1]! * dataKey.input.shape[2]!;
 
-        data[2] = dataKey.output.activation ?? 1;
-        data[3] = dataKey.output.shape[0]! * dataKey.output.shape[1]! * dataKey.output.shape[2]!;
+        network[2] = dataKey.output.activation ?? 1;
+        network[3] = dataKey.output.shape[0]! * dataKey.output.shape[1]! * dataKey.output.shape[2]!;
 
         inputDecided = true;
-      } else if (dataKey.type == ConnectionType.Dense) {
-        data[index] = dataKey.output.activation ?? ActivationType.Linear;
-        data[index + 1] =
+      } 
+      else if (dataKey.type == ConnectionType.Dense) {
+        network[index] = dataKey.output.activation ?? ActivationType.Linear;
+        network[index + 1] =
           dataKey.output.shape[0]! * dataKey.output.shape[1]! * dataKey.output.shape[2]!;
 
         index += 2;
-      } else if (
+      } 
+      else if (
         dataKey.type == ConnectionType.ResidualTruncate ||
         dataKey.type == ConnectionType.ResidualTransform
       ) {
-        data[index] = dataKey.type;
-        data[index + 1] = dataKey.output._sequence_index! - dataKey.input._sequence_index!;
+        network[index] = dataKey.type;
+        network[index + 1] = dataKey.output._sequence_index! - dataKey.input._sequence_index!;
 
         index += 2;
       }
     });
 
-    return data;
+    return network;
   }
 
   newLayer(layer: LayerData) {
@@ -186,19 +188,19 @@ export class Network {
     let offset = 0;
 
     for (let i = 0; i < layer.shape[0]!; i++) {
-      const x = sx + i * NEURON_SPACING;
+      const forward = sx + i * NEURON_SPACING;
       for (let j = 0; j < layer.shape[1]!; j++) {
-        const y = sy + j * NEURON_SPACING;
+        const vertical = sy + j * NEURON_SPACING;
         for (let k = 0; k < layer.shape[2]!; k++) {
-          const z = sz + k * NEURON_SPACING;
+          const horizontal = sz + k * NEURON_SPACING;
 
           //babylonjs uses column major notation
           thinInstanceMatrix[offset] = 1;
           thinInstanceMatrix[offset + 5] = 1;
           thinInstanceMatrix[offset + 10] = 1;
-          thinInstanceMatrix[offset + 12] = x;
-          thinInstanceMatrix[offset + 13] = y;
-          thinInstanceMatrix[offset + 14] = z;
+          thinInstanceMatrix[offset + 12] = forward;
+          thinInstanceMatrix[offset + 13] = vertical;
+          thinInstanceMatrix[offset + 14] = horizontal;
           thinInstanceMatrix[offset + 15] = 1;
 
           offset += 16;

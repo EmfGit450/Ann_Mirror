@@ -105,16 +105,14 @@ export const enum ForwardDirection {
   PositiveZ, NegativeZ,
 }
 
-const HALF_PI = Math.PI / 2;
-
-const DIRECTION_QUATS = [
-  Quaternion.Identity(),                                    // +X
-  Quaternion.RotationAxis(Vector3.Up(), Math.PI),           // -X
-  Quaternion.RotationAxis(Vector3.Forward(), HALF_PI),      // +Y
-  Quaternion.RotationAxis(Vector3.Forward(), -HALF_PI),     // -Y
-  Quaternion.RotationAxis(Vector3.Up(), -HALF_PI),          // +Z
-  Quaternion.RotationAxis(Vector3.Up(), HALF_PI),           // -Z
-];
+const DIRECTION_YAW_PITCH = [
+  { yaw: 0, pitch: 0 },
+  { yaw: Math.PI, pitch: 0 },
+  { yaw: 0, pitch: Math.PI / 2 },
+  { yaw: 0, pitch: -Math.PI / 2 },
+  { yaw: -Math.PI / 2, pitch: 0 },
+  { yaw: Math.PI / 2, pitch: 0 },
+]
 
 
 export class UI {
@@ -247,28 +245,30 @@ export class UI {
   }
 
   setForwardDirection(dir: ForwardDirection) {
-    if (this.state.builder.settings.forwardDirection != dir) {
-      const current = DIRECTION_QUATS[this.state.builder.settings.forwardDirection];
-      const target = DIRECTION_QUATS[dir];
+    if (this.state.builder.settings.forwardDirection === dir) return;
+    if (this.forwardDirTweening) return;
+    
+    const current = DIRECTION_YAW_PITCH[this.state.builder.settings.forwardDirection];
+    const target = DIRECTION_YAW_PITCH[dir];
+    
+    const proxy = { yaw: current.yaw, pitch: current.pitch };
 
-      const proxy = { t: 0 };
+    const tl = gsap.timeline({
+      onStart: () => { this.forwardDirTweening = true; },
+      onComplete: () => { this.forwardDirTweening = false; },
+      onUpdate: () => {
+        this.builderUI.networkRoot.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(),   proxy.yaw).multiply(Quaternion.RotationAxis(Vector3.Forward(), proxy.pitch));
+      },
+    });
 
-      if (!this.forwardDirTweening) {    
-        gsap.to(proxy, {
-          t: 1,
-          duration: 0.6,
-          ease: "circ.inOut",
-          onUpdate: () => {
-            Quaternion.SlerpToRef(current, target, proxy.t, this.builderUI.networkRoot.rotationQuaternion);
-          },
-          
-          onStart: () => { this.forwardDirTweening = true; },
-          onComplete: () => { this.forwardDirTweening = false; }
-        });
-
-        this.state.builder.settings.forwardDirection = dir;
-      }
+    if (target.yaw !== current.yaw) {
+      tl.to(proxy, { yaw: target.yaw, duration: 0.6, ease: "circ.inOut" });
     }
+    if (target.pitch !== current.pitch) {
+      tl.to(proxy, { pitch: target.pitch, duration: 0.6, ease: "circ.inOut" });
+    }
+
+    this.state.builder.settings.forwardDirection = dir;
   }
   
 }
