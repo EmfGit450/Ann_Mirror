@@ -247,27 +247,27 @@ export class UI {
   setForwardDirection(dir: ForwardDirection) {
     if (this.state.builder.settings.forwardDirection === dir) return;
     if (this.forwardDirTweening) return;
-    
+
     const current = DIRECTION_YAW_PITCH[this.state.builder.settings.forwardDirection];
     const target = DIRECTION_YAW_PITCH[dir];
-    
+
     const proxy = { yaw: current.yaw, pitch: current.pitch };
 
     const tl = gsap.timeline({
       onStart: () => { this.forwardDirTweening = true; },
       onComplete: () => { this.forwardDirTweening = false; },
       onUpdate: () => {
-        this.builderUI.networkRoot.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(),   proxy.yaw).multiply(Quaternion.RotationAxis(Vector3.Forward(), proxy.pitch));
+        this.builderUI.networkRoot.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(), proxy.yaw).multiply(Quaternion.RotationAxis(Vector3.Forward(), proxy.pitch));
       },
     });
-
+    
     if (target.yaw !== current.yaw) {
-      tl.to(proxy, { yaw: target.yaw, duration: 0.6, ease: "circ.inOut" });
+      tl.to(proxy, { yaw: target.yaw, duration: 0.3, ease: "circ.inOut" });
     }
     if (target.pitch !== current.pitch) {
-      tl.to(proxy, { pitch: target.pitch, duration: 0.6, ease: "circ.inOut" });
+      tl.to(proxy, { pitch: target.pitch, duration: 0.3, ease: "circ.inOut" });
     }
-
+    
     this.state.builder.settings.forwardDirection = dir;
   }
   
