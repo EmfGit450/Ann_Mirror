@@ -222,8 +222,11 @@ async function Main() {
     axis.getChildMeshes().forEach(mesh => {
         if (mesh.material) {
             const mat = mesh.material as StandardMaterial;
+            //@ts-ignore
             mat.emissiveColor = color;
+            //@ts-ignore
             mat.diffuseColor = color;
+            //@ts-ignore
             mat.specularColor = new Color4(0, 0, 0, 0);
             mat.disableLighting = true;
         }

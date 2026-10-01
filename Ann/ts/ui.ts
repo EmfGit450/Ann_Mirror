@@ -259,7 +259,7 @@ export class UI {
           duration: 0.6,
           ease: "circ.inOut",
           onUpdate: () => {
-            Quaternion.SlerpToRef(current, target, proxy.t, this.builderUI.networkRoot.rotationQuaternion);
+            Quaternion.SlerpToRef(current!, target!, proxy.t, this.builderUI.networkRoot.rotationQuaternion!);
           },
           
           onStart: () => { this.forwardDirTweening = true; },
