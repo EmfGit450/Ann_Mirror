@@ -123,6 +123,7 @@ export class UI {
         themeToggle: document.querySelector(settingsConfig.settingsSelectors.themeToggle)!
       }
     }
+    
 
     this.builderUI = {
       root: document.querySelector(builderConfig.rootSelector)!,
@@ -141,7 +142,8 @@ export class UI {
         }
       }
     }
-
+    
+    
     gsap.set(this.settingsUI.root, { xPercent: 100, opacity: 1 });
     gsap.set(this.builderUI.root, { xPercent: -100, opacity: 1 });
 

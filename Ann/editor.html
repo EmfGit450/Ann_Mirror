@@ -60,61 +60,208 @@
 
     <div class="builder-panel">
       <div class="build-actions-list">
-        <label>Settings</label>
-        <div class="settings builder-panel-section">
-          <div class="forward-dir">
-            <button id="forward-dir-icon">
-              <svg
-                viewBox="0 0 24 24"
-                stroke="black"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+        <div class="creator-panel-section">
+          <label>Create</label>
+          <div class="creation-menu builder-panel-section">
+            <button id="create-layer">
+              <svg viewBox="0 0 32 32">
                 <path
-                  d="M 12 12 L 12 5 M 12 12 L 4.2 17.2 M 12 12 L 19.8 17.2 M 12 12 L 5.2 8.1 M 12 12 L 18.8 8.1 M 12 12 L 12 19"
-                  fill="none"
+                  d="M 5 5 A 2.5 2.5 0 1 0 0 5 A 2.5 2.5 0 1 0 5 5
+                     M 10.5 4 A 2.5 2.5 0 1 0 5.5 4 A 2.5 2.5 0 1 0 10.5 4
+                     M 16 3 A 2.5 2.5 0 1 0 11 3 A 2.5 2.5 0 1 0 16 3
+                     M 21.5 2 A 2.5 2.5 0 1 0 16.5 2 A 2.5 2.5 0 1 0 21.5 2
+                     M 5 10.5 A 2.5 2.5 0 1 0 0 10.5 A 2.5 2.5 0 1 0 5 10.5
+                     M 10.5 9.5 A 2.5 2.5 0 1 0 5.5 9.5 A 2.5 2.5 0 1 0 10.5 9.5
+                     M 16 8.5 A 2.5 2.5 0 1 0 11 8.5 A 2.5 2.5 0 1 0 16 8.5
+                     M 21.5 7.5 A 2.5 2.5 0 1 0 16.5 7.5 A 2.5 2.5 0 1 0 21.5 7.5
+                     M 5 16 A 2.5 2.5 0 1 0 0 16 A 2.5 2.5 0 1 0 5 16
+                     M 10.5 15 A 2.5 2.5 0 1 0 5.5 15 A 2.5 2.5 0 1 0 10.5 15
+                     M 16 14 A 2.5 2.5 0 1 0 11 14 A 2.5 2.5 0 1 0 16 14
+                     M 21.5 13 A 2.5 2.5 0 1 0 16.5 13 A 2.5 2.5 0 1 0 21.5 13
+                     M 5 21.5 A 2.5 2.5 0 1 0 0 21.5 A 2.5 2.5 0 1 0 5 21.5
+                     M 10.5 20.5 A 2.5 2.5 0 1 0 5.5 20.5 A 2.5 2.5 0 1 0 10.5 20.5
+                     M 16 19.5 A 2.5 2.5 0 1 0 11 19.5 A 2.5 2.5 0 1 0 16 19.5
+                     M 21.5 18.5 A 2.5 2.5 0 1 0 16.5 18.5 A 2.5 2.5 0 1 0 21.5 18.5"
                   transform-origin="center"
-                  transform="scale(1.2)"
+                  transform="translate(6.5, 6) scale(1.25)"
                 />
               </svg>
             </button>
-            <div class="forward-dir-options">
-              <button id="px-dir">
-                <svg viewBox="0 0 24 24">
-                  <path d="M 3 12 L 21 12 M 12 3 L 12 21" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
-                </svg>
-              </button>
-              <button id="py-dir">
-                <svg viewBox="0 0 24 24">
-                  <path d="M 3 12 L 21 12 M 12 3 L 12 21" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
-                </svg>
-              </button>
-              <button id="pz-dir">
-                <svg viewBox="0 0 24 24">
-                  <path d="M 3 12 L 21 12 M 12 3 L 12 21" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
-                </svg>
-              </button>
-              <button id="nx-dir">
-                <svg viewBox="0 0 24 24">
-                  <path d="M 4 12 L 20 12" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
-                </svg>
-              </button>
-              <button id="ny-dir">
-                <svg viewBox="0 0 24 24">
-                  <path d="M 4 12 L 20 12" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
-                </svg>
-              </button>
-              <button id="nz-dir">
-                <svg viewBox="0 0 24 24">
-                  <path d="M 4 12 L 20 12" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
-                </svg>
-              </button>
+            <div class="create-layer-config-menu">
+              <label>Layer</label>
+
+              <div class="shape-config">
+                <label class="sub">Shape</label>
+
+                <div class="shape-number-inputs">
+                  <div class="number-input" data-shape1>
+                    <button>
+                      <svg viewBox="0 0 6 6">
+                        <path
+                          d="M 1 5 L 3 3 M 3 3 L 5 5"
+                          stroke-linejoin="round"
+                          stroke-linecap="round"
+                          stroke="#fff"
+                        />
+                      </svg>
+                    </button>
+                    <label class="number-input">10</label>
+                    <button>
+                      <svg viewBox="0 0 6 6">
+                        <path
+                          d="M 1 5 L 3 3 M 3 3 L 5 5"
+                          stroke-linejoin="round"
+                          stroke-linecap="round"
+                          stroke="#fff"
+                          transform-origin="center"
+                          transform="rotate(180)"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="number-input" data-shape2>
+                    <button>
+                      <svg viewBox="0 0 6 6">
+                        <path
+                          d="M 1 5 L 3 3 M 3 3 L 5 5"
+                          stroke-linejoin="round"
+                          stroke-linecap="round"
+                          stroke="#fff"
+                        />
+                      </svg>
+                    </button>
+                    <label class="number-input">10</label>
+                    <button>
+                      <svg viewBox="0 0 6 6">
+                        <path
+                          d="M 1 5 L 3 3 M 3 3 L 5 5"
+                          stroke-linejoin="round"
+                          stroke-linecap="round"
+                          stroke="#fff"
+                          transform-origin="center"
+                          transform="rotate(180)"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div class="number-input" data-shape3>
+                    <button>
+                      <svg viewBox="0 0 6 6">
+                        <path
+                          d="M 1 5 L 3 3 M 3 3 L 5 5"
+                          stroke-linejoin="round"
+                          stroke-linecap="round"
+                          stroke="#fff"
+                        />
+                      </svg>
+                    </button>
+                    <label class="number-input">10</label>
+                    <button>
+                      <svg viewBox="0 0 6 6">
+                        <path
+                          d="M 1 5 L 3 3 M 3 3 L 5 5"
+                          stroke-linejoin="round"
+                          stroke-linecap="round"
+                          stroke="#fff"
+                          transform-origin="center"
+                          transform="rotate(180)"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <label>Create</label>
+        <div class="settings-panel-section">
+          <label>Settings</label>
+          <div class="settings panel-div">
+            <div class="forward-dir">
+              <button id="forward-dir-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  stroke="black"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M 12 12 L 12 5 M 12 12 L 4.2 17.2 M 12 12 L 19.8 17.2 M 12 12 L 5.2 8.1 M 12 12 L 18.8 8.1 M 12 12 L 12 19"
+                    fill="none"
+                    transform-origin="center"
+                    transform="scale(1.2)"
+                  />
+                </svg>
+              </button>
+              <div class="forward-dir-options">
+                <button id="px-dir">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M 3 12 L 21 12 M 12 3 L 12 21"
+                      stroke="#fff"
+                      stroke-linecap="round"
+                      stroke-width="3"
+                    />
+                  </svg>
+                </button>
+                <button id="py-dir">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M 3 12 L 21 12 M 12 3 L 12 21"
+                      stroke="#fff"
+                      stroke-linecap="round"
+                      stroke-width="3"
+                    />
+                  </svg>
+                </button>
+                <button id="pz-dir">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M 3 12 L 21 12 M 12 3 L 12 21"
+                      stroke="#fff"
+                      stroke-linecap="round"
+                      stroke-width="3"
+                    />
+                  </svg>
+                </button>
+                <button id="nx-dir">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M 4 12 L 20 12"
+                      stroke="#fff"
+                      stroke-linecap="round"
+                      stroke-width="3"
+                    />
+                  </svg>
+                </button>
+                <button id="ny-dir">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M 4 12 L 20 12"
+                      stroke="#fff"
+                      stroke-linecap="round"
+                      stroke-width="3"
+                    />
+                  </svg>
+                </button>
+                <button id="nz-dir">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="M 4 12 L 20 12"
+                      stroke="#fff"
+                      stroke-linecap="round"
+                      stroke-width="3"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="builder-panel-notch panel-notch">
