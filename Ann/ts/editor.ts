@@ -226,7 +226,7 @@ async function Main() {
     networkRoot: net.networkRoot,
     
     actionButtonSelectors: {
-      addLayerSelector: "#add-layer"
+      addLayerSelector: "#create-layer"
     },
     settings: {
       forwardDirButtonSelectors: {
@@ -240,23 +240,9 @@ async function Main() {
   const ui = new UI(settingsConfig, builderConfig);
 
 
-  const test1 = new NumberInputUI({
-    rootSelector: ".shape-number-inputs",
-
-    callbacks: {
-      incrementer: () => { console.log(crypto.randomUUID(),"shape1", "++"); },
-      decrementer: () => { console.log(crypto.randomUUID(),"shape1", "--"); }
-    }
-  });
-
-  const test2 = new NumberInputUI({
-    rootSelector: ".shape-number-inputs",
-
-    callbacks: {
-      incrementer: () => { console.log(crypto.randomUUID(),"shape2", "++"); },
-      decrementer: () => { console.log(crypto.randomUUID(),"shape2", "--"); }
-    }
-  });
+  const test1 = new NumberInputUI({ rootSelector: ".shape-number-inputs" });
+  const test2 = new NumberInputUI({ rootSelector: ".shape-number-inputs" });
+  
   //Tests End
   
   engine.runRenderLoop(() => {

@@ -29,5 +29,7 @@ export class Camera {
 
     this.bnCamera.wheelPrecision = 10;
     this.bnCamera.panningSensibility = 200;
+
+    this.bnCamera.inertia = 0.9;
   }
 }

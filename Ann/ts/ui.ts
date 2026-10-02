@@ -15,6 +15,7 @@ interface SettingsConfig {
   }
 }
 
+
 interface BuilderConfig {
   rootSelector: string;
   togglerSelector: string;
@@ -33,6 +34,7 @@ interface BuilderConfig {
   }
 }
 
+
 interface SettingsUI {
   root: HTMLElement;
   toggler: HTMLButtonElement;
@@ -41,6 +43,7 @@ interface SettingsUI {
     themeToggle: HTMLButtonElement;
   }
 }
+
 
 interface BuilderUI {
   root: HTMLElement;
@@ -59,6 +62,15 @@ interface BuilderUI {
     };
   }
 }
+
+interface LayerCreationMenu {
+  shape: {
+    forward: NumberInputUI;
+    vertical: NumberInputUI;
+    horizontal: NumberInputUI;
+  }
+}
+
 
 interface UIState {
   settings: {
@@ -230,18 +242,25 @@ export class UI {
 
 interface NumberInputConfig {
   rootSelector: string;
+
+  initialNum?: number;
   
-  callbacks: {
-    incrementer: () => void;
-    decrementer: () => void;
-  }
+  minVal?: number;
+  maxVal?: number;
 }
 
 export class NumberInputUI {
+  private _value: number;
+
   constructor(numberInputConfig: NumberInputConfig) {
+    this._value = numberInputConfig.initialNum ?? 1;
+
+
     const incrementerId = `${crypto.randomUUID()}-num-input-button`;
     const decrementerId = `${crypto.randomUUID()}-num-input-button`;
 
+    const valueId = `${crypto.randomUUID()}-num-input-value`;
+    
     const numInputDiv = document.createElement("div");
     numInputDiv.classList.add("number-input");
     numInputDiv.innerHTML = `
@@ -256,7 +275,7 @@ export class NumberInputUI {
         </svg>
       </button>
 
-      <label class="number-input">10</label>
+      <label id="${valueId}" class="number-input">${this.value}</label>
 
       <button id="${decrementerId}">
         <svg viewBox="0 0 6 6">
@@ -274,12 +293,24 @@ export class NumberInputUI {
 
     document.querySelector(numberInputConfig.rootSelector)!.append(numInputDiv);
     
+    const valueEl = document.getElementById(valueId);
+
     document.getElementById(incrementerId)!.addEventListener("click", () => {
-      numberInputConfig.callbacks.incrementer();
+      const val = Math.max(numberInputConfig.minVal ?? 1, Math.min(this._value + 1, numberInputConfig.maxVal ?? 20));
+      valueEl!.textContent = `${val}`;
+
+      this._value = val;
     });
 
     document.getElementById(decrementerId)!.addEventListener("click", () => {
-      numberInputConfig.callbacks.decrementer();
+      const val = Math.max(numberInputConfig.minVal ?? 1, Math.min(this._value - 1, numberInputConfig.maxVal ?? 20));
+      valueEl!.textContent = `${val}`;
+
+      this._value = val;
     });
+  }
+
+  value() {
+    return this._value;
   }
 }

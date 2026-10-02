@@ -80,13 +80,13 @@
 /*End*/
 
 /*Layer Create Config Menu*/
-.create-layer-config-menu {
+.create-layer-menu {
   padding: 0.7rem;
   background: #0c0c0cda;
   border-radius: 0.5rem;
 }
 
-.create-layer-config-menu label {
+.create-layer-menu label {
   display: inline-block;
   background: #232323da;
   border-radius: 0.5rem;
@@ -96,7 +96,7 @@
   margin-bottom: 0.7rem;
 }
 
-.create-layer-config-menu label.sub {
+.create-layer-menu label.sub {
   font-size: 1.3rem;
   width: 7rem;
   background: #fff;
@@ -104,7 +104,7 @@
   margin-bottom: 0.5rem;
 }
 
-.create-layer-config-menu label.number-input {
+.create-layer-menu label.number-input {
   background: #fff;
   text-align: center;
   color: #000;
