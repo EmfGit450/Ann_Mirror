@@ -240,14 +240,23 @@ async function Main() {
   const ui = new UI(settingsConfig, builderConfig);
 
 
-  const test = new NumberInputUI({
-    rootSelector: ".shape-config",
+  const test1 = new NumberInputUI({
+    rootSelector: ".shape-number-inputs",
 
     callbacks: {
-      incrementer: () => { console.log(crypto.randomUUID(), "++"); },
-      decrementer: () => { console.log(crypto.randomUUID(), "--"); }
+      incrementer: () => { console.log(crypto.randomUUID(),"shape1", "++"); },
+      decrementer: () => { console.log(crypto.randomUUID(),"shape1", "--"); }
     }
-  })
+  });
+
+  const test2 = new NumberInputUI({
+    rootSelector: ".shape-number-inputs",
+
+    callbacks: {
+      incrementer: () => { console.log(crypto.randomUUID(),"shape2", "++"); },
+      decrementer: () => { console.log(crypto.randomUUID(),"shape2", "--"); }
+    }
+  });
   //Tests End
   
   engine.runRenderLoop(() => {

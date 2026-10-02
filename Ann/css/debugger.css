@@ -1,0 +1,71 @@
+#debugger {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+
+  font-size: 1rem;
+  background: var(--debugger-bg);
+  color: #f0e5e5;
+  border-radius: 1rem;
+  padding: 0.8rem;
+  text-shadow: 0 0 1rem #443838;
+  z-index: 3;
+  font-family: "IBM Plex Mono", Monospace;
+
+  scale: 0;
+}
+
+.debugger-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.debugger-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  line-height: 1.4;
+}
+
+.debugger-top div.label,
+.debugger-body div.label {
+  background: #141414;
+  padding: 0.3rem;
+  border-radius: 0.5rem;
+  margin-right: 0.2rem;
+}
+
+.debugger-top div.value,
+.debugger-body div.value {
+  background: #333;
+  padding: 0.3rem;
+  border-radius: 0.5rem;
+}
+
+.performance {
+  user-select: none;
+}
+.performance,
+.Vendor,
+.Renderer,
+.API {
+  display: flex;
+  gap: 0.3rem;
+}
+
+#debugger-close-btn {
+  pointer-events: auto;
+  user-select: none;
+  border: 0;
+  transition: 0.3s;
+  width: 1.4rem;
+  height: 1.4rem;
+  color: #000;
+  font-size: 1.3rem;
+  padding: 0;
+  cursor: pointer;
+}

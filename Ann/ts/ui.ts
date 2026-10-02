@@ -67,6 +67,8 @@ interface UIState {
   }
   builder: {
     panelToggled: boolean;
+    createLayerMenuToggled: boolean;
+    
     settings: {
       forwardDirection: ForwardDirection;
     }
@@ -107,6 +109,8 @@ export class UI {
       },
       builder: {
         panelToggled: false,
+        createLayerMenuToggled: false,
+
         settings: {
           forwardDirection: ForwardDirection.PositiveX
         }
@@ -164,7 +168,6 @@ export class UI {
         ease: "expo.inOut"
       });
     });
-
     
     this.builderUI.toggler.addEventListener("click", () => {
       this.state.builder.panelToggled = !this.state.builder.panelToggled;
@@ -180,14 +183,19 @@ export class UI {
         ease: "circ.inOut"
       });
     });
-    
+    //Main UI Togglers End
+
+    //Builder Start
     this.builderUI.settings.forwardDirButtons.px.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.PositiveX); });
     this.builderUI.settings.forwardDirButtons.py.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.PositiveY); });
     this.builderUI.settings.forwardDirButtons.pz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.PositiveZ); });
     this.builderUI.settings.forwardDirButtons.nx.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeX); });
     this.builderUI.settings.forwardDirButtons.ny.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeY); });
     this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
-    //Main UI Togglers End
+    
+
+    this.builderUI
+    //Builder End
   }
 
   setForwardDirection(dir: ForwardDirection) {
@@ -234,33 +242,37 @@ export class NumberInputUI {
     const incrementerId = `${crypto.randomUUID()}-num-input-button`;
     const decrementerId = `${crypto.randomUUID()}-num-input-button`;
 
-    document.querySelector(numberInputConfig.rootSelector)!.innerHTML += `
-      <div class="number-input">
-        <button id="${incrementerId}">
-          <svg viewBox="0 0 6 6">
-            <path
-              d="M 1 5 L 3 3 M 3 3 L 5 5"
-              stroke-linejoin="round"
-              stroke-linecap="round"
-              stroke="#fff"
-            />
-          </svg>
-        </button>
-        <label class="number-input">10</label>
-        <button id="${decrementerId}">
-          <svg viewBox="0 0 6 6">
-            <path
-              d="M 1 5 L 3 3 M 3 3 L 5 5"
-              stroke-linejoin="round"
-              stroke-linecap="round"
-              stroke="#fff"
-              transform-origin="center"
-              transform="rotate(180)"
-            />
-          </svg>
-        </button>
-      </div>
-    `
+    const numInputDiv = document.createElement("div");
+    numInputDiv.classList.add("number-input");
+    numInputDiv.innerHTML = `
+      <button id="${incrementerId}">
+        <svg viewBox="0 0 6 6">
+          <path
+            d="M 1 5 L 3 3 M 3 3 L 5 5"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            stroke="#fff"
+          />
+        </svg>
+      </button>
+
+      <label class="number-input">10</label>
+
+      <button id="${decrementerId}">
+        <svg viewBox="0 0 6 6">
+          <path
+            d="M 1 5 L 3 3 M 3 3 L 5 5"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            stroke="#fff"
+            transform-origin="center"
+            transform="rotate(180)"
+          />
+        </svg>
+      </button>
+    `;
+
+    document.querySelector(numberInputConfig.rootSelector)!.append(numInputDiv);
     
     document.getElementById(incrementerId)!.addEventListener("click", () => {
       numberInputConfig.callbacks.incrementer();

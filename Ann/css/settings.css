@@ -1,0 +1,23 @@
+.settings-menu-panel {
+  background: var(--panel-bg);
+  top: 0;
+  right: 0;
+  width: 13rem;
+  height: 100dvh;
+  position: absolute;
+  will-change: transform;
+  z-index: 3;
+  padding: 1rem;
+  opacity: 0;
+
+  font-family: "IBM Plex Mono";
+  font-size: 0.7rem;
+  color: #fff;
+}
+
+.settings-menu-notch {
+  right: 0;
+  padding-right: 0.4rem;
+  border-top-left-radius: 0.6rem;
+  border-bottom-left-radius: 0.6rem;
+}
