@@ -12,7 +12,7 @@ interface SettingsConfig {
   
   settingsSelectors: {
     themeToggle: string;
-  }
+  };
 }
 
 
@@ -24,14 +24,23 @@ interface BuilderConfig {
   
   actionButtonSelectors: {
     addLayerSelector: string;
-  }
+  };
+
+  createLayerMenuConfig: LayerCreationMenuConfig;
+  
   settings: {
     forwardDirButtonSelectors: {
       px: string, nx: string,
       py: string, ny: string,
       pz: string, nz: string,
-    }
+    };
   }
+}
+
+interface LayerCreationMenuConfig {
+  shape: {
+    rootSelector: string;
+  };
 }
 
 
@@ -41,7 +50,7 @@ interface SettingsUI {
   
   settings: {
     themeToggle: HTMLButtonElement;
-  }
+  };
 }
 
 
@@ -54,6 +63,9 @@ interface BuilderUI {
   actions: {
     addLayer: HTMLButtonElement;
   }
+
+  createLayer: LayerCreationMenu;
+  
   settings: {
     forwardDirButtons: {
       px: HTMLButtonElement, nx: HTMLButtonElement,
@@ -68,7 +80,7 @@ interface LayerCreationMenu {
     forward: NumberInputUI;
     vertical: NumberInputUI;
     horizontal: NumberInputUI;
-  }
+  };
 }
 
 
@@ -80,10 +92,18 @@ interface UIState {
   builder: {
     panelToggled: boolean;
     createLayerMenuToggled: boolean;
+
+    createLayerMenu: {
+      shape: {
+        forward: number;
+        vertical: number;
+        horizontal: number;
+      };
+    };
     
     settings: {
       forwardDirection: ForwardDirection;
-    }
+    };
   }
 }
 
@@ -123,6 +143,14 @@ export class UI {
         panelToggled: false,
         createLayerMenuToggled: false,
 
+        createLayerMenu: {
+          shape: {
+            forward: 1,
+            vertical: 1,
+            horizontal: 1
+          }
+        },
+        
         settings: {
           forwardDirection: ForwardDirection.PositiveX
         }
@@ -138,8 +166,8 @@ export class UI {
         themeToggle: document.querySelector(settingsConfig.settingsSelectors.themeToggle)!
       }
     }
-    
 
+    
     this.builderUI = {
       root: document.querySelector(builderConfig.rootSelector)!,
       toggler: document.querySelector(builderConfig.togglerSelector)!,
@@ -149,6 +177,24 @@ export class UI {
       actions: {
         addLayer: document.querySelector(builderConfig.actionButtonSelectors.addLayerSelector)!
       },
+
+      createLayer: {
+        shape: {
+          forward: new NumberInputUI({ 
+            rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
+            initial: 1, min: 1, max: 20
+          }),
+          vertical: new NumberInputUI({ 
+            rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
+            initial: 1, min: 1, max: 20
+          }),
+          horizontal: new NumberInputUI({ 
+            rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
+            initial: 1, min: 1, max: 20
+          })
+        }
+      },
+      
       settings: {
         forwardDirButtons: {
           px: document.querySelector(builderConfig.settings.forwardDirButtonSelectors.px)!, nx: document.querySelector(builderConfig.settings.forwardDirButtonSelectors.nx)!,
@@ -205,8 +251,12 @@ export class UI {
     this.builderUI.settings.forwardDirButtons.ny.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeY); });
     this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
     
-
-    this.builderUI
+     
+    this.builderUI.createLayer.shape.forward.setCallback(() => { this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue(); });
+    this.builderUI.createLayer.shape.vertical.setCallback(() => { this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue(); });
+    this.builderUI.createLayer.shape.horizontal.setCallback(() => { this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue(); });
+    
+    document.addEventListener("click", () => { console.log(this.state.builder.createLayerMenu.shape); });
     //Builder End
   }
 
@@ -242,20 +292,23 @@ export class UI {
 
 interface NumberInputConfig {
   rootSelector: string;
-
-  initialNum?: number;
   
-  minVal?: number;
-  maxVal?: number;
+  initial: number;
+  min: number;
+  max: number;
 }
 
 export class NumberInputUI {
   private _value: number;
 
+  private _callback: () => void;
+
   constructor(numberInputConfig: NumberInputConfig) {
-    this._value = numberInputConfig.initialNum ?? 1;
+    this._value = numberInputConfig.initial ?? 1;
 
-
+    this._callback = () => {};
+    
+    
     const incrementerId = `${crypto.randomUUID()}-num-input-button`;
     const decrementerId = `${crypto.randomUUID()}-num-input-button`;
 
@@ -296,21 +349,29 @@ export class NumberInputUI {
     const valueEl = document.getElementById(valueId);
 
     document.getElementById(incrementerId)!.addEventListener("click", () => {
-      const val = Math.max(numberInputConfig.minVal ?? 1, Math.min(this._value + 1, numberInputConfig.maxVal ?? 20));
+      const val = Math.max(numberInputConfig.min, Math.min(this._value + 1, numberInputConfig.max));
       valueEl!.textContent = `${val}`;
 
       this._value = val;
+
+      this._callback();
     });
 
     document.getElementById(decrementerId)!.addEventListener("click", () => {
-      const val = Math.max(numberInputConfig.minVal ?? 1, Math.min(this._value - 1, numberInputConfig.maxVal ?? 20));
+      const val = Math.max(numberInputConfig.min, Math.min(this._value - 1, numberInputConfig.max));
       valueEl!.textContent = `${val}`;
 
       this._value = val;
+
+      this._callback();
     });
   }
 
-  value() {
+  getValue() {
     return this._value;
+  }
+
+  setCallback(callback: () => void) {
+    this._callback = callback;
   }
 }

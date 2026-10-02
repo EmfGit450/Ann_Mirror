@@ -228,6 +228,13 @@ async function Main() {
     actionButtonSelectors: {
       addLayerSelector: "#create-layer"
     },
+
+    createLayerMenuConfig: {
+      shape: {
+        rootSelector: ".shape-number-inputs"
+      }
+    },
+    
     settings: {
       forwardDirButtonSelectors: {
         px: "#px-dir", nx: "#nx-dir",
@@ -238,10 +245,6 @@ async function Main() {
   };
 
   const ui = new UI(settingsConfig, builderConfig);
-
-
-  const test1 = new NumberInputUI({ rootSelector: ".shape-number-inputs" });
-  const test2 = new NumberInputUI({ rootSelector: ".shape-number-inputs" });
   
   //Tests End
   
