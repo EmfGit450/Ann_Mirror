@@ -252,9 +252,9 @@ export class UI {
     this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
     
      
-    this.builderUI.createLayer.shape.forward.setCallback(() => { this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue(); });
-    this.builderUI.createLayer.shape.vertical.setCallback(() => { this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue(); });
-    this.builderUI.createLayer.shape.horizontal.setCallback(() => { this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue(); });
+    this.builderUI.createLayer.shape.forward.setCallback(() => { this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue(); console.log(this.state.builder.createLayerMenu.shape) });
+    this.builderUI.createLayer.shape.vertical.setCallback(() => { this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue(); console.log(this.state.builder.createLayerMenu.shape) });
+    this.builderUI.createLayer.shape.horizontal.setCallback(() => { this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue(); console.log(this.state.builder.createLayerMenu.shape) });
     //Builder End
   }
 
@@ -369,11 +369,9 @@ export class NumberInputUI {
         valueEl!.textContent = `${this.value}`;
 
         this.callback();
-
-        
-        console.log(this.value);
       }, 100);
     });
+    
     incrementer.addEventListener("pointerup", () => {
       clearInterval(this.incrementIntervalId);
       this.incrementIntervalId = undefined;
@@ -411,7 +409,7 @@ export class NumberInputUI {
       clearInterval(this.decrementIntervalId);
       this.decrementIntervalId = undefined;
     });
-    decrementer.addEventListener("pointercancel", () => {
+    decrementer.addEventListener("pointercancel console.log(this.state.builder.createLayerMenu.shape", () => {
       clearInterval(this.decrementIntervalId);
       this.decrementIntervalId = undefined;
     });
