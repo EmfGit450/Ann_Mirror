@@ -275,7 +275,7 @@ export class NumberInputUI {
         </svg>
       </button>
 
-      <label id="${valueId}" class="number-input">${this.value}</label>
+      <label id="${valueId}" class="number-input">${this._value}</label>
 
       <button id="${decrementerId}">
         <svg viewBox="0 0 6 6">

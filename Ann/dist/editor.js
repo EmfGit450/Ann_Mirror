@@ -14511,7 +14511,7 @@ max.fts.length: ${n.length}
         </svg>
       </button>
 
-      <label id="${r}" class="number-input">${this.value}</label>
+      <label id="${r}" class="number-input">${this._value}</label>
 
       <button id="${i}">
         <svg viewBox="0 0 6 6">
