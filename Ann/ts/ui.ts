@@ -89,7 +89,6 @@ const DIRECTION_YAW_PITCH = [
   { yaw: Math.PI / 2, pitch: 0 },
 ]
 
-
 export class UI {
   settingsUI: SettingsUI;
   builderUI: BuilderUI;
@@ -198,7 +197,7 @@ export class UI {
     const current = DIRECTION_YAW_PITCH[this.state.builder.settings.forwardDirection];
     const target = DIRECTION_YAW_PITCH[dir];
 
-    const proxy = { yaw: current.yaw, pitch: current.pitch };
+    const proxy = { yaw: current!.yaw, pitch: current!.pitch };
 
     const tl = gsap.timeline({
       onStart: () => { this.forwardDirTweening = true; },
@@ -208,14 +207,67 @@ export class UI {
       },
     });
     
-    if (target.yaw !== current.yaw) {
-      tl.to(proxy, { yaw: target.yaw, duration: 0.6, ease: "circ.inOut" });
+    if (target!.yaw !== current!.yaw) {
+      tl.to(proxy, { yaw: target!.yaw, duration: 0.6, ease: "circ.inOut" });
     }
-    if (target.pitch !== current.pitch) {
-      tl.to(proxy, { pitch: target.pitch, duration: 0.6, ease: "circ.inOut" });
+    if (target!.pitch !== current!.pitch) {
+      tl.to(proxy, { pitch: target!.pitch, duration: 0.6, ease: "circ.inOut" });
     }
     
     this.state.builder.settings.forwardDirection = dir;
   }
   
+}
+
+
+interface NumberInputConfig {
+  rootSelector: string;
+  
+  callbacks: {
+    incrementer: () => void;
+    decrementer: () => void;
+  }
+}
+
+export class NumberInputUI {
+  constructor(numberInputConfig: NumberInputConfig) {
+    const incrementerId = `${crypto.randomUUID()}-num-input-button`;
+    const decrementerId = `${crypto.randomUUID()}-num-input-button`;
+
+    document.querySelector(numberInputConfig.rootSelector)!.innerHTML += `
+      <div class="number-input">
+        <button id="${incrementerId}">
+          <svg viewBox="0 0 6 6">
+            <path
+              d="M 1 5 L 3 3 M 3 3 L 5 5"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke="#fff"
+            />
+          </svg>
+        </button>
+        <label class="number-input">10</label>
+        <button id="${decrementerId}">
+          <svg viewBox="0 0 6 6">
+            <path
+              d="M 1 5 L 3 3 M 3 3 L 5 5"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke="#fff"
+              transform-origin="center"
+              transform="rotate(180)"
+            />
+          </svg>
+        </button>
+      </div>
+    `
+    
+    document.getElementById(incrementerId)!.addEventListener("click", () => {
+      numberInputConfig.callbacks.incrementer();
+    });
+
+    document.getElementById(decrementerId)!.addEventListener("click", () => {
+      numberInputConfig.callbacks.decrementer();
+    });
+  }
 }

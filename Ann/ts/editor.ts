@@ -14,7 +14,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
-import { UI } from "./ui";
+import { NumberInputUI, UI } from "./ui";
 
 
 //Init Start
@@ -238,6 +238,16 @@ async function Main() {
   };
 
   const ui = new UI(settingsConfig, builderConfig);
+
+
+  const test = new NumberInputUI({
+    rootSelector: ".shape-config",
+
+    callbacks: {
+      incrementer: () => { console.log(crypto.randomUUID(), "++"); },
+      decrementer: () => { console.log(crypto.randomUUID(), "--"); }
+    }
+  })
   //Tests End
   
   engine.runRenderLoop(() => {
