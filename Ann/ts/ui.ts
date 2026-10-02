@@ -363,6 +363,12 @@ export class NumberInputUI {
     });
     
     incrementer.addEventListener("pointerdown", () => {
+      this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
+
+      valueEl!.textContent = `${this.value}`;
+
+      this.callback();
+      
       this.incrementIntervalId = setInterval(() => {
         this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
 
@@ -400,11 +406,9 @@ export class NumberInputUI {
         valueEl!.textContent = `${this.value}`;
 
         this.callback();
-
-        
-        console.log(this.value);
       }, 100);
     });
+    
     decrementer.addEventListener("pointerup", () => {
       clearInterval(this.decrementIntervalId);
       this.decrementIntervalId = undefined;
