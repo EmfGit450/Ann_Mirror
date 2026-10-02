@@ -182,15 +182,15 @@ export class UI {
         shape: {
           forward: new NumberInputUI({ 
             rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: 1, max: 20
+            initial: 1, min: -1000, max: 1000
           }),
           vertical: new NumberInputUI({ 
             rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: 1, max: 20
+            initial: 1, min: -1000, max: 1000
           }),
           horizontal: new NumberInputUI({ 
             rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: 1, max: 20
+            initial: 1, min: -1000, max: 1000
           })
         }
       },
@@ -255,8 +255,6 @@ export class UI {
     this.builderUI.createLayer.shape.forward.setCallback(() => { this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue(); });
     this.builderUI.createLayer.shape.vertical.setCallback(() => { this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue(); });
     this.builderUI.createLayer.shape.horizontal.setCallback(() => { this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue(); });
-    
-    document.addEventListener("click", () => { console.log(this.state.builder.createLayerMenu.shape); });
     //Builder End
   }
 
@@ -299,14 +297,18 @@ interface NumberInputConfig {
 }
 
 export class NumberInputUI {
-  private _value: number;
+  private value: number;
 
-  private _callback: () => void;
+  private callback: () => void;
+
+  private incrementIntervalId: number | undefined;
+  private decrementIntervalId: number | undefined;
 
   constructor(numberInputConfig: NumberInputConfig) {
-    this._value = numberInputConfig.initial ?? 1;
+    //Init Start
+    this.value = numberInputConfig.initial ?? 1;
 
-    this._callback = () => {};
+    this.callback = () => {};
     
     
     const incrementerId = `${crypto.randomUUID()}-num-input-button`;
@@ -328,7 +330,7 @@ export class NumberInputUI {
         </svg>
       </button>
 
-      <label id="${valueId}" class="number-input">${this._value}</label>
+      <label id="${valueId}" class="number-input">${this.value}</label>
 
       <button id="${decrementerId}">
         <svg viewBox="0 0 6 6">
@@ -347,31 +349,80 @@ export class NumberInputUI {
     document.querySelector(numberInputConfig.rootSelector)!.append(numInputDiv);
     
     const valueEl = document.getElementById(valueId);
+    //Init En-d000
 
-    document.getElementById(incrementerId)!.addEventListener("click", () => {
-      const val = Math.max(numberInputConfig.min, Math.min(this._value + 1, numberInputConfig.max));
-      valueEl!.textContent = `${val}`;
+    //Incrementer Start
+    const incrementer = document.getElementById(incrementerId)!;
 
-      this._value = val;
+    incrementer.addEventListener("click", () => {
+      this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
 
-      this._callback();
+      valueEl!.textContent = `${this.value}`;
+
+      this.callback();
+    });
+    
+    incrementer.addEventListener("pointerdown", () => {
+      this.incrementIntervalId = setInterval(() => {
+        this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
+
+        valueEl!.textContent = `${this.value}`;
+
+        this.callback();
+
+        
+        console.log(this.value);
+      }, 100);
+    });
+    incrementer.addEventListener("pointerup", () => {
+      clearInterval(this.incrementIntervalId);
+      this.incrementIntervalId = undefined;
+    });
+    incrementer.addEventListener("pointercancel", () => {
+      clearInterval(this.incrementIntervalId);
+      this.incrementIntervalId = undefined;
+    });
+    //Incrementer End
+    
+    //Decrementer Start
+    const decrementer = document.getElementById(decrementerId)!;
+    
+    decrementer.addEventListener("click", () => {
+      this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
+
+      valueEl!.textContent = `${this.value}`;
+
+      this.callback();
     });
 
-    document.getElementById(decrementerId)!.addEventListener("click", () => {
-      const val = Math.max(numberInputConfig.min, Math.min(this._value - 1, numberInputConfig.max));
-      valueEl!.textContent = `${val}`;
+    decrementer.addEventListener("pointerdown", () => {
+      this.decrementIntervalId = setInterval(() => {
+        this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
 
-      this._value = val;
+        valueEl!.textContent = `${this.value}`;
 
-      this._callback();
+        this.callback();
+
+        
+        console.log(this.value);
+      }, 100);
     });
+    decrementer.addEventListener("pointerup", () => {
+      clearInterval(this.decrementIntervalId);
+      this.decrementIntervalId = undefined;
+    });
+    decrementer.addEventListener("pointercancel", () => {
+      clearInterval(this.decrementIntervalId);
+      this.decrementIntervalId = undefined;
+    });
+    //Decrementer End
   }
 
   getValue() {
-    return this._value;
+    return this.value;
   }
 
   setCallback(callback: () => void) {
-    this._callback = callback;
+    this.callback = callback;
   }
 }
