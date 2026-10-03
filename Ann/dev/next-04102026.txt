@@ -1,0 +1,13 @@
+- add labels to number input ui
+  for indicating f,v,h
+
+- add input for layer activation - Dropdown or
+                                   Carousel
+
+- Update/add class Network crud functions for ui.
+
+- Link ui and Network.
+  Add tweens to the functions
+
+- Polish UI
+  Especially create-layer-config-menu, the name itself is revoltingly large
