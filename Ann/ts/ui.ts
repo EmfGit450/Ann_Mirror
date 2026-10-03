@@ -1,7 +1,5 @@
 import { gsap } from "gsap";
 
-
-import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
 
@@ -365,7 +363,7 @@ export class NumberInputUI {
         this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
         valueEl!.textContent = `${this.value}`;
         this.callback();
-      }, 200);
+      }, 500);
 
       this.incrementTimeoutId = setTimeout(() => {
         clearInterval(this.incrementIntervalId);
@@ -374,7 +372,7 @@ export class NumberInputUI {
           this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
           valueEl!.textContent = `${this.value}`;
           this.callback();
-        }, 120);
+        }, 150);
         
         this.incrementTimeoutId = setTimeout(() => {
           clearInterval(this.incrementIntervalId);
@@ -383,9 +381,9 @@ export class NumberInputUI {
             this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
             valueEl!.textContent = `${this.value}`;
             this.callback();
-          }, 60);
+          }, 70);
         }, 600)
-      }, 700);
+      }, 500);
     });
     
     incrementer.addEventListener("pointerup", () => {
@@ -398,6 +396,18 @@ export class NumberInputUI {
         this.incrementTimeoutId = undefined;
       }
     });
+    
+    incrementer.addEventListener("pointerleave", () => {
+      if (this.incrementIntervalId) {
+        clearInterval(this.incrementIntervalId);
+        this.incrementIntervalId = undefined;
+      }
+      if (this.incrementTimeoutId) {
+        clearTimeout(this.incrementTimeoutId);
+        this.incrementTimeoutId = undefined;
+      }
+    });
+
     incrementer.addEventListener("pointercancel", () => {
       if (this.incrementIntervalId) {
         clearInterval(this.incrementIntervalId);
@@ -422,7 +432,7 @@ export class NumberInputUI {
         this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
         valueEl!.textContent = `${this.value}`;
         this.callback();
-      }, 200);
+      }, 500);
 
       this.decrementTimeoutId = setTimeout(() => {
         clearInterval(this.decrementIntervalId);
@@ -431,7 +441,7 @@ export class NumberInputUI {
           this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
           valueEl!.textContent = `${this.value}`;
           this.callback();
-        }, 120);
+        }, 150);
         
         this.decrementTimeoutId = setTimeout(() => {
           clearInterval(this.decrementIntervalId);
@@ -442,7 +452,7 @@ export class NumberInputUI {
             this.callback();
           }, 60);
         }, 600)
-      }, 700);
+      }, 500);
     });
     
     decrementer.addEventListener("pointerup", () => {
@@ -455,7 +465,18 @@ export class NumberInputUI {
         this.decrementTimeoutId = undefined;
       }
     });
-    decrementer.addEventListener("pointercancel console.log(this.state.builder.createLayerMenu.shape", () => {
+
+    decrementer.addEventListener("pointerleave", () => {
+      if (this.decrementIntervalId) {
+        clearInterval(this.decrementIntervalId);
+        this.decrementIntervalId = undefined;
+      }
+      if (this.decrementTimeoutId) {
+        clearTimeout(this.decrementTimeoutId);
+        this.decrementTimeoutId = undefined;
+      }
+    });
+    decrementer.addEventListener("pointercancel", () => {
       if (this.decrementIntervalId) {
         clearInterval(this.decrementIntervalId);
         this.decrementIntervalId = undefined;
