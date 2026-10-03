@@ -232,6 +232,9 @@ async function Main() {
     createLayerMenuConfig: {
       shape: {
         rootSelector: ".shape-number-inputs"
+      },
+      pos: {
+        rootSelector: ".position-number-inputs"
       }
     },
     

@@ -39,6 +39,9 @@ interface LayerCreationMenuConfig {
   shape: {
     rootSelector: string;
   };
+  pos: {
+    rootSelector: string;
+  };
 }
 
 
@@ -79,6 +82,11 @@ interface LayerCreationMenu {
     vertical: NumberInputUI;
     horizontal: NumberInputUI;
   };
+  pos: {
+    forward: NumberInputUI;
+    vertical: NumberInputUI;
+    horizontal: NumberInputUI;
+  }
 }
 
 
@@ -93,6 +101,11 @@ interface UIState {
 
     createLayerMenu: {
       shape: {
+        forward: number;
+        vertical: number;
+        horizontal: number;
+      };
+      pos: {
         forward: number;
         vertical: number;
         horizontal: number;
@@ -146,6 +159,11 @@ export class UI {
             forward: 1,
             vertical: 1,
             horizontal: 1
+          },
+          pos: {
+            forward: 0,
+            vertical: 0,
+            horizontal: 0
           }
         },
         
@@ -180,15 +198,29 @@ export class UI {
         shape: {
           forward: new NumberInputUI({ 
             rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: -1000, max: 1000
+            initial: 1, min: 1, max: 10
           }),
           vertical: new NumberInputUI({ 
             rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: -1000, max: 1000
+            initial: 1, min: 1, max: 10
           }),
           horizontal: new NumberInputUI({ 
             rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: -1000, max: 1000
+            initial: 1, min: 1, max: 10
+          })
+        },
+        pos: {
+          forward: new NumberInputUI({ 
+            rootSelector: builderConfig.createLayerMenuConfig.pos.rootSelector,
+            initial: 1, min: undefined, max: undefined
+          }),
+          vertical: new NumberInputUI({ 
+            rootSelector: builderConfig.createLayerMenuConfig.pos.rootSelector,
+            initial: 1, min: undefined, max: undefined
+          }),
+          horizontal: new NumberInputUI({ 
+            rootSelector: builderConfig.createLayerMenuConfig.pos.rootSelector,
+            initial: 1, min: undefined, max: undefined
           })
         }
       },
@@ -250,9 +282,13 @@ export class UI {
     this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
     
      
-    this.builderUI.createLayer.shape.forward.setCallback(() => { this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue(); console.log(this.state.builder.createLayerMenu.shape) });
-    this.builderUI.createLayer.shape.vertical.setCallback(() => { this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue(); console.log(this.state.builder.createLayerMenu.shape) });
-    this.builderUI.createLayer.shape.horizontal.setCallback(() => { this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue(); console.log(this.state.builder.createLayerMenu.shape) });
+    this.builderUI.createLayer.shape.forward.setCallback(() => { this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue(); });
+    this.builderUI.createLayer.shape.vertical.setCallback(() => { this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue(); });
+    this.builderUI.createLayer.shape.horizontal.setCallback(() => { this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue(); });
+    
+    this.builderUI.createLayer.pos.forward.setCallback(() => { this.state.builder.createLayerMenu.pos.forward = this.builderUI.createLayer.pos.forward.getValue(); });
+    this.builderUI.createLayer.pos.vertical.setCallback(() => { this.state.builder.createLayerMenu.pos.vertical = this.builderUI.createLayer.pos.vertical.getValue(); });
+    this.builderUI.createLayer.pos.horizontal.setCallback(() => { this.state.builder.createLayerMenu.pos.horizontal = this.builderUI.createLayer.pos.horizontal.getValue(); });
     //Builder End
   }
 
@@ -290,17 +326,25 @@ interface NumberInputConfig {
   rootSelector: string;
   
   initial: number;
-  min: number;
-  max: number;
+  min: number | undefined;
+  max: number | undefined;
+
+  /* undefined means none
+     max = undefined => No upper limit
+     min = undefined => No lower limit */
 }
+
+//SET UP DOCUMENT LEVEL POINTER CAPTURE ON LAPTOP : NO ISSUES ON TOUCH DEVICE(TABLET)
 
 export class NumberInputUI {
   private value: number;
 
   private callback: () => void;
 
+  // private incrementing: boolean;
   private incrementIntervalId: number | undefined;
   private incrementTimeoutId: number | undefined;
+  // private decrementing: boolean;
   private decrementIntervalId: number | undefined;
   private decrementTimeoutId: number | undefined;
 
@@ -355,21 +399,24 @@ export class NumberInputUI {
     const incrementer = document.getElementById(incrementerId)!;
     
     incrementer.addEventListener("pointerdown", () => {
-      this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
+      if (this.value == numberInputConfig.max) return;
+      this.value += 1;
       valueEl!.textContent = `${this.value}`;
       this.callback();
       
       this.incrementIntervalId = setInterval(() => {
-        this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
+        if (this.value == numberInputConfig.max) return;
+        this.value += 1;
         valueEl!.textContent = `${this.value}`;
         this.callback();
-      }, 500);
+      }, 600);
 
       this.incrementTimeoutId = setTimeout(() => {
         clearInterval(this.incrementIntervalId);
         
         this.incrementIntervalId = setInterval(() => {
-          this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
+          if (this.value == numberInputConfig.max) return;
+          this.value += 1;
           valueEl!.textContent = `${this.value}`;
           this.callback();
         }, 150);
@@ -378,10 +425,11 @@ export class NumberInputUI {
           clearInterval(this.incrementIntervalId);
           
           this.incrementIntervalId = setInterval(() => {
-            this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
+            if (this.value == numberInputConfig.max) return;
+            this.value += 1;
             valueEl!.textContent = `${this.value}`;
             this.callback();
-          }, 70);
+          }, 60);
         }, 600)
       }, 500);
     });
@@ -424,21 +472,24 @@ export class NumberInputUI {
     const decrementer = document.getElementById(decrementerId)!;
 
     decrementer.addEventListener("pointerdown", () => {
-      this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
+      if (this.value == numberInputConfig.min) return;
+      this.value -= 1;
       valueEl!.textContent = `${this.value}`;
       this.callback();
       
       this.decrementIntervalId = setInterval(() => {
-        this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
+        if (this.value == numberInputConfig.min) return;
+        this.value -= 1;
         valueEl!.textContent = `${this.value}`;
         this.callback();
-      }, 500);
+      }, 600);
 
       this.decrementTimeoutId = setTimeout(() => {
         clearInterval(this.decrementIntervalId);
         
         this.decrementIntervalId = setInterval(() => {
-          this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
+          if (this.value == numberInputConfig.min) return;
+          this.value -= 1;
           valueEl!.textContent = `${this.value}`;
           this.callback();
         }, 150);
@@ -447,7 +498,8 @@ export class NumberInputUI {
           clearInterval(this.decrementIntervalId);
           
           this.decrementIntervalId = setInterval(() => {
-            this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
+            if (this.value == numberInputConfig.min) return;
+            this.value -= 1;
             valueEl!.textContent = `${this.value}`;
             this.callback();
           }, 60);
