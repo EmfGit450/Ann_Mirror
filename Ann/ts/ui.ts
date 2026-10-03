@@ -302,7 +302,9 @@ export class NumberInputUI {
   private callback: () => void;
 
   private incrementIntervalId: number | undefined;
+  private incrementTimeoutId: number | undefined;
   private decrementIntervalId: number | undefined;
+  private decrementTimeoutId: number | undefined;
 
   constructor(numberInputConfig: NumberInputConfig) {
     //Init Start
@@ -353,69 +355,115 @@ export class NumberInputUI {
 
     //Incrementer Start
     const incrementer = document.getElementById(incrementerId)!;
-
-    incrementer.addEventListener("click", () => {
-      this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
-
-      valueEl!.textContent = `${this.value}`;
-
-      this.callback();
-    });
     
     incrementer.addEventListener("pointerdown", () => {
       this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
-
       valueEl!.textContent = `${this.value}`;
-
       this.callback();
       
       this.incrementIntervalId = setInterval(() => {
         this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
-
         valueEl!.textContent = `${this.value}`;
-
         this.callback();
-      }, 100);
+      }, 200);
+
+      this.incrementTimeoutId = setTimeout(() => {
+        clearInterval(this.incrementIntervalId);
+        
+        this.incrementIntervalId = setInterval(() => {
+          this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
+          valueEl!.textContent = `${this.value}`;
+          this.callback();
+        }, 120);
+        
+        this.incrementTimeoutId = setTimeout(() => {
+          clearInterval(this.incrementIntervalId);
+          
+          this.incrementIntervalId = setInterval(() => {
+            this.value = Math.max(numberInputConfig.min, Math.min(this.value + 1, numberInputConfig.max));
+            valueEl!.textContent = `${this.value}`;
+            this.callback();
+          }, 60);
+        }, 600)
+      }, 700);
     });
     
     incrementer.addEventListener("pointerup", () => {
-      clearInterval(this.incrementIntervalId);
-      this.incrementIntervalId = undefined;
+      if (this.incrementIntervalId) {
+        clearInterval(this.incrementIntervalId);
+        this.incrementIntervalId = undefined;
+      }
+      if (this.incrementTimeoutId) {
+        clearTimeout(this.incrementTimeoutId);
+        this.incrementTimeoutId = undefined;
+      }
     });
     incrementer.addEventListener("pointercancel", () => {
-      clearInterval(this.incrementIntervalId);
-      this.incrementIntervalId = undefined;
+      if (this.incrementIntervalId) {
+        clearInterval(this.incrementIntervalId);
+        this.incrementIntervalId = undefined;
+      }
+      if (this.incrementTimeoutId) {
+        clearTimeout(this.incrementTimeoutId);
+        this.incrementTimeoutId = undefined;
+      }
     });
     //Incrementer End
     
     //Decrementer Start
     const decrementer = document.getElementById(decrementerId)!;
-    
-    decrementer.addEventListener("click", () => {
-      this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
-
-      valueEl!.textContent = `${this.value}`;
-
-      this.callback();
-    });
 
     decrementer.addEventListener("pointerdown", () => {
+      this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
+      valueEl!.textContent = `${this.value}`;
+      this.callback();
+      
       this.decrementIntervalId = setInterval(() => {
         this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
-
         valueEl!.textContent = `${this.value}`;
-
         this.callback();
-      }, 100);
+      }, 200);
+
+      this.decrementTimeoutId = setTimeout(() => {
+        clearInterval(this.decrementIntervalId);
+        
+        this.decrementIntervalId = setInterval(() => {
+          this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
+          valueEl!.textContent = `${this.value}`;
+          this.callback();
+        }, 120);
+        
+        this.decrementTimeoutId = setTimeout(() => {
+          clearInterval(this.decrementIntervalId);
+          
+          this.decrementIntervalId = setInterval(() => {
+            this.value = Math.max(numberInputConfig.min, Math.min(this.value - 1, numberInputConfig.max));
+            valueEl!.textContent = `${this.value}`;
+            this.callback();
+          }, 60);
+        }, 600)
+      }, 700);
     });
     
     decrementer.addEventListener("pointerup", () => {
-      clearInterval(this.decrementIntervalId);
-      this.decrementIntervalId = undefined;
+      if (this.decrementIntervalId) {
+        clearInterval(this.decrementIntervalId);
+        this.decrementIntervalId = undefined;
+      }
+      if (this.decrementTimeoutId) {
+        clearTimeout(this.decrementTimeoutId);
+        this.decrementTimeoutId = undefined;
+      }
     });
     decrementer.addEventListener("pointercancel console.log(this.state.builder.createLayerMenu.shape", () => {
-      clearInterval(this.decrementIntervalId);
-      this.decrementIntervalId = undefined;
+      if (this.decrementIntervalId) {
+        clearInterval(this.decrementIntervalId);
+        this.decrementIntervalId = undefined;
+      }
+      if (this.decrementTimeoutId) {
+        clearTimeout(this.decrementTimeoutId);
+        this.decrementTimeoutId = undefined;
+      }
     });
     //Decrementer End
   }
