@@ -93,7 +93,7 @@ button:active {
 
   padding: 2rem;
   font-family: "IBM Plex Mono";
-  font-size: var(--fs-xs);
+  font-size: var(--fs-s);
   font-weight: 400;
   color: #fff;
   text-align: center;
