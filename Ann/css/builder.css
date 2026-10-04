@@ -42,13 +42,38 @@
   border-radius: 0.5rem;
   box-shadow: 0 0 1rem #ffffff1c
 }
+
+@media (min-width: 800px) {
+  .builder-panel {
+    width: 16rem;
+  }
+
+  .build-actions-list label.heading {
+    width: 14rem;
+    font-size: 1.75rem;
+  }
+}
+@media (min-width: 1000px) {
+  .builder-panel {
+    width: 18rem;
+  }
+
+  .build-actions-list label.heading {
+    width: 16rem;
+    font-size: 2rem;
+  }
+}
 /*End*/
 
 /*Settings*/
 .build-actions-list .settings > div {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: space-evenly;
+}
+
+#forward-dir-icon:active {
+  transform: scale(1);
 }
 
 .forward-dir-options {
@@ -73,6 +98,18 @@
 #nx-dir { background: radial-gradient(ellipse, #600, #f00); }
 #ny-dir { background: radial-gradient(ellipse, #060, #0f0); }
 #nz-dir { background: radial-gradient(ellipse, #006, #00f); }
+
+@media (min-width: 1000px) {
+  #forward-dir-icon {
+    scale: 1.2;
+  }
+
+  .forward-dir-options button {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.9rem;
+  }
+}
 /*End*/
 
 /*Creation Menu*/
@@ -112,7 +149,7 @@
   margin-bottom: 0.5rem;
 }
 
-.create-layer-menu label.number-input {
+.create-layer-menu label.number-input-value {
   background: #fff;
   text-align: center;
   color: #000;

@@ -244,6 +244,8 @@ export class UI {
     //Main UI Togglers Start
     this.settingsUI.toggler.addEventListener("click", () => {
       this.state.settings.panelToggled = !this.state.settings.panelToggled;
+
+      console.log(this.settingsUI.root.offsetWidth)
       
       gsap.to(this.settingsUI.root, {
         xPercent: this.state.settings.panelToggled ? 0 : 100,
@@ -251,9 +253,15 @@ export class UI {
         ease: "expo.inOut"
       });
       gsap.to(this.settingsUI.toggler.parentElement, {
-        x: this.state.settings.panelToggled ? "-13rem" : 0,
+        x: () => (this.state.settings.panelToggled ? -this.settingsUI.root.offsetWidth : 0),
         duration: 0.3,
         ease: "expo.inOut"
+      });
+    });
+
+    window.addEventListener("resize", () => {
+      gsap.set(this.settingsUI.toggler.parentElement, {
+        x: this.state.settings.panelToggled ? -this.settingsUI.root.offsetWidth : 0
       });
     });
     
@@ -266,9 +274,15 @@ export class UI {
         ease: "circ.inOut"
       });
       gsap.to(this.builderUI.toggler.parentElement, {
-        x: this.state.builder.panelToggled ? "13rem" : 0,
+        x: () => (this.state.builder.panelToggled ? this.builderUI.root.offsetWidth : 0),
         duration: 0.3,
         ease: "circ.inOut"
+      });
+    });
+
+    window.addEventListener("resize", () => {
+      gsap.set(this.builderUI.toggler.parentElement, {
+        x: this.state.builder.panelToggled ? this.builderUI.root.offsetWidth : 0
       });
     });
     //Main UI Togglers End
@@ -354,16 +368,10 @@ export class NumberInputUI {
 
     this.callback = () => {};
     
-    
-    const incrementerId = `${crypto.randomUUID()}-num-input-button`;
-    const decrementerId = `${crypto.randomUUID()}-num-input-button`;
-
-    const valueId = `${crypto.randomUUID()}-num-input-value`;
-    
     const numInputDiv = document.createElement("div");
     numInputDiv.classList.add("number-input");
     numInputDiv.innerHTML = `
-      <button id="${incrementerId}">
+      <button class="number-input-incrementer">
         <svg viewBox="0 0 6 6">
           <path
             d="M 1 5 L 3 3 M 3 3 L 5 5"
@@ -374,9 +382,9 @@ export class NumberInputUI {
         </svg>
       </button>
 
-      <label id="${valueId}" class="number-input">${this.value}</label>
+      <label class="number-input-value" class="number-input">${this.value}</label>
 
-      <button id="${decrementerId}">
+      <button class="number-input-decrementer">
         <svg viewBox="0 0 6 6">
           <path
             d="M 1 5 L 3 3 M 3 3 L 5 5"
@@ -391,13 +399,13 @@ export class NumberInputUI {
     `;
 
     document.querySelector(numberInputConfig.rootSelector)!.append(numInputDiv);
-    
-    const valueEl = document.getElementById(valueId);
+
+    const incrementer = numInputDiv.children[0]!;
+    const valueEl = numInputDiv.children[1]!;
+    const decrementer = numInputDiv.children[2]!;
     //Init En-d000
 
     //Incrementer Start
-    const incrementer = document.getElementById(incrementerId)!;
-    
     incrementer.addEventListener("pointerdown", () => {
       if (this.value == numberInputConfig.max) return;
       this.value += 1;
@@ -469,8 +477,6 @@ export class NumberInputUI {
     //Incrementer End
     
     //Decrementer Start
-    const decrementer = document.getElementById(decrementerId)!;
-
     decrementer.addEventListener("pointerdown", () => {
       if (this.value == numberInputConfig.min) return;
       this.value -= 1;

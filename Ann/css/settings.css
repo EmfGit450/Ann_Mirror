@@ -21,3 +21,14 @@
   border-top-left-radius: 0.6rem;
   border-bottom-left-radius: 0.6rem;
 }
+
+@media (min-width: 800px) {
+  .settings-menu-panel {
+    width: 16rem;
+  }
+}
+@media (min-width: 1000px) {
+  .settings-menu-panel {
+    width: 18rem;
+  }
+}

@@ -147,7 +147,7 @@ button:active {
   touch-action: none;
 }
 
-@media (max-width: 620px) or (max-height: 400px) {
+@media (max-width: 620px) and (orientation: portrait) {
   .small-screen-error {
     display: flex;
   }

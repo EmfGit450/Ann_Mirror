@@ -286,6 +286,8 @@ async function Main() {
     engine?.resize();
   });
 
+  window.addEventListener("dblclick", () => { document.documentElement.requestFullscreen(); });
+
   window.addEventListener("contextmenu", (e) => e.preventDefault());
 }
 
