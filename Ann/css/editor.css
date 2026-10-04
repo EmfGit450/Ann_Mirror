@@ -1,6 +1,12 @@
 :root {
   --panel-bg: #171717fa;
   --debugger-bg: #00000066;
+
+  --fs-xl: 32px;
+  --fs-l: 26px;
+  --fs-m: 22px;
+  --fs-s: 18px;
+  --fs-xs: 14px;
 }
 
 * {
@@ -87,7 +93,7 @@ button:active {
 
   padding: 2rem;
   font-family: "IBM Plex Mono";
-  font-size: 0.9rem;
+  font-size: var(--fs-xs);
   font-weight: 400;
   color: #fff;
   text-align: center;
@@ -99,6 +105,12 @@ button:active {
 }
 .small-screen-error svg {
   transform: scale(4.5);
+}
+
+@media (max-width: 650px) and (orientation: portrait) {
+  .small-screen-error {
+    display: flex;
+  }
 }
 /*End*/
 
@@ -145,11 +157,5 @@ button:active {
   height: 100%;
   z-index: 0;
   touch-action: none;
-}
-
-@media (max-width: 620px) and (orientation: portrait) {
-  .small-screen-error {
-    display: flex;
-  }
 }
 /*End*/

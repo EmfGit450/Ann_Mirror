@@ -4,7 +4,7 @@
   align-items: stretch;
   gap: 0.5rem;
 
-  font-size: 1rem;
+  font-size: var(--fs-s);
   background: var(--debugger-bg);
   color: #f0e5e5;
   border-radius: 1rem;
@@ -65,7 +65,7 @@
   width: 1.4rem;
   height: 1.4rem;
   color: #000;
-  font-size: 1.3rem;
+  font-size: var(--fs-m);
   padding: 0;
   cursor: pointer;
 }
