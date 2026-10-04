@@ -39,9 +39,6 @@ interface LayerCreationMenuConfig {
   shape: {
     rootSelector: string;
   };
-  pos: {
-    rootSelector: string;
-  };
 }
 
 
@@ -82,11 +79,6 @@ interface LayerCreationMenu {
     vertical: NumberInputUI;
     horizontal: NumberInputUI;
   };
-  pos: {
-    forward: NumberInputUI;
-    vertical: NumberInputUI;
-    horizontal: NumberInputUI;
-  }
 }
 
 
@@ -101,11 +93,6 @@ interface UIState {
 
     createLayerMenu: {
       shape: {
-        forward: number;
-        vertical: number;
-        horizontal: number;
-      };
-      pos: {
         forward: number;
         vertical: number;
         horizontal: number;
@@ -159,11 +146,6 @@ export class UI {
             forward: 1,
             vertical: 1,
             horizontal: 1
-          },
-          pos: {
-            forward: 0,
-            vertical: 0,
-            horizontal: 0
           }
         },
         
@@ -198,29 +180,15 @@ export class UI {
         shape: {
           forward: new NumberInputUI({ 
             rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: 1, max: 10
+            initial: 1, min: 1, max: 1000
           }),
           vertical: new NumberInputUI({ 
             rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: 1, max: 10
+            initial: 1, min: 1, max: 1000
           }),
           horizontal: new NumberInputUI({ 
             rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: 1, max: 10
-          })
-        },
-        pos: {
-          forward: new NumberInputUI({ 
-            rootSelector: builderConfig.createLayerMenuConfig.pos.rootSelector,
-            initial: 1, min: undefined, max: undefined
-          }),
-          vertical: new NumberInputUI({ 
-            rootSelector: builderConfig.createLayerMenuConfig.pos.rootSelector,
-            initial: 1, min: undefined, max: undefined
-          }),
-          horizontal: new NumberInputUI({ 
-            rootSelector: builderConfig.createLayerMenuConfig.pos.rootSelector,
-            initial: 1, min: undefined, max: undefined
+            initial: 1, min: 1, max: 1000
           })
         }
       },
@@ -296,13 +264,57 @@ export class UI {
     this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
     
      
-    this.builderUI.createLayer.shape.forward.setCallback(() => { this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue(); });
-    this.builderUI.createLayer.shape.vertical.setCallback(() => { this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue(); });
-    this.builderUI.createLayer.shape.horizontal.setCallback(() => { this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue(); });
-    
-    this.builderUI.createLayer.pos.forward.setCallback(() => { this.state.builder.createLayerMenu.pos.forward = this.builderUI.createLayer.pos.forward.getValue(); });
-    this.builderUI.createLayer.pos.vertical.setCallback(() => { this.state.builder.createLayerMenu.pos.vertical = this.builderUI.createLayer.pos.vertical.getValue(); });
-    this.builderUI.createLayer.pos.horizontal.setCallback(() => { this.state.builder.createLayerMenu.pos.horizontal = this.builderUI.createLayer.pos.horizontal.getValue(); });
+    this.builderUI.createLayer.shape.forward.setCallback(() => { 
+      if (
+        (this.state.builder.createLayerMenu.shape.forward + 1) *
+        this.state.builder.createLayerMenu.shape.vertical *
+        this.state.builder.createLayerMenu.shape.horizontal > 1000
+      ) {
+        this.builderUI.createLayer.shape.forward.setValue(this.state.builder.createLayerMenu.shape.forward);
+        return;
+      }
+      else if (
+        (this.state.builder.createLayerMenu.shape.forward - 1) *
+        this.state.builder.createLayerMenu.shape.vertical *
+        this.state.builder.createLayerMenu.shape.horizontal > 1000
+      ) {
+        this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue();
+      }
+    });
+    this.builderUI.createLayer.shape.vertical.setCallback(() => {
+      if (
+        this.state.builder.createLayerMenu.shape.forward *
+        (this.state.builder.createLayerMenu.shape.vertical + 1) *
+        this.state.builder.createLayerMenu.shape.horizontal > 1000      
+      ) {
+        this.builderUI.createLayer.shape.vertical.setValue(this.state.builder.createLayerMenu.shape.vertical);
+        return;
+      }
+      else if (
+        this.state.builder.createLayerMenu.shape.forward *
+        (this.state.builder.createLayerMenu.shape.vertical - 1) *
+        this.state.builder.createLayerMenu.shape.horizontal > 1000
+      ) {
+        this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue();
+      }
+    });
+    this.builderUI.createLayer.shape.horizontal.setCallback(() => {
+      if (
+        this.state.builder.createLayerMenu.shape.forward *
+        this.state.builder.createLayerMenu.shape.vertical *
+        (this.state.builder.createLayerMenu.shape.horizontal + 1) > 1000 
+      ) {
+        this.builderUI.createLayer.shape.horizontal.setValue(this.state.builder.createLayerMenu.shape.horizontal);
+        return;
+      }
+      else if (
+        this.state.builder.createLayerMenu.shape.forward *
+        this.state.builder.createLayerMenu.shape.vertical *
+        (this.state.builder.createLayerMenu.shape.horizontal - 1) < 1000
+      ) {
+        this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue();
+      }
+    });
     //Builder End
   }
 
@@ -348,17 +360,15 @@ interface NumberInputConfig {
      min = undefined => No lower limit */
 }
 
-//SET UP DOCUMENT LEVEL POINTER CAPTURE ON LAPTOP : NO ISSUES ON TOUCH DEVICE(TABLET)
-
 export class NumberInputUI {
   private value: number;
 
   private callback: () => void;
 
-  // private incrementing: boolean;
+  
   private incrementIntervalId: number | undefined;
   private incrementTimeoutId: number | undefined;
-  // private decrementing: boolean;
+
   private decrementIntervalId: number | undefined;
   private decrementTimeoutId: number | undefined;
 
@@ -403,7 +413,12 @@ export class NumberInputUI {
     const incrementer = numInputDiv.children[0]!;
     const valueEl = numInputDiv.children[1]!;
     const decrementer = numInputDiv.children[2]!;
-    //Init En-d000
+
+    this.setValue = (num: number) => {
+      this.value = Math.min(numberInputConfig.max, Math.max(numberInputConfig.min, num));
+      valueEl.textContent = `${this.value}`;
+    }
+    //Init End
 
     //Incrementer Start
     incrementer.addEventListener("pointerdown", () => {
@@ -551,7 +566,15 @@ export class NumberInputUI {
     return this.value;
   }
 
+  setValue: (num: number) => void;
+
   setCallback(callback: () => void) {
     this.callback = callback;
+  }
+}
+
+class NumberInputSystemUI {
+  constructor(configs: NumberInputConfig[]) {
+    
   }
 }

@@ -1,3 +1,4 @@
+/*Root*/
 .settings-menu-panel {
   background: var(--panel-bg);
   top: 0;
@@ -36,3 +37,4 @@
     width: 18rem;
   }
 }
+/*End*/

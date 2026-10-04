@@ -1,5 +1,6 @@
+/*Root*/
 :root {
-  --panel-bg: #171717fa;
+  --panel-bg: #080808fa;
   --debugger-bg: #00000066;
 
   --fs-xl: 32px;
@@ -31,6 +32,18 @@ body {
   flex-direction: column;
   padding: 0rem;
 }
+
+@media (max-width: 800px) and (orientation: portrait),
+       (max-height: 800px) and (orientation: landscape) {
+  :root {
+    --fs-xl: 28px;
+    --fs-l: 24px;
+    --fs-m: 18px;
+    --fs-s: 14px;
+    --fs-xs: 10px;
+  }
+}
+/*End*/
 
 /*Main Container*/
 .main-c {
