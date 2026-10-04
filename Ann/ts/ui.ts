@@ -4,6 +4,11 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
 
 
+type None = undefined;
+
+type CommitBool = boolean;
+
+
 interface SettingsConfig {
   rootSelector: string;
   togglerSelector: string;
@@ -264,55 +269,31 @@ export class UI {
     this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
     
      
-    this.builderUI.createLayer.shape.forward.setCallback(() => { 
+    this.builderUI.createLayer.shape.forward.setCallback((next: number) => { 
       if (
-        (this.state.builder.createLayerMenu.shape.forward + 1) *
+        next *
         this.state.builder.createLayerMenu.shape.vertical *
         this.state.builder.createLayerMenu.shape.horizontal > 1000
       ) {
-        this.builderUI.createLayer.shape.forward.setValue(this.state.builder.createLayerMenu.shape.forward);
-        return;
-      }
-      else if (
-        (this.state.builder.createLayerMenu.shape.forward - 1) *
-        this.state.builder.createLayerMenu.shape.vertical *
-        this.state.builder.createLayerMenu.shape.horizontal > 1000
-      ) {
-        this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue();
+        return false; //CommitBool
       }
     });
-    this.builderUI.createLayer.shape.vertical.setCallback(() => {
+    this.builderUI.createLayer.shape.vertical.setCallback((next: number) => {
       if (
         this.state.builder.createLayerMenu.shape.forward *
-        (this.state.builder.createLayerMenu.shape.vertical + 1) *
+        next *
         this.state.builder.createLayerMenu.shape.horizontal > 1000      
       ) {
-        this.builderUI.createLayer.shape.vertical.setValue(this.state.builder.createLayerMenu.shape.vertical);
-        return;
-      }
-      else if (
-        this.state.builder.createLayerMenu.shape.forward *
-        (this.state.builder.createLayerMenu.shape.vertical - 1) *
-        this.state.builder.createLayerMenu.shape.horizontal > 1000
-      ) {
-        this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue();
+        return false; //CommitBool
       }
     });
-    this.builderUI.createLayer.shape.horizontal.setCallback(() => {
+    this.builderUI.createLayer.shape.horizontal.setCallback((next: number) => {
       if (
         this.state.builder.createLayerMenu.shape.forward *
         this.state.builder.createLayerMenu.shape.vertical *
-        (this.state.builder.createLayerMenu.shape.horizontal + 1) > 1000 
+        next > 1000 
       ) {
-        this.builderUI.createLayer.shape.horizontal.setValue(this.state.builder.createLayerMenu.shape.horizontal);
-        return;
-      }
-      else if (
-        this.state.builder.createLayerMenu.shape.forward *
-        this.state.builder.createLayerMenu.shape.vertical *
-        (this.state.builder.createLayerMenu.shape.horizontal - 1) < 1000
-      ) {
-        this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue();
+        return false; //CommitBool
       }
     });
     //Builder End
@@ -347,14 +328,13 @@ export class UI {
   
 }
 
-
 interface NumberInputConfig {
   rootSelector: string;
   
   initial: number;
-  min: number | undefined;
-  max: number | undefined;
-
+  min: number | None;
+  max: number | None;
+  
   /* undefined means none
      max = undefined => No upper limit
      min = undefined => No lower limit */
@@ -363,7 +343,7 @@ interface NumberInputConfig {
 export class NumberInputUI {
   private value: number;
 
-  private callback: () => void;
+  private callback: (next: number) => CommitBool;
 
   
   private incrementIntervalId: number | undefined;
@@ -371,12 +351,13 @@ export class NumberInputUI {
 
   private decrementIntervalId: number | undefined;
   private decrementTimeoutId: number | undefined;
+  
 
   constructor(numberInputConfig: NumberInputConfig) {
     //Init Start
     this.value = numberInputConfig.initial ?? 1;
 
-    this.callback = () => {};
+    this.callback = (next: number): CommitBool => { return true; };
     
     const numInputDiv = document.createElement("div");
     numInputDiv.classList.add("number-input");
@@ -422,36 +403,40 @@ export class NumberInputUI {
 
     //Incrementer Start
     incrementer.addEventListener("pointerdown", () => {
+      if(this.callback(this.value + 1) == false) return;
+      
       if (this.value == numberInputConfig.max) return;
       this.value += 1;
       valueEl!.textContent = `${this.value}`;
-      this.callback();
       
       this.incrementIntervalId = setInterval(() => {
+        if(this.callback(this.value + 1) == false) return;
+        
         if (this.value == numberInputConfig.max) return;
         this.value += 1;
         valueEl!.textContent = `${this.value}`;
-        this.callback();
       }, 600);
 
       this.incrementTimeoutId = setTimeout(() => {
         clearInterval(this.incrementIntervalId);
         
         this.incrementIntervalId = setInterval(() => {
+          if(this.callback(this.value + 1) == false) return;
+          
           if (this.value == numberInputConfig.max) return;
           this.value += 1;
           valueEl!.textContent = `${this.value}`;
-          this.callback();
         }, 150);
         
         this.incrementTimeoutId = setTimeout(() => {
           clearInterval(this.incrementIntervalId);
           
           this.incrementIntervalId = setInterval(() => {
+            if (this.callback(this.value + 1) == false) return;
+            
             if (this.value == numberInputConfig.max) return;
             this.value += 1;
             valueEl!.textContent = `${this.value}`;
-            this.callback();
           }, 60);
         }, 600)
       }, 500);
@@ -493,36 +478,40 @@ export class NumberInputUI {
     
     //Decrementer Start
     decrementer.addEventListener("pointerdown", () => {
+      if (this.callback(this.value - 1) == false) return;
+      
       if (this.value == numberInputConfig.min) return;
       this.value -= 1;
       valueEl!.textContent = `${this.value}`;
-      this.callback();
       
       this.decrementIntervalId = setInterval(() => {
+        if (this.callback(this.value - 1) == false) return;
+        
         if (this.value == numberInputConfig.min) return;
         this.value -= 1;
         valueEl!.textContent = `${this.value}`;
-        this.callback();
       }, 600);
 
       this.decrementTimeoutId = setTimeout(() => {
         clearInterval(this.decrementIntervalId);
         
         this.decrementIntervalId = setInterval(() => {
+          if (this.callback(this.value - 1) == false) return;
+          
           if (this.value == numberInputConfig.min) return;
           this.value -= 1;
           valueEl!.textContent = `${this.value}`;
-          this.callback();
         }, 150);
         
         this.decrementTimeoutId = setTimeout(() => {
           clearInterval(this.decrementIntervalId);
           
           this.decrementIntervalId = setInterval(() => {
+            if (this.callback(this.value - 1) == false) return;
+            
             if (this.value == numberInputConfig.min) return;
             this.value -= 1;
             valueEl!.textContent = `${this.value}`;
-            this.callback();
           }, 60);
         }, 600)
       }, 500);
@@ -568,13 +557,7 @@ export class NumberInputUI {
 
   setValue: (num: number) => void;
 
-  setCallback(callback: () => void) {
+  setCallback(callback: (next: number) => CommitBool) {
     this.callback = callback;
-  }
-}
-
-class NumberInputSystemUI {
-  constructor(configs: NumberInputConfig[]) {
-    
   }
 }
