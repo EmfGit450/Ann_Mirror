@@ -267,35 +267,10 @@ export class UI {
     this.builderUI.settings.forwardDirButtons.nx.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeX); });
     this.builderUI.settings.forwardDirButtons.ny.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeY); });
     this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
-    
-     
-    this.builderUI.createLayer.shape.forward.setCallback((next: number) => { 
-      if (
-        next *
-        this.state.builder.createLayerMenu.shape.vertical *
-        this.state.builder.createLayerMenu.shape.horizontal > 1000
-      ) {
-        return false; //CommitBool
-      }
-    });
-    this.builderUI.createLayer.shape.vertical.setCallback((next: number) => {
-      if (
-        this.state.builder.createLayerMenu.shape.forward *
-        next *
-        this.state.builder.createLayerMenu.shape.horizontal > 1000      
-      ) {
-        return false; //CommitBool
-      }
-    });
-    this.builderUI.createLayer.shape.horizontal.setCallback((next: number) => {
-      if (
-        this.state.builder.createLayerMenu.shape.forward *
-        this.state.builder.createLayerMenu.shape.vertical *
-        next > 1000 
-      ) {
-        return false; //CommitBool
-      }
-    });
+
+    this.builderUI.createLayer.shape.forward.setCallback((next) => next * this.builderUI.createLayer.shape.vertical.getValue() * this.builderUI.createLayer.shape.horizontal.getValue() <= 1000);
+    this.builderUI.createLayer.shape.vertical.setCallback((next) => this.builderUI.createLayer.shape.forward.getValue() * next * this.builderUI.createLayer.shape.horizontal.getValue() <= 1000);
+    this.builderUI.createLayer.shape.horizontal.setCallback((next) => this.builderUI.createLayer.shape.forward.getValue() * this.builderUI.createLayer.shape.vertical.getValue() * next <= 1000);
     //Builder End
   }
 
