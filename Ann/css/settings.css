@@ -22,6 +22,10 @@
   border-bottom-left-radius: 0.6rem;
 }
 
+.settings-menu-notch button {
+  cursor: grab;
+}
+
 @media (min-width: 800px) {
   .settings-menu-panel {
     width: 16rem;

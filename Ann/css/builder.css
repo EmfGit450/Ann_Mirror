@@ -25,6 +25,10 @@
   border-bottom-right-radius: 0.6rem;
 }
 
+.builder-panel-notch button {
+  cursor: grab;
+}
+
 .build-actions-list {
   display: flex;
   flex-direction: column;
