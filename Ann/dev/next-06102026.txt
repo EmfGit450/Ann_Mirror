@@ -1,8 +1,7 @@
 - add labels to number input ui
   for indicating f,v,h
 
-- add input for layer activation - Dropdown or
-                                   Carousel
+- add input for layer activation - Dropdown
 
 - Update/add class Network crud functions for ui.
 
@@ -11,3 +10,5 @@
 
 - Polish UI
   Especially create-layer-config-menu, the name itself is revoltingly large
+
+- Polish Debugger
