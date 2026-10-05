@@ -1,13 +1,23 @@
 /*Root*/
 :root {
+  /*Colors*/
   --panel-bg: #0d0d0dfa;
   --debugger-bg: #00000066;
 
+  
+  --boxglow-subtle-light: 0 0 1rem #ffffff09;
+  /*End*/
+
+  /*Sizes*/
   --fs-xl: 32px;
   --fs-l: 26px;
   --fs-m: 22px;
   --fs-s: 18px;
   --fs-xs: 14px;
+
+
+  --app-panel-width: 0;
+  /*End*/
 }
 
 * {
@@ -77,7 +87,7 @@ button {
   width: 3.6rem;
   height: 3.3rem;
   background: radial-gradient(ellipse, #f7f7f7, #dddddd);
-  box-shadow: 0 0 1rem #dcdcdc33;
+  box-shadow: var(--boxglow-subtle-light)/*0 0 1rem #dcdcdc33*/;
 }
 button svg {
   width: 2rem;
