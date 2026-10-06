@@ -109,8 +109,8 @@
   }
 
   .forward-dir-options button {
-    width: 2.2rem;
-    height: 2.2rem;
+    width: 2rem;
+    height: 2rem;
     border-radius: 0.9rem;
   }
 }
@@ -169,6 +169,18 @@
   font-size: var(--fs-s);
   margin-bottom: 0;
   user-select: none;
+}
+
+@media (min-width: 800px) {
+  .create-layer-menu label.heading {
+    width: 12.5rem;
+  }
+}
+
+@media (min-width: 1000px) {
+  .create-layer-menu label.heading {
+    width: 14.5rem;
+  }
 }
 /*End*/
 
