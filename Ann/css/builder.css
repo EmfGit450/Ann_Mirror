@@ -12,7 +12,7 @@
   padding: 1rem;
   opacity: 0;
 
-  font-family: "IBM Plex Mono";
+  font-family: "DM Sans";
   font-size: var(--fs-xl);
   color: #fff;
 
@@ -40,7 +40,7 @@
 
 .build-actions-list label.heading {
   display: block;
-  background: #09090900;
+  background: #0000;
   padding: 0.4rem;
   padding-left: 0.5rem;
   margin-bottom: 1rem;
@@ -144,19 +144,15 @@
   border-radius: 0.5rem;
   padding: 0.1rem;
   padding-left: 0.3rem;
-  width: 9rem;
+  width: 100%;
   margin-bottom: 0.7rem;
 }
 
-.create-layer-menu label.heading {
-  width: 9.5rem;
-}
-
 .create-layer-menu label.sub {
-  font-size: var(--fs-m);
-  width: 8rem;
-  background: #fff;
-  color: #000;
+  font-size: var(--fs-b);
+  width: 100%;
+  background: #0000;
+  box-shadow: var(--boxglow-subtle-light);
   margin-bottom: 0.5rem;
 }
 
@@ -169,27 +165,6 @@
   font-size: var(--fs-s);
   margin-bottom: 0;
   user-select: none;
-}
-
-@media (min-width: 800px) {
-  .create-layer-menu label.heading {
-    width: 12.5rem;
-  }
-
-  .create-layer-menu label.sub {
-    width: 11.5rem;
-  }
-}
-
-@media (min-width: 1000px) {
-  .create-layer-menu label.heading {
-    width: 14.5rem;
-  }
-
-  .create-layer-menu label.sub {
-    width: 13.5rem;
-    font-size: var(--fs-b);
-  }
 }
 /*End*/
 
