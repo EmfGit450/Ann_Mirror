@@ -35,7 +35,7 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .build-actions-list label.heading {
@@ -135,7 +135,7 @@
   box-shadow: var(--boxglow-subtle-light);
   border-radius: 0.5rem;
 
-  border: 1px groove #fff;
+  border: 1px solid #fff;
 }
 
 .create-layer-menu label {
@@ -175,11 +175,20 @@
   .create-layer-menu label.heading {
     width: 12.5rem;
   }
+
+  .create-layer-menu label.sub {
+    width: 11.5rem;
+  }
 }
 
 @media (min-width: 1000px) {
   .create-layer-menu label.heading {
     width: 14.5rem;
+  }
+
+  .create-layer-menu label.sub {
+    width: 13.5rem;
+    font-size: var(--fs-b);
   }
 }
 /*End*/

@@ -9,11 +9,12 @@
   /*End*/
 
   /*Sizes*/
-  --fs-xl: 32px;
-  --fs-l: 26px;
-  --fs-m: 22px;
-  --fs-s: 18px;
-  --fs-xs: 14px;
+  --fs-xl: 32px; /*Extra Large*/
+  --fs-l: 26px;  /*Large*/
+  --fs-b: 24px;  /*Big*/
+  --fs-m: 22px;  /*Medium*/
+  --fs-s: 18px;  /*Small*/
+  --fs-xs: 14px; /*Extra Small*/
   /*End*/
 }
 
