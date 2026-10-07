@@ -309,10 +309,6 @@ interface NumberInputConfig {
   initial: number;
   min: number | None;
   max: number | None;
-  
-  /* undefined means none
-     max = undefined => No upper limit
-     min = undefined => No lower limit */
 }
 
 export class NumberInputUI {
@@ -328,10 +324,11 @@ export class NumberInputUI {
   private decrementTimeoutId: number | undefined;
   
 
-  constructor(numberInputConfig: NumberInputConfig) {
+  constructor(config: NumberInputConfig) {
     //Init Start
-    this.value = numberInputConfig.initial ?? 1;
-
+    this.value = config.initial ?? 1;
+    
+    //@ts-ignore
     this.callback = (next: number): CommitBool => { return true; };
     
     const numInputDiv = document.createElement("div");
@@ -364,14 +361,14 @@ export class NumberInputUI {
       </button>
     `;
 
-    document.querySelector(numberInputConfig.rootSelector)!.append(numInputDiv);
+    document.querySelector(config.rootSelector)!.append(numInputDiv);
 
     const incrementer = numInputDiv.children[0]!;
     const valueEl = numInputDiv.children[1]!;
     const decrementer = numInputDiv.children[2]!;
 
     this.setValue = (num: number) => {
-      this.value = Math.min(numberInputConfig.max, Math.max(numberInputConfig.min, num));
+      this.value = Math.min(config.max ?? Infinity, Math.max(config.min ?? -Infinity, num));
       valueEl.textContent = `${this.value}`;
     }
     //Init End
@@ -380,14 +377,14 @@ export class NumberInputUI {
     incrementer.addEventListener("pointerdown", () => {
       if(this.callback(this.value + 1) == false) return;
       
-      if (this.value == numberInputConfig.max) return;
+      if (this.value == config.max) return;
       this.value += 1;
       valueEl!.textContent = `${this.value}`;
       
       this.incrementIntervalId = setInterval(() => {
         if(this.callback(this.value + 1) == false) return;
         
-        if (this.value == numberInputConfig.max) return;
+        if (this.value == config.max) return;
         this.value += 1;
         valueEl!.textContent = `${this.value}`;
       }, 600);
@@ -398,7 +395,7 @@ export class NumberInputUI {
         this.incrementIntervalId = setInterval(() => {
           if(this.callback(this.value + 1) == false) return;
           
-          if (this.value == numberInputConfig.max) return;
+          if (this.value == config.max) return;
           this.value += 1;
           valueEl!.textContent = `${this.value}`;
         }, 150);
@@ -409,7 +406,7 @@ export class NumberInputUI {
           this.incrementIntervalId = setInterval(() => {
             if (this.callback(this.value + 1) == false) return;
             
-            if (this.value == numberInputConfig.max) return;
+            if (this.value == config.max) return;
             this.value += 1;
             valueEl!.textContent = `${this.value}`;
           }, 60);
@@ -455,14 +452,14 @@ export class NumberInputUI {
     decrementer.addEventListener("pointerdown", () => {
       if (this.callback(this.value - 1) == false) return;
       
-      if (this.value == numberInputConfig.min) return;
+      if (this.value == config.min) return;
       this.value -= 1;
       valueEl!.textContent = `${this.value}`;
       
       this.decrementIntervalId = setInterval(() => {
         if (this.callback(this.value - 1) == false) return;
         
-        if (this.value == numberInputConfig.min) return;
+        if (this.value == config.min) return;
         this.value -= 1;
         valueEl!.textContent = `${this.value}`;
       }, 600);
@@ -473,7 +470,7 @@ export class NumberInputUI {
         this.decrementIntervalId = setInterval(() => {
           if (this.callback(this.value - 1) == false) return;
           
-          if (this.value == numberInputConfig.min) return;
+          if (this.value == config.min) return;
           this.value -= 1;
           valueEl!.textContent = `${this.value}`;
         }, 150);
@@ -484,7 +481,7 @@ export class NumberInputUI {
           this.decrementIntervalId = setInterval(() => {
             if (this.callback(this.value - 1) == false) return;
             
-            if (this.value == numberInputConfig.min) return;
+            if (this.value == config.min) return;
             this.value -= 1;
             valueEl!.textContent = `${this.value}`;
           }, 60);
