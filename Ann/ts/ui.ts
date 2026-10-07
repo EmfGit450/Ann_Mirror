@@ -533,3 +533,33 @@ export class NumberInputUI {
     this.callback = callback;
   }
 }
+
+interface DropdownUIConfig {
+  rootSelector: string;
+
+  options: string[];
+}
+
+export class DropdownUI {
+  constructor(config: DropdownUIConfig) {
+    const list = document.createElement("div");
+
+    config.options.forEach(option => {
+      list.innerHTML += `<span class="option">${option}</span>`;
+    });
+
+    list.style.display = "flex";
+    list.style.flexDirection = "column";
+    list.style.gap = "0.5rem";
+
+    list.style.background = "#fff";
+    list.style.color = "#000";
+    
+    list.style.borderBottomLeftRadius = "0.6rem";
+    list.style.borderBottomRightRadius = "0.6rem";
+    list.style.padding = "0.5rem";
+    
+
+    document.querySelector(config.rootSelector).append(list);
+  }
+}

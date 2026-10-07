@@ -14,7 +14,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
-import { NumberInputUI, UI } from "./ui";
+import { DropdownUI, UI } from "./ui";
 
 
 //Init Start
@@ -245,6 +245,13 @@ async function Main() {
   };
 
   const ui = new UI(settingsConfig, builderConfig);
+
+
+  const test = new DropdownUI({
+    rootSelector: ".creation-menu",
+
+    options: ["Linear", "Sigmoid", "Tanh", "Mish"]
+  })
   
   //Tests End
   
