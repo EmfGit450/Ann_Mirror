@@ -14,7 +14,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
-import { DropdownUI, UI } from "./ui";
+import { UI } from "./ui/main";
 
 
 //Init Start
@@ -230,6 +230,9 @@ async function Main() {
     },
 
     createLayerMenuConfig: {
+      activation: {
+        rootSelector: ".activation-config"
+      },
       shape: {
         rootSelector: ".shape-number-inputs"
       }
@@ -245,13 +248,6 @@ async function Main() {
   };
 
   const ui = new UI(settingsConfig, builderConfig);
-
-
-  const test = new DropdownUI({
-    rootSelector: ".creation-menu",
-
-    options: ["Linear", "Sigmoid", "Tanh", "Mish"]
-  })
   
   //Tests End
   
@@ -295,8 +291,4 @@ async function Main() {
   window.addEventListener("contextmenu", (e) => e.preventDefault());
 }
 
-try {
-  Main();
-} catch (err) {
-  console.log("Ann - Caught runtime error", err);
-}
+Main().catch((err) => console.log("Ann - Caught runtime error", err));

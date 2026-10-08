@@ -44,7 +44,7 @@ export const enum ActivationType {
   Swish,
   Softplus,
   ReLU,
-  LeakyReLU, //alpha = 1
+  LeakyReLU, //alpha = 0.1
   GELU,
   ELU,
   Softmax,
