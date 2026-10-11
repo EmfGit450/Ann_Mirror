@@ -15,9 +15,11 @@ export class DropdownUI {
   private listToggled: boolean = false;
   
   constructor(config: DropdownUIConfig) {
+    this.value = config.options[config.initialValueIndex] as string;
     this.callback = () => {};
 
     const root = document.createElement("div");
+    root.classList.add("dropdown");
 
     root.innerHTML = `
       <div class="dropdown-value-and-toggler">
@@ -33,42 +35,15 @@ export class DropdownUI {
       <div class="dropdown-item-list"></div>
     `;
 
-    root.style.position = "relative";
-
     const valueTogglerDiv = root.children[0] as HTMLDivElement;
 
-    valueTogglerDiv.style.cssText = `
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      background: #fff;
-      color: #000;
-
-      padding-inline: 0.6rem;
-
-      border-radius: 0.6rem;
-
-      position: relative;
-      z-index: 5;
-    `;
-
     const toggler = valueTogglerDiv.children[1] as HTMLButtonElement;
-    
-    toggler.style.cssText = `
-      background: transparent;
-      box-shadow: none;
-      width: 1.8rem;
-      height: 1.8rem;
-      border: 0px solid #000;
-    `;
     
     const list = root.children[1] as HTMLDivElement;
 
     config.options.forEach(option => {
       const item = document.createElement("span");
       item.classList.add("dropdown-list-option");
-      item.style.paddingInline = "0.2rem";
 
       if (option == config.options[config.initialValueIndex]) {
         item.classList.add("selected");
@@ -86,44 +61,18 @@ export class DropdownUI {
         for (let i = 0; i < list.children.length; i++) {
           if (list.children[i] == item) continue;
 
-          if (list.children[i].classList.contains("selected")) {
-            list.children[i].classList.remove("selected");
+          if (list.children[i]!.classList.contains("selected")) {
+            list.children[i]!.classList.remove("selected");
             break;
           }
         }
 
         this.value = item.textContent;
-        valueTogglerDiv.children[0].textContent = this.value;
+        valueTogglerDiv.children[0]!.textContent = this.value;
         
         this.callback();
       }
     });
-
-    list.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-
-      overflow: scroll;
-
-      margin-top: -0.7rem;
-      padding: 0.5rem;
-      
-      background: #eee;
-      color: #000;
-
-      max-height: 10.5rem;
-
-      border-bottom-left-radius: 0.6rem;
-      border-bottom-right-radius: 0.6rem;
-
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      
-      z-index: 4;
-    `;
     
     gsap.set(list, { transformOrigin: "50% 0%", scaleY: 0 });
 
@@ -145,7 +94,7 @@ export class DropdownUI {
       });
     }
 
-    document.querySelector(config.rootSelector).append(root);
+    document.querySelector(config.rootSelector)!.append(root);
   }
 
   getValue() {

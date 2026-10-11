@@ -283,15 +283,15 @@ export class UI {
     
     this.builderUI.createLayer.shape.forward.setCallback((next) => {
       this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue();
-      next * this.builderUI.createLayer.shape.vertical.getValue() * this.builderUI.createLayer.shape.horizontal.getValue() <= 1000
+      return next * this.builderUI.createLayer.shape.vertical.getValue() * this.builderUI.createLayer.shape.horizontal.getValue() <= 1000
     });
     this.builderUI.createLayer.shape.vertical.setCallback((next) => {
       this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue();
-      this.builderUI.createLayer.shape.forward.getValue() * next * this.builderUI.createLayer.shape.horizontal.getValue() <= 1000
+      return this.builderUI.createLayer.shape.forward.getValue() * next * this.builderUI.createLayer.shape.horizontal.getValue() <= 1000
     });
     this.builderUI.createLayer.shape.horizontal.setCallback((next) => {
       this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue();
-      this.builderUI.createLayer.shape.forward.getValue() * this.builderUI.createLayer.shape.vertical.getValue() * next <= 1000
+      return this.builderUI.createLayer.shape.forward.getValue() * this.builderUI.createLayer.shape.vertical.getValue() * next <= 1000
     });
     //Builder End
   }

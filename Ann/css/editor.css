@@ -52,6 +52,18 @@ body {
     --fs-xs: 10px;
   }
 }
+
+@media (max-width: 1000px) and (orientation: portrait),
+       (max-height: 1000px) and (orientation: landscape) {
+  :root {
+    --fs-xl: 30px;
+    --fs-l: 26px;
+    --fs-b: 24px;
+    --fs-m: 20px;
+    --fs-s: 16px;
+    --fs-xs: 12px;
+  }
+}
 /*End*/
 
 /*Main Container*/

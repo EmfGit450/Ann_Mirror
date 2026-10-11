@@ -13,7 +13,7 @@ interface NumberInputConfig {
 export class NumberInputUI {
   private value: number;
 
-  private callback: (next: number) => CommitBool;
+  private callback: (next: number) => CommitBool | boolean;
 
   
   private incrementIntervalId: number | undefined;
@@ -48,28 +48,11 @@ export class NumberInputUI {
       </button>
     `;
 
-    numInputDiv.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.2rem;
-    `;
-
     document.querySelector(config.rootSelector)!.append(numInputDiv);
 
     const incrementer = numInputDiv.children[0]! as HTMLButtonElement;
     const valueEl = numInputDiv.children[1]!;
     const decrementer = numInputDiv.children[2]! as HTMLButtonElement;
-
-    incrementer.style.cssText = `
-      background: transparent;
-      box-shadow: none;
-      width: 1.8rem;
-      height: 1rem;
-      border: 0;
-    `;
-    
-    decrementer.style.cssText = incrementer.style.cssText;
 
     this.setValue = (num: number) => {
       this.value = Math.min(config.max ?? Infinity, Math.max(config.min ?? -Infinity, num));
