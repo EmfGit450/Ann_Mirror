@@ -22,6 +22,8 @@ import { UtilityLayerRenderer } from "@babylonjs/core/Rendering/utilityLayerRend
 import "@babylonjs/core/Culling/ray";
 
 import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import "@babylonjs/core/Rendering/edgesRenderer";
 
 //Init Start
 let engine: WebGPUEngine | Engine | null = null;
@@ -162,21 +164,21 @@ async function Main() {
 
   //@ts-ignore
   const layer1: LayerData = {
-    pos: [20, 0, 0],
+    pos: [21, 0, 0],
     shape: [1, 4, 4],
     activation: ActivationType.Softplus,
   };
 
   //@ts-ignore
   const layer2: LayerData = {
-    pos: [30, 0, 0],
+    pos: [31.5, 0, 0],
     shape: [1, 5, 5],
     activation: ActivationType.Softplus,
   };
 
   //@ts-ignore
   const layer3: LayerData = {
-    pos: [40, 0, 0],
+    pos: [38.5, 0, 0],
     shape: [1, 10, 1],
     activation: ActivationType.Softplus,
   };
@@ -261,8 +263,6 @@ async function Main() {
   const utilLayer = new UtilityLayerRenderer(scene);
   const gizmo = new AxisDragGizmo(new Vector3(1, 0, 0), new Color3(0.4, 0.4, 1), utilLayer);
 
-  gizmo.attachedMesh = [...net.layerMemory.values()][0];
-
   console.log(gizmo);
 
   const GRID = 3.5;
@@ -291,8 +291,25 @@ gizmo.dragBehavior.onDragEndObservable.add(() => {
     onComplete: () => { activeSnapTween = null; }
   });
 });
+
+  //NOTE: SIZE 2.5 can fit 1 Sphere
+
+  const testBox = CreateBox("layerPreviewOutline", {
+    width: 2.5,
+    height: 2.5 * 28 / 2,
+    depth: 2.5 * 28 / 2
+  }, scene);
+
+  const tBMat = new StandardMaterial("testBoxMat", scene);
+  tBMat.diffuseColor = new Color3(0x00 / 255, 0x7a / 255, 0xd7 / 255);
+  tBMat.alpha = 0.6;
   
-   
+  testBox.material = tBMat;
+testBox.enableEdgesRendering();
+testBox.edgesWidth = 8;
+testBox.edgesColor = new Color4(0x98 / 255, 0xd3 / 255, 0xff / 255, 1);
+
+  gizmo.attachedMesh = testBox;
   //Tests End
   
   engine.runRenderLoop(() => {
