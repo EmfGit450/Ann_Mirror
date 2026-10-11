@@ -8,7 +8,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { Camera } from "./camera";
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
@@ -16,6 +16,12 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
 import { UI } from "./ui/main";
 
+
+import { AxisDragGizmo } from "@babylonjs/core/Gizmos/axisDragGizmo";
+import { UtilityLayerRenderer } from "@babylonjs/core/Rendering/utilityLayerRenderer";
+import "@babylonjs/core/Culling/ray";
+
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
 
 //Init Start
 let engine: WebGPUEngine | Engine | null = null;
@@ -127,7 +133,8 @@ function hideDebugger() {
     {
       scale: 0,
       duration: 0.3,
-      ease: "power4.inOut",
+      ease: "circ.inOut",
+      onComplete: () => {Debugger.style.display="none";}
     }
   );
 }
@@ -248,7 +255,44 @@ async function Main() {
   };
 
   const ui = new UI(settingsConfig, builderConfig);
+
+
+
+  const utilLayer = new UtilityLayerRenderer(scene);
+  const gizmo = new AxisDragGizmo(new Vector3(1, 0, 0), new Color3(0.4, 0.4, 1), utilLayer);
+
+  gizmo.attachedMesh = [...net.layerMemory.values()][0];
+
+  console.log(gizmo);
+
+  const GRID = 3.5;
+
+  let activeSnapTween: gsap.core.Tween | null = null;
+
+gizmo.dragBehavior.onDragStartObservable.add(() => {
+  activeSnapTween?.kill();
+  activeSnapTween = null;
+});
+
+gizmo.dragBehavior.onDragEndObservable.add(() => {
+  const currPos = gizmo.attachedMesh!.position;
+  const targetPos = new Vector3(
+    Math.round(currPos.x / GRID) * GRID,
+    Math.round(currPos.y / GRID) * GRID,
+    Math.round(currPos.z / GRID) * GRID
+  );
+
+  activeSnapTween = gsap.to(currPos, {
+    x: targetPos.x,
+    y: targetPos.y,
+    z: targetPos.z,
+    duration: 0.4,
+    ease: "circ.inOut",
+    onComplete: () => { activeSnapTween = null; }
+  });
+});
   
+   
   //Tests End
   
   engine.runRenderLoop(() => {
