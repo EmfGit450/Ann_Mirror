@@ -22,14 +22,9 @@ import { UtilityLayerRenderer } from "@babylonjs/core/Rendering/utilityLayerRend
 import "@babylonjs/core/Culling/ray";
 
 import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
-import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBuilder";
-import { GreasedLineMesh } from "@babylonjs/core/Meshes/GreasedLine/greasedLineMesh";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
-import { GreasedLineMeshMaterialType } from "@babylonjs/core/Materials/GreasedLine/greasedLineMaterialInterfaces";
-import { GreasedLinePluginMaterial } from "@babylonjs/core/Materials/GreasedLine/greasedLinePluginMaterial";
-
-import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
+import "@babylonjs/core/Rendering/edgesRenderer";
 
 
 //Init Start
@@ -166,7 +161,7 @@ async function Main() {
   //@ts-ignore
   const layer0: LayerData = {
     pos: [0, 0, 0],
-    shape: [1, 14, 14],
+    shape: [1, 8, 8],
   };
 
   //@ts-ignore
@@ -303,51 +298,23 @@ gizmo.dragBehavior.onDragEndObservable.add(() => {
 
   const testBox = CreateBox("layerPreviewOutline", {
     width: 2.5,
-    height: 2.5 * 28 / 2,
-    depth: 2.5 * 28 / 2,
+    height: 2.5 * 8,
+    depth: 2.5 * 8,
   }, scene);
 
   const tBMat = new StandardMaterial("testBoxMat", scene);
   tBMat.diffuseColor = new Color3(0x2a / 255, 0x9d / 255, 0xff / 255);
   tBMat.alpha = 0.6;
-
-  const outline = CreateGreasedLine("testBoxOutline", {
-  points: [
-    [0,1],[1,2],[2,3],[3,0],
-    [4,5],[5,6],[6,7],[7,4],
-    [0,4],[1,5],[2,6],[3,7],
-  ].map(([a,b]) => [
-    [-1.25,-17.5,-17.5],[1.25,-17.5,-17.5],[1.25,17.5,-17.5],[-1.25,17.5,-17.5],
-    [-1.25,-17.5,17.5],[1.25,-17.5,17.5],[1.25,17.5,17.5],[-1.25,17.5,17.5],
-  ][a].concat([
-    [-1.25,-17.5,-17.5],[1.25,-17.5,-17.5],[1.25,17.5,-17.5],[-1.25,17.5,-17.5],
-    [-1.25,-17.5,17.5],[1.25,-17.5,17.5],[1.25,17.5,17.5],[-1.25,17.5,17.5],
-  ][b])),
-}, {
-  width: 0.1,
-}, scene);
-
-  outline.setParent(testBox);
-
-  
-const outlineMat = new StandardMaterial("outlineMat", scene);
-outlineMat.emissiveColor = new Color3(0x2a / 255, 0x9d / 255, 0xff / 255);
-outlineMat.diffuseColor = new Color3(0, 0, 0);
-outlineMat.specularColor = new Color3(0, 0, 0);
-
-outline.material = outlineMat;
-
-const plugin = new GreasedLinePluginMaterial(outlineMat, scene, GreasedLineMeshMaterialType.MATERIAL_TYPE_STANDARD);
-plugin.color = new Color3(0xff / 255, 0xff / 255, 0xff / 255);
-  
-const glow = new GlowLayer("glow", scene);
-glow.intensity = 0.9;
-
-  for (const mesh of net.layerMemory.values()) glow.addExcludedMesh(mesh);
   
   testBox.material = tBMat;
+ 
+testBox.enableEdgesRendering();
+testBox.edgesWidth = 10;
+testBox.edgesColor = new Color4(1, 1, 1, 1);
 
   gizmo.attachedMesh = testBox;
+
+  testBox.setParent(net.networkRoot);
   //Tests End
   
   engine.runRenderLoop(() => {
