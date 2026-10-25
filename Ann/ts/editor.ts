@@ -219,12 +219,12 @@ async function Main() {
   });
 
   console.log(net.parseNetworkAsArray(), net);
-  
+
 
   const settingsConfig = {
     rootSelector: ".settings-menu-panel",
     togglerSelector: "#app-settings",
-    
+
     settingsSelectors: {
       themeToggle: "#theme-toggle"
     }
@@ -234,8 +234,8 @@ async function Main() {
     rootSelector: ".builder-panel",
     togglerSelector: "#builder-panel-toggler",
 
-    networkRoot: net.networkRoot,
-    
+    network: net,
+
     actionButtonSelectors: {
       addLayerSelector: "#create-layer"
     },
@@ -248,7 +248,7 @@ async function Main() {
         rootSelector: ".shape-number-inputs"
       }
     },
-    
+
     settings: {
       forwardDirButtonSelectors: {
         px: "#px-dir", nx: "#nx-dir",
@@ -260,63 +260,10 @@ async function Main() {
 
   const ui = new UI(settingsConfig, builderConfig);
 
-
-
-  const utilLayer = new UtilityLayerRenderer(scene);
-  const gizmo = new AxisDragGizmo(new Vector3(1, 0, 0), new Color3(0.4, 0.4, 1), utilLayer);
-
-  console.log(gizmo);
-
-  const GRID = 3.5;
-
-  let activeSnapTween: gsap.core.Tween | null = null;
-
-gizmo.dragBehavior.onDragStartObservable.add(() => {
-  activeSnapTween?.kill();
-  activeSnapTween = null;
-});
-
-gizmo.dragBehavior.onDragEndObservable.add(() => {
-  const currPos = gizmo.attachedMesh!.position;
-  const targetPos = new Vector3(
-    Math.round(currPos.x / GRID) * GRID,
-    Math.round(currPos.y / GRID) * GRID,
-    Math.round(currPos.z / GRID) * GRID
-  );
-
-  activeSnapTween = gsap.to(currPos, {
-    x: targetPos.x,
-    y: targetPos.y,
-    z: targetPos.z,
-    duration: 0.4,
-    ease: "circ.inOut",
-    onComplete: () => { activeSnapTween = null; }
-  });
-});
-
   //NOTE: SIZE 2.5 can fit 1 Sphere
 
-  const testBox = CreateBox("layerPreviewOutline", {
-    width: 2.5,
-    height: 2.5 * 8,
-    depth: 2.5 * 8,
-  }, scene);
-
-  const tBMat = new StandardMaterial("testBoxMat", scene);
-  tBMat.diffuseColor = new Color3(0x2a / 255, 0x9d / 255, 0xff / 255);
-  tBMat.alpha = 0.6;
-  
-  testBox.material = tBMat;
- 
-testBox.enableEdgesRendering();
-testBox.edgesWidth = 10;
-testBox.edgesColor = new Color4(1, 1, 1, 1);
-
-  gizmo.attachedMesh = testBox;
-
-  testBox.setParent(net.networkRoot);
   //Tests End
-  
+
   engine.runRenderLoop(() => {
     scene.render();
   });

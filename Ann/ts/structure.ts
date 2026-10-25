@@ -32,7 +32,7 @@ export function randInt53(): number {
 
 export const enum ConnectionType {
   Dense = 100,
-  ResidualTruncate,
+  ResidualPad,
   ResidualTransform,
 }
 
@@ -87,7 +87,7 @@ export class Network {
 
   layerMemory: Map<LayerData, Mesh>;
   connectionMemory: Map<ConnectionData, GreasedLineMesh[] | undefined>;
-  
+
   scene: Scene;
   networkRoot: TransformNode;
 
@@ -138,16 +138,16 @@ export class Network {
         network[3] = dataKey.output.shape[0]! * dataKey.output.shape[1]! * dataKey.output.shape[2]!;
 
         inputDecided = true;
-      } 
+      }
       else if (dataKey.type == ConnectionType.Dense) {
         network[index] = dataKey.output.activation ?? ActivationType.Linear;
         network[index + 1] =
           dataKey.output.shape[0]! * dataKey.output.shape[1]! * dataKey.output.shape[2]!;
 
         index += 2;
-      } 
+      }
       else if (
-        dataKey.type == ConnectionType.ResidualTruncate ||
+        dataKey.type == ConnectionType.ResidualPad ||
         dataKey.type == ConnectionType.ResidualTransform
       ) {
         network[index] = dataKey.type;
@@ -223,7 +223,7 @@ export class Network {
     if (connection.type == ConnectionType.Dense) {
       this.newDenseConnection(connection);
     } else if (
-      connection.type == ConnectionType.ResidualTruncate ||
+      connection.type == ConnectionType.ResidualPad ||
       connection.type == ConnectionType.ResidualTransform
     ) {
       this.connectionMemory.set(connection, undefined);
@@ -320,7 +320,7 @@ export class Network {
       );
 
       detailMesh.parent = this.networkRoot;
-      
+
       //@ts-ignore
       detailMesh.annMeta = metadata;
 
@@ -340,7 +340,7 @@ export class Network {
       );
 
       highDetailMesh.parent = this.networkRoot;
-      
+
       //@ts-ignore
       highDetailMesh.annMeta = metadata;
 
@@ -360,7 +360,7 @@ export class Network {
       );
 
       maxDetailMesh.parent = this.networkRoot;
-      
+
       //@ts-ignore
       maxDetailMesh.annMeta = metadata;
 
