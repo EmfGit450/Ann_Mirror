@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Centered Div</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: system-ui, sans-serif;
+      }
+
+      .centered {
+        position: fixed;
+        padding: 2rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-shadow: 0 0 0.2rem #090909;
+      }
+    </style>
+  </head>
+  <body>
+    <p style="font-size: 100rem;">K
+      J
+      js
+      js
+    </p>
+    <div class="centered">
+      <button id="drag">+</button>
+    </div>
+  </body>
+
+  <script>
+    const div = document.querySelector(".centered");
+    const drag = document.querySelector("#drag");
+    
+    let tx = 0, ty = 0;
+    let startX = 0, startY = 0;
+    let startTx = 0, startTy = 0;
+    let isDragging = false;
+    
+    drag.addEventListener("pointerdown", (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startTx = tx;
+      startTy = ty;
+      drag.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    
+    drag.addEventListener("pointermove", (e) => {
+      if (!isDragging) return;
+      tx = startTx + (e.clientX - startX);
+      ty = startTy + (e.clientY - startY);
+      div.style.transform = `translate(${tx}px, ${ty}px)`;
+    });
+    
+    drag.addEventListener("pointerup", (e) => {
+      isDragging = false;
+      drag.releasePointerCapture(e.pointerId);
+    });
+    
+    drag.addEventListener("pointercancel", () => {
+      isDragging = false;
+    });
+  </script>
+</html>
