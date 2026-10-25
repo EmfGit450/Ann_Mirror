@@ -61,6 +61,7 @@ button.dropdown-toggler:active {
   gap: 0.5rem;
 
   overflow: scroll;
+  scrollbar-color: #0000 #0000;
 
   margin-top: -0.7rem;
   padding: 0.5rem;
