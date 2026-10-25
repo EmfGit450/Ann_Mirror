@@ -65,7 +65,7 @@ button.dropdown-toggler:active {
 
   margin-top: -0.7rem;
   padding: 0.5rem;
-      
+
   background: #eee;
   color: #000;
 
@@ -78,7 +78,7 @@ button.dropdown-toggler:active {
   top: 100%;
   left: 0;
   right: 0;
-  
+
   z-index: 4;
 }
 
@@ -90,5 +90,21 @@ span.dropdown-list-option.selected {
   transition: 0.4s;
   background: #c2c2c2a4;
   border-radius: 0.4rem;
+}
+/*End*/
+
+/*Floating Window*/
+.floating-window button {
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.floating-window button svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.floating-window button:active {
+  transform: none;
 }
 /*End*/

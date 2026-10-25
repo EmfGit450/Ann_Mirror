@@ -16,15 +16,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
 import { UI } from "./ui/main";
 
-
-import { AxisDragGizmo } from "@babylonjs/core/Gizmos/axisDragGizmo";
-import { UtilityLayerRenderer } from "@babylonjs/core/Rendering/utilityLayerRenderer";
-import "@babylonjs/core/Culling/ray";
-
-import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-
-import "@babylonjs/core/Rendering/edgesRenderer";
+import { FloatingWindowUI } from "./ui/floating-window";
 
 
 //Init Start
@@ -260,7 +252,14 @@ async function Main() {
 
   const ui = new UI(settingsConfig, builderConfig);
 
-  //NOTE: SIZE 2.5 can fit 1 Sphere
+
+  const fw = new FloatingWindowUI({
+    rootSelector: ".main-c",
+    children: [],
+    styleString: undefined,
+
+    startPos: { x: 300, y: 300}
+  })
 
   //Tests End
 
