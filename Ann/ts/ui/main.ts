@@ -332,9 +332,7 @@ export class UI {
     });
 
     const preview = CreateBox("layerPreview", {
-      width: 2.5,
-      height: 2.5,
-      depth: 2.5,
+      size: 2.5
     }, this.builderUI.connectedNet.scene);
 
     const previewMat = new StandardMaterial("layerPreviewMat", this.builderUI.connectedNet.scene);
@@ -358,7 +356,12 @@ export class UI {
 
       if (next * this.builderUI.createLayer.shape.vertical.getValue() * this.builderUI.createLayer.shape.horizontal.getValue() > 999) return false;
 
-      preview.scaling.x = next || 1;
+      gsap.to(preview.scaling, {
+        x: next || 1,
+        ease: "circ.inOut",
+        duration: 0.2,
+        overwrite: "auto"
+      })
       return true;
     });
     this.builderUI.createLayer.shape.vertical.setCallback((next) => {
@@ -366,7 +369,12 @@ export class UI {
 
       if (this.builderUI.createLayer.shape.forward.getValue() * next * this.builderUI.createLayer.shape.horizontal.getValue() > 999) return false;
 
-      preview.scaling.y = next || 1;
+      gsap.to(preview.scaling, {
+        y: next || 1,
+        ease: "circ.inOut",
+        duration: 0.2,
+        overwrite: "auto"
+      })
       return true;
     });
     this.builderUI.createLayer.shape.horizontal.setCallback((next) => {
@@ -374,7 +382,12 @@ export class UI {
 
       if (this.builderUI.createLayer.shape.forward.getValue() * this.builderUI.createLayer.shape.vertical.getValue() * next > 999) return false;
 
-      preview.scaling.z = next || 1;
+      gsap.to(preview.scaling, {
+        z: next || 1,
+        ease: "circ.inOut",
+        duration: 0.2,
+        overwrite: "auto"
+      })
       return true;
     });
     //Shape End
