@@ -259,7 +259,15 @@ async function Main() {
     styleString: undefined,
 
     startPos: { x: 300, y: 300}
-  })
+  });
+
+  const fw2 = new FloatingWindowUI({
+    rootSelector: ".main-c",
+    children: [],
+    styleString: undefined,
+
+    startPos: { x: 600, y: 600}
+  });
 
   //Tests End
 
