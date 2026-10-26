@@ -1,9 +1,11 @@
-#debugger {
+.debugger {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 0.5rem;
 
+  width: fit-content;
+  height: fit-content;
   font-size: var(--fs-s);
   background: var(--debugger-bg);
   color: #f0e5e5;
@@ -13,7 +15,6 @@
   z-index: 3;
   font-family: "IBM Plex Mono", Monospace;
 
-  scale: 0;
 }
 
 .debugger-top {
@@ -46,13 +47,9 @@
   border-radius: 0.5rem;
 }
 
-.performance {
+.debugger .performance,
+.debugger .API {
   user-select: none;
-}
-.performance,
-.Vendor,
-.Renderer,
-.API {
   display: flex;
   gap: 0.3rem;
 }

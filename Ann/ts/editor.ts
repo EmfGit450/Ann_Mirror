@@ -15,6 +15,7 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 
 import { Network, ActivationType, ConnectionType, LayerData } from "./structure";
 import { UI } from "./ui/main";
+import { DebuggerUI } from "./ui/debugger";
 
 import { FloatingWindowUI } from "./ui/floating-window";
 
@@ -39,102 +40,7 @@ async function createEngine(canvas: HTMLCanvasElement) {
   console.log("Ann - Using WebGL");
   return new Engine(canvas, true);
 }
-
-async function getWebGPUInfo() {
-  //@ts-ignore
-  if (!navigator.gpu) {
-    return null;
-  }
-
-  //@ts-ignore
-  const adapter = await navigator.gpu.requestAdapter();
-
-  if (!adapter) {
-    return null;
-  }
-
-  const info = adapter.info;
-
-  return {
-    vendor: info.vendor || "Unavailable",
-    renderer: info.device || info.description || "Unavailable",
-  };
-}
-
-async function showGraphicsInfo() {
-  if (engine?.isWebGPU) {
-    const info = await getWebGPUInfo();
-
-    document.getElementById("debugger-vendor")!.textContent = info?.vendor ?? "Unavailable";
-    document.getElementById("debugger-renderer")!.textContent = info?.renderer ?? "Unavailable";
-    document.getElementById("debugger-api")!.textContent = "WebGPU";
-
-    return;
-  }
-
-  const info = (engine as Engine).getGlInfo();
-
-  document.getElementById("debugger-vendor")!.textContent = info.vendor;
-  document.getElementById("debugger-renderer")!.textContent = info.renderer;
-  document.getElementById("debugger-api")!.textContent = `WebGL ${(engine as Engine).webGLVersion}`;
-}
 //Init End
-
-//Debugger Start
-const Debugger = document.getElementById("debugger")!;
-
-const PerformanceDebug = document.querySelector(".performance")!;
-
-let debugUpdateIntervalId: number | undefined = undefined;
-let frameDelta: number | null = null;
-
-function updateDebugger() {
-  PerformanceDebug.children[1]!.textContent = `${Math.round(engine?.getFps() as number)} fps`;
-  PerformanceDebug.children[2]!.textContent = `∆ ${frameDelta?.toFixed(2)} ms`;
-}
-
-function showDebugger() {
-  updateDebugger();
-
-  if (debugUpdateIntervalId !== undefined) {
-    clearInterval(debugUpdateIntervalId);
-  }
-
-  debugUpdateIntervalId = setInterval(updateDebugger, 150);
-
-  gsap.fromTo(
-    "#debugger",
-    {
-      scale: 0,
-    },
-    {
-      scale: 1,
-      duration: 0.3,
-      ease: "power4.inOut",
-    }
-  );
-}
-
-function hideDebugger() {
-  if (debugUpdateIntervalId !== undefined) {
-    clearInterval(debugUpdateIntervalId);
-    debugUpdateIntervalId = undefined;
-  }
-
-  gsap.fromTo(
-    "#debugger",
-    {
-      scale: 1,
-    },
-    {
-      scale: 0,
-      duration: 0.3,
-      ease: "circ.inOut",
-      onComplete: () => {Debugger.style.display="none";}
-    }
-  );
-}
-//Debugger End
 
 async function Main() {
   const canvas = document.getElementById("mainCanvas") as HTMLCanvasElement;
@@ -252,6 +158,8 @@ async function Main() {
 
   const ui = new UI(settingsConfig, builderConfig);
 
+  new DebuggerUI({ rootSelector: ".debugger", bjsEngine: engine });
+
 
   const fw = new FloatingWindowUI({
     rootSelector: ".main-c",
@@ -266,7 +174,7 @@ async function Main() {
     children: [],
     styleString: undefined,
 
-    startPos: { x: 600, y: 600}
+    startPos: { x: 600, y: 300}
   });
 
   //Tests End
@@ -274,27 +182,6 @@ async function Main() {
   engine.runRenderLoop(() => {
     scene.render();
   });
-
-  let lastFrameTime = performance.now();
-
-  scene.onBeforeRenderObservable.add(() => {
-    const now = performance.now();
-    frameDelta = now - lastFrameTime;
-    lastFrameTime = now;
-  });
-
-  //Debugger Start
-  Debugger.addEventListener("click", (event) => {
-    const target = event.target as HTMLElement;
-
-    if (target.closest("#debugger-close-btn")) {
-      hideDebugger();
-    }
-  });
-
-  await showGraphicsInfo();
-
-  setTimeout(showDebugger, 1000);
 
   //@ts-ignore
   window.net = () => net;
