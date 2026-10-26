@@ -1,1 +1,2 @@
-Link a box geometry(style = layer preview) to the create-layer-menu          [ ]
+polish debugger                    [ ]
+Create a proper z-index hierarchy  [ ]

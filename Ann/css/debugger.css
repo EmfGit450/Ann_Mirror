@@ -1,11 +1,17 @@
 .debugger {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  justify-content: center;
   gap: 0.5rem;
 
   width: fit-content;
   height: fit-content;
+
   font-size: var(--fs-s);
   background: var(--debugger-bg);
   color: #f0e5e5;
@@ -14,7 +20,6 @@
   text-shadow: 0 0 1rem #443838;
   z-index: 3;
   font-family: "IBM Plex Mono", Monospace;
-
 }
 
 .debugger-top {
@@ -54,14 +59,16 @@
   gap: 0.3rem;
 }
 
-#debugger-close-btn {
-  pointer-events: auto;
-  user-select: none;
-  border: 0;
-  transition: 0.3s;
+.debugger-close-btn {
   width: 1.4rem;
   height: 1.4rem;
-  color: #000;
   padding: 0;
+  border: 0;
   cursor: pointer;
+  transition: 0.3s;
+}
+
+.debugger-close-btn svg {
+  width: 100%;
+  height: 100%;
 }

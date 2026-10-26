@@ -14707,7 +14707,7 @@ max.fts.length: ${n.length}
           <div id="debugger-deltaFrameTime" class="value"></div>
         </div>
 
-        <button id="debugger-close-btn">
+        <button class="debugger-close-btn">
           <!-- Modified - shrink by Barudak Lier on IconScout[iconscout.com] -->
           <svg enable-background="new 0 0 32 32" viewBox="0 0 32 32">
             <path
@@ -14728,7 +14728,7 @@ max.fts.length: ${n.length}
           <div id="debugger-api" class="value"></div>
         </div>
       </div>
-    `,e.bjsEngine.isWebGPU?t.children[1].children[0].textContent="WebGPU":t.children[1].children[0].textContent=`WebGL ${e.bjsEngine.webGLVersion}`}};var T_=class{pointerId;isDragging;clientX;clientY;transX;transY;constructor(e){this.pointerId=void 0,this.isDragging=!1,this.clientX=0,this.clientY=0;let t=document.createElement("div");t.classList.add("floating-window"),t.style=e.styleString??`
+    `;let i=t.querySelector("#debugger-api");i.textContent=e.bjsEngine.isWebGPU?"WebGPU":`WebGL ${e.bjsEngine.webGLVersion}`;let r=document.getElementById("debugger-fps"),n=document.getElementById("debugger-deltaFrameTime"),a=performance.now(),o=0,l=0;e.bjsEngine.scenes[0].onAfterRenderObservable.add(()=>{let c=performance.now(),f=c-a;if(a=c,o+=f,l++,l>=20){let u=o/l;n.innerHTML=`\u2206&nbsp;${u.toFixed(2)}&nbsp;ms`,r.innerHTML=`${Math.round(1e3/u)}&nbsp;fps`,o=0,l=0}})}};var T_=class{pointerId;isDragging;clientX;clientY;transX;transY;constructor(e){this.pointerId=void 0,this.isDragging=!1,this.clientX=0,this.clientY=0;let t=document.createElement("div");t.classList.add("floating-window"),t.style=e.styleString??`
       min-width: 13rem;
       min-height: 17rem;
       background: #0d0d0dfa;
