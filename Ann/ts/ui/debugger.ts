@@ -55,27 +55,12 @@ export class DebuggerUI {
     const fpsValue = document.getElementById("debugger-fps");
     const frameTimeValue = document.getElementById("debugger-deltaFrameTime");
 
-    let lastFrameTime = performance.now();
-    let frameTimeSum = 0;
-    let frameCount = 0;
+    setInterval(() => {
+      const fps = config.bjsEngine.getFps();
 
-    config.bjsEngine.scenes[0].onAfterRenderObservable.add(() => {
-      const now = performance.now();
-      const delta = now - lastFrameTime;
-      lastFrameTime = now;
-
-      frameTimeSum += delta;
-      frameCount++;
-
-      if (frameCount >= 20) {
-        const avgDelta = frameTimeSum / frameCount;
-        frameTimeValue.innerHTML = `∆&nbsp;${avgDelta.toFixed(2)}&nbsp;ms`;
-        fpsValue.innerHTML = `${Math.round(1000 / avgDelta)}&nbsp;fps`;
-
-        frameTimeSum = 0;
-        frameCount = 0;
-      }
-    });
+      frameTimeValue.innerHTML = `∆&nbsp;${(1000 / fps).toFixed(2)}&nbsp;ms`;
+      fpsValue.innerHTML = `${Math.round(fps)}&nbsp;fps`;
+    }, 1000);
     //Performance End
   }
 }

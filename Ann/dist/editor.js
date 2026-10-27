@@ -14728,7 +14728,7 @@ max.fts.length: ${n.length}
           <div id="debugger-api" class="value"></div>
         </div>
       </div>
-    `;let i=t.querySelector("#debugger-api");i.textContent=e.bjsEngine.isWebGPU?"WebGPU":`WebGL ${e.bjsEngine.webGLVersion}`;let r=document.getElementById("debugger-fps"),n=document.getElementById("debugger-deltaFrameTime"),a=performance.now(),o=0,l=0;e.bjsEngine.scenes[0].onAfterRenderObservable.add(()=>{let c=performance.now(),f=c-a;if(a=c,o+=f,l++,l>=20){let u=o/l;n.innerHTML=`\u2206&nbsp;${u.toFixed(2)}&nbsp;ms`,r.innerHTML=`${Math.round(1e3/u)}&nbsp;fps`,o=0,l=0}})}};var T_=class{pointerId;isDragging;clientX;clientY;transX;transY;constructor(e){this.pointerId=void 0,this.isDragging=!1,this.clientX=0,this.clientY=0;let t=document.createElement("div");t.classList.add("floating-window"),t.style=e.styleString??`
+    `;let i=t.querySelector("#debugger-api");i.textContent=e.bjsEngine.isWebGPU?"WebGPU":`WebGL ${e.bjsEngine.webGLVersion}`;let r=document.getElementById("debugger-fps"),n=document.getElementById("debugger-deltaFrameTime");setInterval(()=>{let a=e.bjsEngine.getFps();n.innerHTML=`\u2206&nbsp;${(1e3/a).toFixed(2)}&nbsp;ms`,r.innerHTML=`${Math.round(a)}&nbsp;fps`},1e3)}};var T_=class{pointerId;isDragging;clientX;clientY;transX;transY;constructor(e){this.pointerId=void 0,this.isDragging=!1,this.clientX=0,this.clientY=0;let t=document.createElement("div");t.classList.add("floating-window"),t.style=e.styleString??`
       min-width: 13rem;
       min-height: 17rem;
       background: #0d0d0dfa;
