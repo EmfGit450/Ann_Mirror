@@ -10,13 +10,14 @@ import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 
 import "@babylonjs/core/Rendering/edgesRenderer";
 
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
 
 import { NumberInputUI } from "./number-input";
 import { DropdownUI } from "./dropdown";
+import { FloatingWindowUI } from "./floating-window";
 
-import { Network } from "../structure.ts";
+import { Network } from "../structure";
+import { Layer } from "@babylonjs/core";
 
 interface SettingsConfig {
   rootSelector: string;
@@ -79,7 +80,7 @@ interface BuilderUI {
     addLayer: HTMLButtonElement;
   }
 
-  createLayer: LayerCreationMenu;
+  createLayerWindows: LayerCreationMenu[];
 
   settings: {
     forwardDirButtons: {
@@ -90,12 +91,14 @@ interface BuilderUI {
   }
 }
 
-interface LayerCreationMenu {
-  activation: DropdownUI;
+type LayerCreationMenu = FloatingWindowUI;
+
+interface LayerCreationMenuState {
+  activation: string;
   shape: {
-    forward: NumberInputUI;
-    vertical: NumberInputUI;
-    horizontal: NumberInputUI;
+    forward: number;
+    vertical: number;
+    horizontal: number;
   };
 }
 
@@ -108,16 +111,8 @@ interface UIState {
 
   builder: {
     panelToggled: boolean;
-    createLayerMenuToggled: boolean;
 
-    createLayerMenu: {
-      activation: string;
-      shape: {
-        forward: number;
-        vertical: number;
-        horizontal: number;
-      };
-    };
+    createLayerWindowStates: LayerCreationMenuState[]; //multiple can be open at once
 
     settings: {
       forwardDirection: ForwardDirection;
@@ -159,16 +154,8 @@ export class UI {
       },
       builder: {
         panelToggled: false,
-        createLayerMenuToggled: false,
 
-        createLayerMenu: {
-          activation: "Linear",
-          shape: {
-            forward: 1,
-            vertical: 1,
-            horizontal: 1
-          }
-        },
+        createLayerWindowStates: [],
 
         settings: {
           forwardDirection: ForwardDirection.PositiveX
@@ -197,28 +184,7 @@ export class UI {
         addLayer: document.querySelector(builderConfig.actionButtonSelectors.addLayerSelector)!
       },
 
-      createLayer: {
-        activation: new DropdownUI({
-          rootSelector: builderConfig.createLayerMenuConfig.activation.rootSelector,
-
-          options: ["Linear", "Sigmoid", "Tanh", "Mish", "Swish", "Softplus", "ReLU", "LeakyReLU", "GELU", "ELU", "Softmax"],
-          initialValueIndex: 0
-        }),
-        shape: {
-          forward: new NumberInputUI({
-            rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: 1, max: 1000
-          }),
-          vertical: new NumberInputUI({
-            rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: 1, max: 1000
-          }),
-          horizontal: new NumberInputUI({
-            rootSelector: builderConfig.createLayerMenuConfig.shape.rootSelector,
-            initial: 1, min: 1, max: 1000
-          })
-        }
-      },
+      createLayerWindows: [],
 
       settings: {
         forwardDirButtons: {

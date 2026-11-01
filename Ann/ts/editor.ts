@@ -140,10 +140,10 @@ async function Main() {
 
     createLayerMenuConfig: {
       activation: {
-        rootSelector: ".activation-config"
+        rootSelector: "#tb"//".activation-config"
       },
       shape: {
-        rootSelector: ".shape-number-inputs"
+        rootSelector: "#ta"//".shape-number-inputs"
       }
     },
 
@@ -156,27 +156,42 @@ async function Main() {
     }
   };
 
-  const ui = new UI(settingsConfig, builderConfig);
+  
 
   new DebuggerUI({ rootSelector: ".debugger", bjsEngine: engine });
+  
 
+  const activationConfig = document.createElement("div");
+activationConfig.classList.add("activation-config");
+
+const activationLabel = document.createElement("label");
+activationLabel.classList.add("sub");
+activationLabel.textContent = "Activation";
+
+activationConfig.append(activationLabel);
+
+  const shapeConfig = document.createElement("div");
+shapeConfig.classList.add("shape-config");
+
+const shapeLabel = document.createElement("label");
+shapeLabel.classList.add("sub");
+shapeLabel.textContent = "Shape";
+
+const shapeNumberInputs = document.createElement("div");
+shapeNumberInputs.classList.add("shape-number-inputs");
+
+shapeConfig.append(shapeLabel, shapeNumberInputs);
 
   const fw = new FloatingWindowUI({
     rootSelector: ".main-c",
-    children: [],
+    children: [activationConfig, shapeConfig],
+    attrs: undefined,
     styleString: undefined,
-
+    
     startPos: { x: 300, y: 300}
   });
-
-  const fw2 = new FloatingWindowUI({
-    rootSelector: ".main-c",
-    children: [],
-    styleString: undefined,
-
-    startPos: { x: 600, y: 300}
-  });
-
+  
+  const ui = new UI(settingsConfig, builderConfig);
   //Tests End
 
   engine.runRenderLoop(() => {

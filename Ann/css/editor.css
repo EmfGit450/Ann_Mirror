@@ -123,7 +123,7 @@ button:active {
   width: 100dvw;
   height: 100dvh;
   background: #0f0f0f;
-  z-index: 4;
+  z-index: 10000;
 
   padding: 2rem;
   font-family: "DM Sans";
@@ -161,17 +161,7 @@ button:active {
 }
 /*End*/
 
-/*Top Editor*/
-.top-editor {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin: 1rem;
-  z-index: 1;
-}
-/*End*/
-
-/*Center Editor*/
+/*Canvas*/
 .babylonjs-canvas {
   display: flex;
   flex-grow: 1;

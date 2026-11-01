@@ -16,7 +16,7 @@ export class DebuggerUI {
     //Init Start
     this.toggled = false;
 
-    const root = document.querySelector(config.rootSelector);
+    const root = document.querySelector(config.rootSelector) as HTMLElement;
 
     root.innerHTML = `
       <div class="debugger-top">
@@ -57,12 +57,12 @@ export class DebuggerUI {
 
     //API Start
     const apiValue = root.querySelector("#debugger-api")!;
-    apiValue.textContent = config.bjsEngine.isWebGPU ? "WebGPU" : `WebGL ${(config.bjsEngine as Engine).webGLVersion}`;
+    apiValue.innerHTML = config.bjsEngine.isWebGPU ? "WebGPU" : `WebGL&nbsp;${(config.bjsEngine as Engine).webGLVersion}`;
     //API End
 
     //Performance Start
-    const fpsValue = document.getElementById("debugger-fps");
-    const frameTimeValue = document.getElementById("debugger-deltaFrameTime");
+    const fpsValue = document.getElementById("debugger-fps")!;
+    const frameTimeValue = document.getElementById("debugger-deltaFrameTime")!;
 
     setInterval(() => {
       const fps = config.bjsEngine.getFps();
@@ -78,14 +78,14 @@ export class DebuggerUI {
     const debugPerformance = root.querySelector(".performance") as HTMLElement;
     const debugBody = root.querySelector(".debugger-body") as HTMLElement;
 
-    const toggleChevronGChildren = [...root.querySelector("g").children];
+    const toggleChevronGChildren = Array.from(root.querySelector("g")!.children);
 
     gsap.set(toggleChevronGChildren, { transformOrigin: "50% 50%" })
 
     debugPerformance.style.overflow = "hidden";
     debugBody.style.overflow = "hidden";
 
-    debugToggleBtn.addEventListener("click", () => {
+    debugToggleBtn!.addEventListener("click", () => {
       this.toggled = !this.toggled;
 
       gsap.to([debugPerformance, debugBody], {

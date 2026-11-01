@@ -2,6 +2,10 @@ interface FloatingWindowUIConfig {
   rootSelector: string;
 
   children: HTMLElement[];
+  attrs: { 
+    id: string | undefined,
+    classlist: string[] | undefined 
+  } | undefined;
   styleString: string | undefined;
 
   startPos: { x: number, y: number };
@@ -25,7 +29,13 @@ export class FloatingWindowUI {
     this.clientY = 0;
 
     const window = document.createElement("div");
+    
     window.classList.add("floating-window");
+    if (config.attrs) {
+      if (config.attrs.id) window.setAttribute("id", config.attrs.id);
+      if (config.attrs.classlist) config.attrs.classlist.forEach(classStr => { window.classList.add(classStr); });
+    }
+
     window.style = config.styleString ?? `
       min-width: 13rem;
       min-height: 17rem;
@@ -33,6 +43,7 @@ export class FloatingWindowUI {
       padding: 0.8rem;
       border: 1px solid #fff;
       border-radius: 0.7rem;
+      z-index: 3;
     `;
     window.style.position = "fixed";
 
