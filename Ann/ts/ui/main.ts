@@ -259,13 +259,6 @@ export class UI {
     this.builderUI.settings.forwardDirButtons.nz.addEventListener("click", () => { this.setForwardDirection(ForwardDirection.NegativeZ); });
     //Forward Direction End
 
-
-    //Activation Start
-    this.builderUI.createLayer.activation.setCallback(() => {
-      this.state.builder.createLayerMenu.activation = this.builderUI.createLayer.activation.getValue();
-    });
-    //Activation End
-
     //Layer Preview Start
     const utilLayer = new UtilityLayerRenderer(this.builderUI.connectedNet.scene);
     const gizmo = new AxisDragGizmo(new Vector3(1, 0, 0), new Color3(0.4, 0.4, 1), utilLayer);
@@ -316,47 +309,17 @@ export class UI {
     preview.setParent(this.builderUI.connectedNet.networkRoot);
     //Layer Preview End
 
-    //Shape Start
-    this.builderUI.createLayer.shape.forward.setCallback((next) => {
-      this.state.builder.createLayerMenu.shape.forward = this.builderUI.createLayer.shape.forward.getValue();
+    //Layer Creation Windows Start
+    this.builderUI.actions.addLayer.addEventListener("click", () => {
+      this.builderUI.createLayerWindows.push(
+        new FloatingWindowUI({
+          rootSelector: "body",
 
-      if (next * this.builderUI.createLayer.shape.vertical.getValue() * this.builderUI.createLayer.shape.horizontal.getValue() > 999) return false;
-
-      gsap.to(preview.scaling, {
-        x: next || 1,
-        ease: "circ.inOut",
-        duration: 0.2,
-        overwrite: "auto"
-      })
-      return true;
+          chidlre
+        })
+      )
     });
-    this.builderUI.createLayer.shape.vertical.setCallback((next) => {
-      this.state.builder.createLayerMenu.shape.vertical = this.builderUI.createLayer.shape.vertical.getValue();
-
-      if (this.builderUI.createLayer.shape.forward.getValue() * next * this.builderUI.createLayer.shape.horizontal.getValue() > 999) return false;
-
-      gsap.to(preview.scaling, {
-        y: next || 1,
-        ease: "circ.inOut",
-        duration: 0.2,
-        overwrite: "auto"
-      })
-      return true;
-    });
-    this.builderUI.createLayer.shape.horizontal.setCallback((next) => {
-      this.state.builder.createLayerMenu.shape.horizontal = this.builderUI.createLayer.shape.horizontal.getValue();
-
-      if (this.builderUI.createLayer.shape.forward.getValue() * this.builderUI.createLayer.shape.vertical.getValue() * next > 999) return false;
-
-      gsap.to(preview.scaling, {
-        z: next || 1,
-        ease: "circ.inOut",
-        duration: 0.2,
-        overwrite: "auto"
-      })
-      return true;
-    });
-    //Shape End
+    //Layer Creation Windows End
 
     //Builder End
   }
@@ -386,6 +349,17 @@ export class UI {
     }
 
     this.state.builder.settings.forwardDirection = dir;
+  }
+
+  newCreateLayerWindow(id: string) {
+    new FloatingWindowUI({
+      rootSelector: "body",
+
+      children: [],
+      attrs: { id: id, classlist: undefined },
+      styleString: undefined,
+      startPos: { x: 0, y: 0 };
+    });
   }
 
 }

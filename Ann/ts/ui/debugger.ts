@@ -14,7 +14,7 @@ export class DebuggerUI {
 
   constructor(config: DebuggerUIConfig) {
     //Init Start
-    this.toggled = false;
+    this.toggled = true;
 
     const root = document.querySelector(config.rootSelector) as HTMLElement;
 
