@@ -9,6 +9,7 @@
     "prettier": "^3.9.9"
   },
   "scripts": {
+    "build": "node build.mjs",
     "watch": "node build.mjs --watch",
     "serve": "python3 -m http.server 8192",
     "check": "tsc --noEmit",

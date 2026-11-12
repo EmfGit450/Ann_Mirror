@@ -3,9 +3,7 @@ pages:
   script:
   - mkdir -p public
   - cp -r Ann public/
-  - cp index.html public/
-  - cp index.css public/
-  - cp index.js public/
+  - cp index.* public/
   artifacts:
     paths:
       - public

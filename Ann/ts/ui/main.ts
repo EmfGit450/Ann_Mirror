@@ -39,8 +39,6 @@ interface BuilderConfig {
     addLayerSelector: string;
   };
 
-  createLayerMenuConfig: LayerCreationMenuConfig;
-
   settings: {
     forwardDirButtonSelectors: {
       px: string, nx: string,
@@ -48,15 +46,6 @@ interface BuilderConfig {
       pz: string, nz: string,
     };
   }
-}
-
-interface LayerCreationMenuConfig {
-  activation: {
-    rootSelector: string;
-  }
-  shape: {
-    rootSelector: string;
-  };
 }
 
 
