@@ -1,2 +1,1 @@
-polish debugger                    [ ]
-Create a proper z-index hierarchy  [ ]
+finish the multiple windows rewrite

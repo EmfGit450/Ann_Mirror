@@ -1,7 +1,8 @@
 import { gsap } from "gsap";
 
 interface DropdownUIConfig {
-  rootSelector: string;
+  rootSelector: string | undefined;
+  rootElement: HTMLElement | undefined;
 
   initialValueIndex: number;
   options: string[];
@@ -17,6 +18,9 @@ export class DropdownUI {
   constructor(config: DropdownUIConfig) {
     this.value = config.options[config.initialValueIndex] as string;
     this.callback = () => {};
+
+    console.assert(!config.rootSelector && !config.rootElement, "rootSelector and rootElement are undefined, no root to append to");
+    console.assert(config.rootSelector != null && config.rootElement != null, "rootSelector and rootElement are defined, root ambiguity");
 
     const root = document.createElement("div");
     root.classList.add("dropdown");
@@ -94,7 +98,8 @@ export class DropdownUI {
       });
     }
 
-    document.querySelector(config.rootSelector)!.append(root);
+    if (config.rootSelector) document.querySelector(config.rootSelector!)!.append(root);
+    else config.rootElement!.append(root);
   }
 
   getValue() {

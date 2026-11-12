@@ -311,13 +311,7 @@ export class UI {
 
     //Layer Creation Windows Start
     this.builderUI.actions.addLayer.addEventListener("click", () => {
-      this.builderUI.createLayerWindows.push(
-        new FloatingWindowUI({
-          rootSelector: "body",
-
-          chidlre
-        })
-      )
+      this.newCreateLayerWindow(crypto.randomUUID());
     });
     //Layer Creation Windows End
 
@@ -352,14 +346,60 @@ export class UI {
   }
 
   newCreateLayerWindow(id: string) {
-    new FloatingWindowUI({
+    //Init Start
+    const activationConfig = document.createElement("div");
+    activationConfig.classList.add("activation-config");
+
+    const activationLabel = document.createElement("label");
+    activationLabel.classList.add("sub");
+    activationLabel.textContent = "Activation";
+
+    activationConfig.append(activationLabel);
+
+    const shapeConfig = document.createElement("div");
+    shapeConfig.classList.add("shape-config");
+
+    const shapeLabel = document.createElement("label");
+    shapeLabel.classList.add("sub");
+    shapeLabel.textContent = "Shape";
+
+    const shapeNumberInputs = document.createElement("div");
+    shapeNumberInputs.classList.add("shape-number-inputs");
+
+    shapeConfig.append(shapeLabel, shapeNumberInputs);
+
+    const window = new FloatingWindowUI({
       rootSelector: "body",
 
-      children: [],
-      attrs: { id: id, classlist: undefined },
+      children: [activationConfig, shapeConfig],
+      attrs: { id, classlist: undefined },
       styleString: undefined,
-      startPos: { x: 0, y: 0 };
+      startPos: { x: 0, y: 0 }
     });
+
+    this.builderUI.createLayerWindows.push(window);
+
+    const initialState: LayerCreationMenuState = {
+      activation: "Linear",
+      shape: {
+        forward: 1,
+        vertical: 1,
+        horizontal: 1
+      }
+    };
+
+    this.state.builder.createLayerWindowStates.push(initialState);
+    //Init End
+
+    //Events Start
+    const activationDropdown = new DropdownUI({
+      rootSelector: undefined,
+      rootElement: activationConfig,
+
+      options: ["Linear", "Sigmoid", "Tanh", "Mish", "Swish", "Softplus", "ReLU", "LeakyReLU", "GELU", "ELU", "Softmax"],
+      initialValueIndex: 0
+    });
+    //Events End
   }
 
 }
