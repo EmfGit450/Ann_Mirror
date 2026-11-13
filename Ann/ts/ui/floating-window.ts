@@ -1,3 +1,5 @@
+import { NumberInputUI } from "./number-input";
+
 interface FloatingWindowUIConfig {
   rootSelector: string;
 
@@ -6,7 +8,7 @@ interface FloatingWindowUIConfig {
     id: string | undefined,
     classlist: string[] | undefined
   } | undefined;
-  styleString: string | undefined;
+  stylesObject: object | undefined;
 
   startPos: { x: number, y: number };
 }
@@ -21,14 +23,11 @@ export class FloatingWindowUI {
     clientX: number;
     clientY: number;
 
-    deltaX: number;
-    deltaY: number;
-
     transX: number;
     transY: number;
   };
 
-  childIds: string[];
+  children: HTMLElement[];
 
   data: object | undefined;
 
@@ -42,12 +41,11 @@ export class FloatingWindowUI {
       clientX: 0,
       clientY: 0,
 
-      deltaX: 0,
-      deltaY: 0,
-
       transX: config.startPos.x,
       transY: config.startPos.y
     }
+    
+    this.children = config.children;
 
     const window = document.createElement("div");
 
@@ -57,15 +55,19 @@ export class FloatingWindowUI {
       if (config.attrs.classlist) config.attrs.classlist.forEach(classStr => { window.classList.add(classStr); });
     }
 
-    window.style.cssText = config.styleString ?? `
-      width: 208px;
-      height: 272px;
-      background: #0d0d0dfa;
-      padding: 0.8rem;
-      border: 1px solid #fff;
-      border-radius: 0.7rem;
-      z-index: 3;
-    `;
+    Object.assign(window.style, {
+      width:"208px",
+      height: "272px",
+      background: "#0d0d0dfa",
+      padding: "0.8rem",
+      border: "1px solid #fff",
+      borderRadius: "0.7rem",
+      zIndex: "3"
+    });
+
+    //Modifies default
+    Object.assign(window.style, config.stylesObject);
+
     window.style.position = "fixed";
 
     this.state.zIndex = parseInt(window.style.zIndex);
@@ -79,6 +81,8 @@ export class FloatingWindowUI {
         <path d="M 2 12 L 22 12 M 12 2 L 12 22 M 2 12 L 5 15 M 2 12 L 5 9 M 22 12 L 19 15 M 22 12 L 19 9 M 12 2 L 15 5 M 12 2 L 9 5 M 12 22 L 9 19 M 12 22 L 15 19"/>
       </svg>
     `;
+
+    dragger.style.cursor = "move"; 
 
     document.addEventListener("pointerdown", (e) => {
       if (!dragger.contains(e.target as Node)) return;
@@ -96,13 +100,8 @@ export class FloatingWindowUI {
       const newCX = e.clientX;
       const newCY = e.clientY;
 
-      this.state.deltaX = newCX - this.state.clientX;
-      this.state.deltaY = newCY - this.state.clientY;
-
-      this.state.transX += this.state.deltaX;
-      this.state.transY += this.state.deltaY;
-
-      console.log(this.state.deltaX, this.state.deltaY);
+      this.state.transX += newCX - this.state.clientX;
+      this.state.transY += newCY - this.state.clientY;
 
       window.style.transform = `translate(${this.state.transX}px, ${this.state.transY}px)`;
 
@@ -120,76 +119,79 @@ export class FloatingWindowUI {
       this.state.pointerId = undefined;
     });
 
-    window.append(dragger);
-
-    this.childIds = [];
-
-    for (let child of config.children) {
-      if (child.getAttribute("id") == null) child.setAttribute("id", crypto.randomUUID());
-      window.append(child);
-      this.childIds.push(child.getAttribute("id")!);
-    }
+    window.append(dragger, ...config.children);
 
     document.querySelector(config.rootSelector)!.append(window);
   }
 }
 
 
-interface FloatingWindowSystemUIConfig {
-  windowConfig: FloatingWindowUIConfig;
-
+interface LayerCreationWindowsUIConfig {
   maxWindows: number;
   baseZindex: number;
 
   spawnStartPos: { x: number, y: number };
 }
 
-class FloatingWindowSystemUI {
-  windowConfig: FloatingWindowUIConfig;
-  windowWidth!: number;
-  windowHeight!: number;
+class LayerCreationWindowsUI {
+  windows: FloatingWindowUI[];
 
   windowCount: number;
 
-  maxWindows!: number;
-  baseZindex!: number;
+  maxWindows: number;
+  baseZindex: number;
 
-  constructor(config: FloatingWindowSystemUIConfig) {
-    this.windowConfig = config.windowConfig;
+  constructor(config: LayerCreationWindowsUIConfig) {
+    this.windows = [];
 
     this.windowCount = 0;
-
-    let wMatch = this.windowConfig.styleString!.match(/width: *;/);
-    let wStr: string = (wMatch != null ? wMatch[0].split(" ")[1] : "208px")!;
-
-    let wUnitStr = wStr[wStr.length - 2]! + wStr[wStr.length - 1]!;
-    if (wUnitStr != "px") {
-      console.error("Width must be given in px");
-      return;
-    }
-
-    let wNumStr = "";
-    for (let i = 0; i < wStr.length - wUnitStr.length; i++) wNumStr += wStr[i];
-    this.windowWidth = parseInt(wNumStr);
-
-    let hMatch = this.windowConfig.styleString!.match(/width: *;/);
-    let hStr: string = (hMatch != null ? hMatch[0].split(" ")[1] : "272px")!;
-
-    let hUnitStr = hStr[hStr.length - 2]! + hStr[hStr.length - 1]!;
-    if (hUnitStr != "px") {
-      console.error("Width must be given in px");
-      return;
-    }
-
-    let hNumStr = "";
-    for (let i = 0; i < hStr.length - hUnitStr.length; i++) hNumStr += hStr[i];
-    this.windowHeight = parseInt(hNumStr);
 
     this.maxWindows = config.maxWindows;
     this.baseZindex = config.baseZindex;
   }
 
-  newFloatingWindow() {
+  newWindow() {
+    if (this.windowCount == this.maxWindows) {
+      console.error("Maximum window count reached");
+      return;
+    }
 
+    const activationConfig = document.createElement("div");
+    activationConfig.classList.add("activation-config");
+
+    const activationLabel = document.createElement("label");
+    activationLabel.classList.add("sub");
+    activationLabel.textContent = "Activation";
+
+    activationConfig.append(activationLabel);
+
+    const shapeConfig = document.createElement("div");
+    shapeConfig.classList.add("shape-config");
+
+    const shapeLabel = document.createElement("label");
+    shapeLabel.classList.add("sub");
+    shapeLabel.textContent = "Shape";
+
+    const shapeNumberInputs = document.createElement("div");
+    shapeNumberInputs.classList.add("shape-number-inputs");
+
+    shapeConfig.append(shapeLabel, shapeNumberInputs);
+
+    const floatingWindow = new FloatingWindowUI({
+      rootSelector: "body",
+
+      children: [activationConfig, shapeConfig],
+      attrs: undefined,
+      stylesObject: { zIndex: this.baseZindex },
+      startPos: { x: 0, y: 0 }
+    });
+
+     const numberInput1 = new NumberInputUI({
+      rootSelector: undefined,
+      rootElement: shapeNumberInputs,
+
+      initial: 1, min: 1, max: 1000
+     });
+    
   }
 }

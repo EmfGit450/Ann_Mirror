@@ -3,7 +3,8 @@ type None = undefined;
 type CommitBool = boolean;
 
 interface NumberInputConfig {
-  rootSelector: string;
+  rootSelector: string | undefined;
+  rootElement: HTMLElement | undefined;
   
   initial: number;
   min: number | None;
@@ -29,6 +30,9 @@ export class NumberInputUI {
     
     //@ts-ignore
     this.callback = (next: number): CommitBool => { return true; };
+
+    console.assert(!config.rootSelector && !config.rootElement, "rootSelector and rootElement are undefined, no root to append to");
+    console.assert(config.rootSelector != null && config.rootElement != null, "rootSelector and rootElement are defined, root ambiguity");
     
     const numInputDiv = document.createElement("div");
     numInputDiv.classList.add("number-input");
@@ -48,7 +52,8 @@ export class NumberInputUI {
       </button>
     `;
 
-    document.querySelector(config.rootSelector)!.append(numInputDiv);
+    if (config.rootSelector) document.querySelector(config.rootSelector!)!.append(numInputDiv);
+    else config.rootElement!.append(numInputDiv);
 
     const incrementer = numInputDiv.children[0]! as HTMLButtonElement;
     const valueEl = numInputDiv.children[1]!;
@@ -100,30 +105,8 @@ export class NumberInputUI {
         }, 600)
       }, 500);
     });
-    
-    incrementer.addEventListener("pointerup", () => {
-      if (this.incrementIntervalId) {
-        clearInterval(this.incrementIntervalId);
-        this.incrementIntervalId = undefined;
-      }
-      if (this.incrementTimeoutId) {
-        clearTimeout(this.incrementTimeoutId);
-        this.incrementTimeoutId = undefined;
-      }
-    });
-    
-    incrementer.addEventListener("pointerleave", () => {
-      if (this.incrementIntervalId) {
-        clearInterval(this.incrementIntervalId);
-        this.incrementIntervalId = undefined;
-      }
-      if (this.incrementTimeoutId) {
-        clearTimeout(this.incrementTimeoutId);
-        this.incrementTimeoutId = undefined;
-      }
-    });
 
-    incrementer.addEventListener("pointercancel", () => {
+    const incup = () => {
       if (this.incrementIntervalId) {
         clearInterval(this.incrementIntervalId);
         this.incrementIntervalId = undefined;
@@ -132,7 +115,11 @@ export class NumberInputUI {
         clearTimeout(this.incrementTimeoutId);
         this.incrementTimeoutId = undefined;
       }
-    });
+    }
+    
+    incrementer.addEventListener("pointerup", incup);
+    incrementer.addEventListener("pointerleave", incup);
+    incrementer.addEventListener("pointercancel", incup);
     //Incrementer End
     
     //Decrementer Start
@@ -175,19 +162,8 @@ export class NumberInputUI {
         }, 600)
       }, 500);
     });
-    
-    decrementer.addEventListener("pointerup", () => {
-      if (this.decrementIntervalId) {
-        clearInterval(this.decrementIntervalId);
-        this.decrementIntervalId = undefined;
-      }
-      if (this.decrementTimeoutId) {
-        clearTimeout(this.decrementTimeoutId);
-        this.decrementTimeoutId = undefined;
-      }
-    });
 
-    decrementer.addEventListener("pointerleave", () => {
+    const decup = () => {
       if (this.decrementIntervalId) {
         clearInterval(this.decrementIntervalId);
         this.decrementIntervalId = undefined;
@@ -196,17 +172,11 @@ export class NumberInputUI {
         clearTimeout(this.decrementTimeoutId);
         this.decrementTimeoutId = undefined;
       }
-    });
-    decrementer.addEventListener("pointercancel", () => {
-      if (this.decrementIntervalId) {
-        clearInterval(this.decrementIntervalId);
-        this.decrementIntervalId = undefined;
-      }
-      if (this.decrementTimeoutId) {
-        clearTimeout(this.decrementTimeoutId);
-        this.decrementTimeoutId = undefined;
-      }
-    });
+    }
+    
+    decrementer.addEventListener("pointerup", decup);
+    decrementer.addEventListener("pointerleave", decup);
+    decrementer.addEventListener("pointercancel", decup);
     //Decrementer End
   }
 
