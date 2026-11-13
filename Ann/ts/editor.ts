@@ -190,6 +190,8 @@ shapeConfig.append(shapeLabel, shapeNumberInputs);
     
     startPos: { x: 300, y: 300}
   });
+
+  console.log(fw);
   
   const ui = new UI(settingsConfig, builderConfig);
   //Tests End

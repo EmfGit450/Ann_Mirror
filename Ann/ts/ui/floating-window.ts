@@ -21,18 +21,33 @@ export class FloatingWindowUI {
     clientX: number;
     clientY: number;
 
+    deltaX: number;
+    deltaY: number;
+
     transX: number;
     transY: number;
   };
 
-  data: object;
+  childIds: string[];
+
+  data: object | undefined;
 
   constructor(config: FloatingWindowUIConfig) {
-    this.state.pointerId = undefined;
-    this.state.isDragging = false;
+    this.state = {
+      zIndex: 3,
 
-    this.state.clientX = 0;
-    this.state.clientY = 0;
+      pointerId: undefined,
+      isDragging: false,
+
+      clientX: 0,
+      clientY: 0,
+
+      deltaX: 0,
+      deltaY: 0,
+
+      transX: config.startPos.x,
+      transY: config.startPos.y
+    }
 
     const window = document.createElement("div");
 
@@ -43,8 +58,8 @@ export class FloatingWindowUI {
     }
 
     window.style.cssText = config.styleString ?? `
-      min-width: 13rem;
-      min-height: 17rem;
+      width: 208px;
+      height: 272px;
       background: #0d0d0dfa;
       padding: 0.8rem;
       border: 1px solid #fff;
@@ -53,11 +68,7 @@ export class FloatingWindowUI {
     `;
     window.style.position = "fixed";
 
-    const regexp = /z-index: \d/;
-    this.zIndex = parseInt(window.style.cssText.match(regexp)[0].split(" ")[1]);
-
-    this.state.transX = config.startPos.x;
-    this.state.transY = config.startPos.y;
+    this.state.zIndex = parseInt(window.style.zIndex);
 
     window.style.transform = `translate(${this.state.transX}px, ${this.state.transY}px)`;
 
@@ -85,8 +96,13 @@ export class FloatingWindowUI {
       const newCX = e.clientX;
       const newCY = e.clientY;
 
-      this.state.transX += newCX - this.state.clientX;
-      this.state.transY += newCY - this.state.clientY;
+      this.state.deltaX = newCX - this.state.clientX;
+      this.state.deltaY = newCY - this.state.clientY;
+
+      this.state.transX += this.state.deltaX;
+      this.state.transY += this.state.deltaY;
+
+      console.log(this.state.deltaX, this.state.deltaY);
 
       window.style.transform = `translate(${this.state.transX}px, ${this.state.transY}px)`;
 
@@ -106,110 +122,74 @@ export class FloatingWindowUI {
 
     window.append(dragger);
 
+    this.childIds = [];
 
-    for (let child of config.children) window.append(child);
+    for (let child of config.children) {
+      if (child.getAttribute("id") == null) child.setAttribute("id", crypto.randomUUID());
+      window.append(child);
+      this.childIds.push(child.getAttribute("id")!);
+    }
 
     document.querySelector(config.rootSelector)!.append(window);
   }
 }
 
 
-interface DependentFloatingWindowUIConfig {
-  rootSelector: string;
+interface FloatingWindowSystemUIConfig {
+  windowConfig: FloatingWindowUIConfig;
 
-  children: HTMLElement[];
-  attrs: {
-    id: string | undefined,
-    classlist: string[] | undefined
-  } | undefined;
-  styleString: string | undefined;
+  maxWindows: number;
+  baseZindex: number;
 
-  startPos: { x: number, y: number };
+  spawnStartPos: { x: number, y: number };
 }
 
-export class DependentFloatingWindowUI {
-  pointerId: number | undefined;
-  isDragging: boolean;
+class FloatingWindowSystemUI {
+  windowConfig: FloatingWindowUIConfig;
+  windowWidth!: number;
+  windowHeight!: number;
 
-  clientX: number;
-  clientY: number;
+  windowCount: number;
 
-  transX: number;
-  transY: number;
+  maxWindows!: number;
+  baseZindex!: number;
 
-  constructor(config: FloatingWindowUIConfig) {
-    this.pointerId = undefined;
-    this.isDragging = false;
+  constructor(config: FloatingWindowSystemUIConfig) {
+    this.windowConfig = config.windowConfig;
 
-    this.clientX = 0;
-    this.clientY = 0;
+    this.windowCount = 0;
 
-    const window = document.createElement("div");
+    let wMatch = this.windowConfig.styleString!.match(/width: *;/);
+    let wStr: string = (wMatch != null ? wMatch[0].split(" ")[1] : "208px")!;
 
-    window.classList.add("floating-window");
-    if (config.attrs) {
-      if (config.attrs.id) window.setAttribute("id", config.attrs.id);
-      if (config.attrs.classlist) config.attrs.classlist.forEach(classStr => { window.classList.add(classStr); });
+    let wUnitStr = wStr[wStr.length - 2]! + wStr[wStr.length - 1]!;
+    if (wUnitStr != "px") {
+      console.error("Width must be given in px");
+      return;
     }
 
-    window.style = config.styleString ?? `
-      min-width: 13rem;
-      min-height: 17rem;
-      background: #0d0d0dfa;
-      padding: 0.8rem;
-      border: 1px solid #fff;
-      border-radius: 0.7rem;
-      z-index: 3;
-    `;
-    window.style.position = "fixed";
+    let wNumStr = "";
+    for (let i = 0; i < wStr.length - wUnitStr.length; i++) wNumStr += wStr[i];
+    this.windowWidth = parseInt(wNumStr);
 
-    this.transX = config.startPos.x;
-    this.transY = config.startPos.y;
+    let hMatch = this.windowConfig.styleString!.match(/width: *;/);
+    let hStr: string = (hMatch != null ? hMatch[0].split(" ")[1] : "272px")!;
 
-    window.style.transform = `translate(${this.transX}px, ${this.transY}px)`;
+    let hUnitStr = hStr[hStr.length - 2]! + hStr[hStr.length - 1]!;
+    if (hUnitStr != "px") {
+      console.error("Width must be given in px");
+      return;
+    }
 
+    let hNumStr = "";
+    for (let i = 0; i < hStr.length - hUnitStr.length; i++) hNumStr += hStr[i];
+    this.windowHeight = parseInt(hNumStr);
 
-    const dragger = document.createElement("button");
-    dragger.innerHTML = `
-      <svg viewBox="0 0 24 24" stroke="#000" stroke-width="1.5" stroke-linecap="round">
-        <path d="M 2 12 L 22 12 M 12 2 L 12 22 M 2 12 L 5 15 M 2 12 L 5 9 M 22 12 L 19 15 M 22 12 L 19 9 M 12 2 L 15 5 M 12 2 L 9 5 M 12 22 L 9 19 M 12 22 L 15 19"/>
-      </svg>
-    `;
+    this.maxWindows = config.maxWindows;
+    this.baseZindex = config.baseZindex;
+  }
 
-    document.addEventListener("pointerdown", (e) => {
-      if (!dragger.contains(e.target as Node)) return;
+  newFloatingWindow() {
 
-      this.pointerId = e.pointerId;
-      this.isDragging = true;
-
-      this.clientX = e.clientX;
-      this.clientY = e.clientY;
-    }, { capture: true });
-
-    document.addEventListener("pointermove", (e) => {
-      if (e.pointerId != this.pointerId || !this.isDragging) return;
-
-      const newCX = e.clientX;
-      const newCY = e.clientY;
-
-      this.transX += newCX - this.clientX;
-      this.transY += newCY - this.clientY;
-
-      window.style.transform = `translate(${this.transX}px, ${this.transY}px)`;
-
-      this.clientX = newCX;
-      this.clientY = newCY;
-    });
-
-    document.addEventListener("pointerup", () => { this.isDragging = false; this.pointerId = undefined; });
-
-    document.addEventListener("pointercancel", () => { this.isDragging = false; this.pointerId = undefined; });
-
-    window.append(dragger);
-
-
-    for (let child of config.children) window.append(child);
-
-    document.querySelector(config.rootSelector)!.append(window);
   }
 }
