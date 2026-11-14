@@ -19,6 +19,7 @@ export class FloatingWindowUI {
 
     pointerId: number | undefined;
     isDragging: boolean;
+    cursorMoveSet: boolean;
 
     clientX: number;
     clientY: number;
@@ -37,6 +38,7 @@ export class FloatingWindowUI {
 
       pointerId: undefined,
       isDragging: false,
+      cursorMoveSet: false,
 
       clientX: 0,
       clientY: 0,
@@ -97,6 +99,12 @@ export class FloatingWindowUI {
     document.addEventListener("pointermove", (e) => {
       if (e.pointerId != this.state.pointerId || !this.state.isDragging) return;
 
+      if (!this.state.cursorMoveSet) {
+        document.body.style.cursor = "move";
+        this.state.cursorMoveSet = true;
+      }
+
+
       const newCX = e.clientX;
       const newCY = e.clientY;
 
@@ -109,15 +117,15 @@ export class FloatingWindowUI {
       this.state.clientY = newCY;
     });
 
-    document.addEventListener("pointerup", () => {
+    const onup = () => {
       this.state.isDragging = false;
       this.state.pointerId = undefined;
-    });
+      this.state.cursorMoveSet = false;
+      document.body.style.cursor = "auto";
+    }
 
-    document.addEventListener("pointercancel", () => {
-      this.state.isDragging = false;
-      this.state.pointerId = undefined;
-    });
+    document.addEventListener("pointerup", onup);
+    document.addEventListener("pointercancel", onup);
 
     window.append(dragger, ...config.children);
 
